@@ -144,6 +144,21 @@
         <div v-if="incomingCustomer" style="display: flex; gap: 4px; justify-content: center; margin-top: 10px">
           <risk-tag v-for="t in incomingCustomer.riskTags" :key="t" :type="t" />
         </div>
+        <!-- OPT-3:命中标签规则时的预览 -->
+        <div v-if="incomingAlert" style="margin-top: 14px; padding: 10px 12px; border-radius: 6px; background: rgba(245, 34, 45, 0.08); border: 1px solid rgba(245, 34, 45, 0.2)">
+          <div style="font-weight: 600; color: #f5222d; font-size: 13px">
+            <icon-warning /> {{ incomingAlert.title }}
+          </div>
+          <div style="font-size: 12px; color: var(--cp-text-secondary); margin-top: 4px">
+            <template v-for="(a, i) in incomingAlert.actions" :key="i">
+              <a-tag color="red" size="small" style="margin-right: 4px">{{ a }}</a-tag>
+            </template>
+          </div>
+          <div v-if="incomingHitRules.length" style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 4px">
+            命中 {{ incomingHitRules.length }} 条规则:
+            <span style="margin-left: 4px">{{ incomingHitRules.map(r => r.ruleName).join(' · ') }}</span>
+          </div>
+        </div>
         <div class="cp-incoming-actions">
           <a-button size="large" @click="declineCall">拒接</a-button>
           <a-button size="large" type="primary" status="success" @click="answerCall">
@@ -169,6 +184,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWorkbenchStore } from '@/stores/workbench'
+import { useTagRuleStore, RiskTag as RiskTagType } from '@/stores/tagRule'
 import { customers, tickets } from '@/mock/data'
 import RiskTag from '@/components/RiskTag.vue'
 import TicketDetail from './TicketDetail.vue'
@@ -276,6 +292,17 @@ function manualCall(c: any) {
 const incomingCustomer = computed(() => {
   const cid = wb.incoming?.customerId
   return cid ? customers.find(c => c.id === cid) : null
+})
+
+// OPT-3:来电客户命中的标签规则(给坐席接通前预览)
+const tagRuleStore = useTagRuleStore()
+const incomingAlert = computed(() => {
+  if (!incomingCustomer.value) return null
+  return tagRuleStore.firstAlert(incomingCustomer.value.riskTags as RiskTagType[])
+})
+const incomingHitRules = computed(() => {
+  if (!incomingCustomer.value) return []
+  return tagRuleStore.applyToCustomer(incomingCustomer.value.riskTags as RiskTagType[]).hitRules
 })
 
 function simulateIncoming() {

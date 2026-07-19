@@ -79,6 +79,8 @@
 
       <!-- 内容区 -->
       <a-layout-content class="cp-content">
+        <!-- OPT-1: 实时指令 banner(登录态下展示当前角色指令收件箱) -->
+        <InstructionCenter v-if="userStore.currentRole" />
         <router-view v-slot="{ Component }">
           <transition name="cp-fade" mode="out-in">
             <component :is="Component" />
@@ -117,6 +119,7 @@ import { useUserStore, ROLE_LIST, RoleKey } from '@/stores/user'
 import { useWorkflowStore } from '@/stores/workflow'
 import { alerts } from '@/mock/data'
 import NotificationCenter from '@/components/NotificationCenter.vue'
+import InstructionCenter from '@/components/InstructionCenter.vue'
 
 const route = useRoute()
 const router = useRouter()

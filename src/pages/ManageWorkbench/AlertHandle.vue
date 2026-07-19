@@ -86,6 +86,47 @@
           <a-radio value="ignore">忽略 - 仅限低优先级预警</a-radio>
         </a-radio-group>
 
+        <a-divider style="margin: 16px 0" />
+        <h4 style="margin: 0 0 8px; font-size: 14px">快速指令(OPT-1 · 实时)</h4>
+        <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 8px">
+          不走工作流,直接给坐席/业务执行/审查下达指令。坐席可在 AgentDesk 顶部 banner 接收。
+        </div>
+        <a-form :model="instructionForm" layout="vertical" size="small">
+          <a-row :gutter="8">
+            <a-col :span="12">
+              <a-form-item label="接收方">
+                <a-select v-model="instructionForm.toRole">
+                  <a-option value="agent">坐席</a-option>
+                  <a-option value="business">业务执行</a-option>
+                  <a-option value="review">审查</a-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="紧急度">
+                <a-select v-model="instructionForm.priority">
+                  <a-option value="urgent">紧急</a-option>
+                  <a-option value="high">高</a-option>
+                  <a-option value="normal">普通</a-option>
+                  <a-option value="low">低</a-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-form-item label="标题">
+            <a-input v-model="instructionForm.title" placeholder="例:严防催收红线" />
+          </a-form-item>
+          <a-form-item label="内容">
+            <a-textarea v-model="instructionForm.content" :rows="3" placeholder="例:客户已被列入失信,杜绝上门" />
+          </a-form-item>
+          <a-form-item label="截止时间(可选)">
+            <a-input v-model="instructionForm.deadline" placeholder="例:2026-07-15 18:00" />
+          </a-form-item>
+          <a-button type="primary" size="small" long status="warning" @click="sendInstruction">
+            下达指令
+          </a-button>
+        </a-form>
+
         <div class="cp-form" style="margin-top: 16px">
           <a-form-item label="处置意见" required>
             <a-textarea v-model="opinion" :rows="4" placeholder="请填写处置意见..." />
@@ -124,11 +165,53 @@ import { ref } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useWorkflowStore } from '@/stores/workflow'
 import { useAlertStore } from '@/stores/alert'
+import { useInstructionStore, InstructionPriority, InstructionRole } from '@/stores/instruction'
+import { useUserStore, getRoleInfo } from '@/stores/user'
 import WorkflowTodosCard from '@/components/WorkflowTodosCard.vue'
 import { Message } from '@arco-design/web-vue'
 
 const wf = useWorkflowStore()
 const alertStore = useAlertStore()
+const instructionStore = useInstructionStore()
+const userStore = useUserStore()
+
+// OPT-1:快速指令表单(管理层下达)
+const instructionForm = ref({
+  toRole: 'agent' as InstructionRole,
+  priority: 'high' as InstructionPriority,
+  title: '',
+  content: '',
+  deadline: ''
+})
+
+function sendInstruction() {
+  if (!current.value) {
+    Message.warning('请先选中一个预警')
+    return
+  }
+  if (!instructionForm.value.title || !instructionForm.value.content) {
+    Message.warning('标题与内容必填')
+    return
+  }
+  const fromRole = userStore.currentRole || 'manage'
+  const fromOperator = (userStore.currentRole ? getRoleInfo(userStore.currentRole)?.username : '管理层') || '管理层'
+  const ins = instructionStore.create({
+    fromRole,
+    fromOperator,
+    toRole: instructionForm.value.toRole,
+    title: instructionForm.value.title,
+    content: instructionForm.value.content,
+    priority: instructionForm.value.priority,
+    alertId: current.value.id,
+    ticketId: current.value.relatedTicket,
+    deadline: instructionForm.value.deadline || undefined
+  })
+  Message.success(`指令已下达:${ins.id},接收方 ${instructionForm.value.toRole}`)
+  // 清空
+  instructionForm.value.title = ''
+  instructionForm.value.content = ''
+  instructionForm.value.deadline = ''
+}
 const alerts = alertStore.items
 
 const showDrawer = ref(false)

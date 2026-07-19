@@ -39,13 +39,20 @@
       </template>
     </a-page-header>
 
-    <!-- 顶部预警(不可关闭) - 由 useTagRuleStore 驱动(P2-9) -->
+    <!-- 顶部预警(不可关闭) - 由 useTagRuleStore 驱动(P2-9,OPT-3 升级) -->
     <a-alert v-if="alertLevel" :type="alertLevel.type" show-icon style="margin-bottom: 16px">
       <template #title>{{ alertLevel.title }}</template>
       <template #content>
         <div style="margin-top: 4px">
           建议处置:
           <a-tag v-for="a in alertLevel.actions" :key="a" :color="alertLevel.type === 'error' ? 'red' : 'orange'" style="margin-left: 4px">{{ a }}</a-tag>
+        </div>
+        <!-- OPT-3:列出命中的具体规则与描述 -->
+        <div v-if="hitRules.length" style="margin-top: 8px; font-size: 12px">
+          <span style="color: var(--cp-text-tertiary)">命中规则 ({{ hitRules.length }} 条):</span>
+          <a-tag v-for="r in hitRules" :key="r.ruleId" color="arcoblue" size="small" style="margin-left: 4px">
+            {{ r.ruleName }}
+          </a-tag>
         </div>
       </template>
     </a-alert>
@@ -768,6 +775,12 @@ const restrictNotes = computed(() => {
 const upgradeNotes = computed(() => {
   if (!customer.value) return []
   return tagRule.autoUpgradeNotes(customer.value.riskTags as RiskTagType[])
+})
+
+/** OPT-3:命中规则详情列表(供 banner 展示) */
+const hitRules = computed(() => {
+  if (!customer.value) return []
+  return tagRule.applyToCustomer(customer.value.riskTags as RiskTagType[]).hitRules
 })
 
 /** 命中"自动升级"规则时一键发起 alert_directive 工作流 */

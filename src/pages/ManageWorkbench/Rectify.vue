@@ -228,6 +228,37 @@
         <a-form-item label="验证说明">
           <a-textarea v-model="verifyForm.note" :rows="3" placeholder="说明验证依据、抽样结果等" />
         </a-form-item>
+
+        <!-- OPT-2:验证通过时,一键生成标准项 -->
+        <div v-if="verifyForm.result === 'pass'" style="margin-top: 16px; padding: 12px; background: rgba(20, 148, 232, 0.05); border: 1px solid rgba(20, 148, 232, 0.2); border-radius: 6px">
+          <a-checkbox v-model="verifyForm.alsoGenerateStandard">
+            <b>同步沉淀为审查标准(OPT-2 一键生成)</b>
+          </a-checkbox>
+          <div style="font-size: 12px; color: var(--cp-text-tertiary); margin: 4px 0 12px">
+            验证通过的标准会自动带 `source: rectify` 标签,可在 `/review/standards` 中筛选查看。
+          </div>
+          <a-form-item v-if="verifyForm.alsoGenerateStandard" label="标准大类">
+            <a-select v-model="verifyForm.stdCategory">
+              <a-option>产品审查</a-option>
+              <a-option>催收规范</a-option>
+              <a-option>客户适当性</a-option>
+              <a-option>信息披露</a-option>
+              <a-option>应急预案</a-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item v-if="verifyForm.alsoGenerateStandard" label="标准条款">
+            <a-input v-model="verifyForm.stdItem" placeholder="例:催收单日触达上限 3 次" />
+          </a-form-item>
+          <a-form-item v-if="verifyForm.alsoGenerateStandard" label="依据">
+            <a-input v-model="verifyForm.stdBasis" placeholder="例:《商业银行互联网贷款管理办法》第18条" />
+          </a-form-item>
+          <a-form-item v-if="verifyForm.alsoGenerateStandard" label="适用范围">
+            <a-input v-model="verifyForm.stdScope" placeholder="例:全部高风险客户" />
+          </a-form-item>
+          <a-form-item v-if="verifyForm.alsoGenerateStandard" label="是否必选">
+            <a-switch v-model="verifyForm.stdRequired" />
+          </a-form-item>
+        </div>
       </a-form>
     </a-modal>
 
@@ -289,9 +320,11 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRectifyStore, TraceReport, RectifyTask } from '@/stores/rectify'
+import { useReviewStore } from '@/stores/review'
 import { Message } from '@arco-design/web-vue'
 
 const store = useRectifyStore()
+const reviewStore = useReviewStore()
 
 function statusColor(s: string) {
   return {
@@ -414,7 +447,18 @@ function onAddProgress() {
 
 // 验证
 const showVerify = ref(false)
-const verifyForm = reactive({ result: 'pass' as 'pass' | 'fail', metricDrop: 30, note: '' })
+const verifyForm = reactive({
+  result: 'pass' as 'pass' | 'fail',
+  metricDrop: 30,
+  note: '',
+  // OPT-2:一键生成审查标准
+  alsoGenerateStandard: false,
+  stdCategory: '催收规范',
+  stdItem: '',
+  stdBasis: '',
+  stdScope: '',
+  stdRequired: true
+})
 const verifyTask = ref<RectifyTask | null>(null)
 
 function openVerify(t: RectifyTask) {
@@ -428,7 +472,33 @@ function openVerify(t: RectifyTask) {
 function onVerify() {
   if (!verifyTask.value) return
   store.verify(verifyTask.value.id, '陈强', verifyForm.result, verifyForm.note, verifyForm.metricDrop)
-  Message.success(verifyForm.result === 'pass' ? '验证通过,已自动沉淀到标准/知识' : '已驳回,等待责任人继续整改')
+
+  // OPT-2:如果勾选了同时沉淀为标准 → 写入 reviewStore
+  let stdId: string | null = null
+  if (verifyForm.result === 'pass' && verifyForm.alsoGenerateStandard && verifyForm.stdItem && verifyForm.stdBasis) {
+    stdId = reviewStore.generateFromRectify({
+      category: verifyForm.stdCategory,
+      item: verifyForm.stdItem,
+      basis: verifyForm.stdBasis,
+      required: verifyForm.stdRequired,
+      scope: verifyForm.stdScope || undefined,
+      author: '陈强',
+      rectifyTaskId: verifyTask.value.id,
+      rectifyReportId: verifyTask.value.reportId
+    }).id
+  }
+
+  // 重置 verifyForm 状态
+  verifyForm.alsoGenerateStandard = false
+  verifyForm.stdItem = ''
+  verifyForm.stdBasis = ''
+  verifyForm.stdScope = ''
+
+  if (stdId) {
+    Message.success(`验证通过,已沉淀为审查标准 ${stdId}`)
+  } else {
+    Message.success(verifyForm.result === 'pass' ? '验证通过,已自动沉淀到标准/知识' : '已驳回,等待责任人继续整改')
+  }
   showVerify.value = false
 }
 

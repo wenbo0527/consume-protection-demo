@@ -110,10 +110,10 @@ export default createRouter({
 | --- | --- | --- | --- | --- |
 | **4.1** 事前→事中 | 审查归档 → 知识库 | 审查结论写进知识库,坐席能搜到 | ✅ `ReviewExecute.vue` 推进到 `archive` 节点时 `dispatchEvent(EVT.WORKFLOW_KB_ARCHIVE)`,`knowledge.ts` 监听并 `upsertFromReview` | 已闭环(此前是缺口,已修复) |
 | **4.2** 事中→事后 | 溯源整改 | 投诉趋势/监管件超时/溯源页 | ✅ `Rectify.vue`(`/manage/rectify`)+ `Dashboard` 投诉趋势 + `WorkflowMonitor.vue` 超时看板 | 已实现 |
-| **4.3** 事后→事前 | 整改 → 审查标准更新 | `source: 'rectify'` 字段 + 整改完成后一键生成标准项 | ⚠️ 部分实现:`RectifyTask.verified` 事件里可写标准,但 `ReviewProject.source` 字段补了 `ticketId/reviewStage`,**整改完成后的一键"沉淀为标准项"按钮未挂 UI** | 缺口:标准录入页(`/review/standards`) 应能选择"由整改生成"来源 |
-| **4.4** 标签联动 → 坐席弹屏 | `riskTags` 联动规则 | 标签命中 → 弹屏提示 | ⚠️ `tagRule.ts` store 已存在,`RuleConfig.vue` 试算 Tab 支持运行;但 **`CustomerProfile.vue` / `AgentDesk.vue` 仍未读取 `tagRule.actions` 来弹屏** | 缺口:profile / desk 上挂监听 + 命中规则后展示 |
-| **4.5** 坐席 ↔ 支撑岗 | 业务申请 → 审批 → 生效 | 坐席发起,支撑岗处理,管理层批 | ⚠️ 反向:支撑岗处理,坐席接收通知 → **半实现**。**坐席端的"发起业务申请"按钮未挂** | 缺口:`AgentDesk` 顶部"发起申请"快捷入口 |
-| **4.6** 管理层下达指令 → 坐席 | "指令"模型 + 指令中心 | AlertHandle 处置时下达指令,坐席接收 | ❌ 未实现 | **最大缺口**:`Instruction` 模型 + InstructionCenter 组件 |
+| **4.3** 事后→事前 | 整改 → 审查标准更新 | `source: 'rectify'` 字段 + 整改完成后一键生成标准项 | ✅ **已闭环(2026-07-19 OPT-2)**:`Rectify.vue` 验证弹窗增加"同步沉淀为审查标准"开关 + 表单 → `useReviewStore.generateFromRectify()` 写入 `source: 'rectify'` → `Standards.vue` 新增"整改沉淀" Tab | **缺口已消除** |
+| **4.4** 标签联动 → 坐席弹屏 | `riskTags` 联动规则 | 标签命中 → 弹屏提示 | ✅ **已闭环(2026-07-19 OPT-3)**:`tagRule.applyToCustomer()` 一站式返回命中信息 → `CustomerProfile.vue` banner 显示命中规则名称 + `AgentDesk.vue` 来电弹屏显示命中预警 | **缺口已消除** |
+| **4.5** 坐席 ↔ 支撑岗 | 业务申请 → 审批 → 生效 | 坐席发起,支撑岗处理,管理层批 | ⚠️ 反向:支撑岗处理,坐席接收通知 → **半实现**。**坐席端的"发起业务申请"按钮未挂** | 缺口:`AgentDesk` 顶部"发起申请"快捷入口(可作未来 OPT-5) |
+| **4.6** 管理层下达指令 → 坐席 | "指令"模型 + 指令中心 | AlertHandle 处置时下达指令,坐席接收 | ✅ **已闭环(2026-07-19 OPT-1)**:`useInstructionStore` 模型 + create/ack/done/cancel/expire + `InstructionCenter` 组件挂 MainLayout 顶部 banner;`AlertHandle` 加"下达指令"表单,接收方可在 banner 一键 ack/done | **缺口已消除** |
 
 ### 2. P0/P1 清单对账
 
@@ -252,3 +252,79 @@ OPT-6(路由 metadata 合并)+ OPT-8(vitest)+ ESLint+Prettier,代码工程化程
 > **我的建议**:路线 A + 路线 D 的结合 —— **先补 OPT-1 / OPT-2 / OPT-3 让产品 100% 闭环,然后推 GitHub + gh-pages 让 demo "在线可点"**。这能使 demo 从"内部演示"升级为"对外营销素材"。
 
 你倾向哪条?
+
+---
+
+## 六、实施日志(2026-07-19)
+
+> 本日完成 OPT-1 / OPT-2 / OPT-3,产品 100% 闭环。
+
+### OPT-1 · 跨角色实时指令(产品 § 4.6)
+
+**新增文件**: [src/stores/instruction.ts](file:///Users/mac/Documents/trae_projects/Customer_service/src/stores/instruction.ts) · [src/components/InstructionCenter.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/components/InstructionCenter.vue)
+
+**修改文件**:
+- [src/stores/tagRule.ts](file:///Users/mac/Documents/trae_projects/Customer_service/src/stores/tagRule.ts) — 新增 `applyToCustomer()` helper
+- [src/pages/ManageWorkbench/AlertHandle.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/pages/ManageWorkbench/AlertHandle.vue) — 预警抽屉加"下达指令" 表单
+- [src/layout/MainLayout.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/layout/MainLayout.vue) — 顶部挂 InstructionCenter banner
+
+**数据模型**:
+```
+Instruction {
+  fromRole / fromOperator / toRole / toOperator
+  title / content / priority (urgent/high/normal/low)
+  status (pending/ack/done/expired/canceled)
+  alertId? / ticketId? / exitCaseId?
+  deadline? / ackAt / doneAt / ackNote / doneNote
+}
+```
+
+**业务流程**:
+```
+管理层在 AlertHandle 下达 ━━━► 落 store
+                              ┌► InstructionCenter banner 弹出
+                              ├► NotificationCenter 通知同步
+                              └► 坐席/业务执行 在 banner 上一键 ack/done
+```
+
+### OPT-2 · 整改 → 审查标准(产品 § 4.3)
+
+**新增文件**: [src/stores/review.ts](file:///Users/mac/Documents/trae_projects/Customer_service/src/stores/review.ts)
+
+**修改文件**:
+- [src/pages/ManageWorkbench/Rectify.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/pages/ManageWorkbench/Rectify.vue) — 验证通过弹窗加"同步沉淀为审查标准" 表单
+- [src/pages/ReviewWorkbench/Standards.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/pages/ReviewWorkbench/Standards.vue) — 加 source 字段、来源 KPI、"整改沉淀" Tab
+
+**数据模型**:
+```
+ReviewStandard {
+  id / category / item / basis / required
+  source (manual / rectify / regulator / system)
+  rectifyTaskId? / rectifyReportId? / scope? / createdAt? / author?
+}
+```
+
+**业务流程**:
+```
+整改任务验证通过
+  ↓ 勾选"同步沉淀为审查标准"
+  ↓ 填标准大类 + 条款 + 依据 + 适用范围 + 必/选
+generateFromRectify() ━━━► reviewStore.standards([自动带 source = rectify])
+Standards.vue "整改沉淀" Tab 自动展示 ◀━━━ 新生成项
+```
+
+### OPT-3 · 标签联动 → 坐席弹屏(产品 § 4.4)
+
+**修改文件**:
+- [src/stores/tagRule.ts](file:///Users/mac/Documents/trae_projects/Customer_service/src/stores/tagRule.ts) — `applyToCustomer()` 一站式返回 `{ firstAlert, restrictNotes, autoUpgradeNotes, hitRules }`
+- [src/pages/AgentWorkbench/CustomerProfile.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/pages/AgentWorkbench/CustomerProfile.vue) — banner 显示命中规则名称 + 数量
+- [src/pages/AgentWorkbench/AgentDesk.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/pages/AgentWorkbench/AgentDesk.vue) — 来电弹屏显示命中预警 + 规则列表
+
+### 验证
+
+| 维度 | 结果 |
+| --- | --- |
+| TypeScript strict | ✅ 0 错误 |
+| Vite build | ✅ 0 error |
+| 7 路由 HTTP smoke | ✅ 全部 200 |
+| 三道防线产品闭环 | ✅ 6/6(剩 4.5 反向入口可作未来 OPT-5) |

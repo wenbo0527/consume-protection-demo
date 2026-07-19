@@ -172,6 +172,25 @@ export const useTagRuleStore = defineStore('tagRule', {
       return notes
     },
 
+    /**
+     * OPT-3 一站式评估:对客户的所有"弹屏 + 限制 + 升级"信息合并返回
+     * - firstAlert: 用于顶部 banner / 弹窗提示
+     * - restrictNotes: 用于客户头像下方的"限制说明"
+     * - autoUpgradeNotes: 用于日志 / 管理层通知
+     */
+    applyToCustomer(tags: RiskTag[]) {
+      return {
+        firstAlert: this.firstAlert(tags),
+        restrictNotes: this.restrictNotes(tags),
+        autoUpgradeNotes: this.autoUpgradeNotes(tags),
+        hitRules: this.evaluate(tags).map(r => ({
+          ruleId: r.rule.id,
+          ruleName: r.rule.name,
+          ruleDesc: r.rule.desc
+        }))
+      }
+    },
+
     updateRule(id: string, patch: Partial<TagRule>) {
       const r = this.rules.find(x => x.id === id)
       if (!r) return
