@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 提交前:类型检查(快速验证)
+# 注:安装 husky + lint-staged 后,可启用 lint-staged 仅检查暂存文件
+echo "🔍 运行 type-check..."
+pnpm run lint:no-emit 2>&1 || {
+  echo "❌ TypeScript 错误,请修复后重试"
+  exit 1
+}
+
+echo "✅ 准备就绪"

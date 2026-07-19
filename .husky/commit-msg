@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 检查 commit message 是否符合 Conventional Commits 规范
+# 若未安装 commitlint,跳过检查
+if command -v npx >/dev/null 2>&1; then
+  npx --no -- commitlint --edit "$1" 2>/dev/null || {
+    echo "⚠️  commitlint not available, skipping message validation"
+    echo "    (recommended: pnpm add -D @commitlint/cli @commitlint/config-conventional)"
+  }
+fi
