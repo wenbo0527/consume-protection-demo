@@ -81,3 +81,9 @@ config/local.json
 # ===== IDE 工程目录 =====
 .trae/
 
+# ===== E2E / Playwright =====
+playwright-report/
+test-results/
+playwright/.cache/
+screenshots/
+
