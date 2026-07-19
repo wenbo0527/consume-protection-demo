@@ -25,6 +25,8 @@ const routes: RouteRecordRaw[] = [
       { path: 'business', redirect: '/business/desk' },
       { path: 'business/desk', name: 'BusinessDesk', component: () => import('./pages/BusinessWorkbench/BusinessDesk.vue'), meta: { title: '业务执行工作台' } },
       { path: 'business/apply', name: 'BusinessApply', component: () => import('./pages/BusinessWorkbench/BusinessApply.vue'), meta: { title: '业务申请审批' } },
+      { path: 'agent/phone', name: 'AgentPhoneChannel', component: () => import('./pages/AgentWorkbench/PhoneChannel.vue'), meta: { title: '电话工作台' } },
+      { path: 'agent/online-chat', name: 'AgentOnlineChat', component: () => import('./pages/AgentWorkbench/OnlineChatChannel.vue'), meta: { title: '在线客服' } },
       { path: 'business/pending', name: 'BusinessPending', component: () => import('./pages/BusinessWorkbench/PendingTickets.vue'), meta: { title: '待办列表' } },
       { path: 'business/stop-coll', name: 'BusinessStopColl', component: () => import('./pages/BusinessWorkbench/StopCollection.vue'), meta: { title: '停催停扣' } },
       { path: 'business/negotiate', name: 'BusinessNegotiate', component: () => import('./pages/BusinessWorkbench/Negotiate.vue'), meta: { title: '协商还款' } },

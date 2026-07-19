@@ -8,6 +8,24 @@
       <a-button type="primary" @click="showForm = true"><icon-plus /> 新建停催申请</a-button>
     </div>
 
+    <!-- OPT-5 联动横幅:展示由坐席在 AgentDesk 发起、正在此页生效的业务申请 -->
+    <a-alert v-if="businessAppsForStop.length" type="info" show-icon style="margin-bottom: 16px">
+      <template #title>
+        来自坐席的业务申请({{ businessAppsForStop.length }} 条)
+      </template>
+      <template #content>
+        <div style="font-size: 13px">
+          这些申请由坐席在 `/agent/desk` 发起,审批通过后自动启动工作流实例并落到下方表中。
+          当前运行实例 <b>{{ runningInstances }}</b> 条 / 总 {{ list.length }} 条。
+        </div>
+        <div v-for="a in businessAppsForStop.slice(0, 3)" :key="a.id" style="margin-top: 4px; font-size: 12px">
+          <a-tag size="small" :color="baStatusColor(a.status)">{{ appStatusLabel(a.status) }}</a-tag>
+          <span>{{ a.id }}</span>
+          <span style="color: var(--cp-text-tertiary); margin-left: 6px">{{ a.title }} · 客户 {{ a.customerName }}</span>
+        </div>
+      </template>
+    </a-alert>
+
     <!-- 到期提醒 -->
     <a-alert type="warning" show-icon style="margin-bottom: 16px">
       <template #title>2 笔停催将于 24 小时内到期</template>
@@ -105,6 +123,7 @@
 import { computed, reactive, ref } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { useWorkflowStore } from '@/stores/workflow'
+import { useBusinessAppStore } from '@/stores/businessApp'
 import { enrichStopCollectionRow, mapInstanceStatus } from '@/utils/workflow-helpers'
 import StartWorkflowModal from '@/components/StartWorkflowModal.vue'
 
@@ -127,10 +146,24 @@ const list = computed(() => wf.instances
   })
 )
 
+// OPT-5 业务申请来源(由坐席在 AgentDesk 发起)
+const ba = useBusinessAppStore()
+const businessAppsForStop = computed(() =>
+  ba.items.filter(a => a.type === 'stop_collection' || a.type === 'negotiate')
+)
+const runningInstances = computed(() => list.value.filter(r => r.status === 'running').length)
+
 function statusColor(s: string) {
   return mapInstanceStatus(s).color === 'green' ? 'green'
     : mapInstanceStatus(s).color === 'red' ? 'red'
     : s === '已恢复' ? 'gray' : 'blue'
+}
+
+function baStatusColor(s: string) {
+  return ({ pending: 'orange', approved: 'arcoblue', rejected: 'red', in_progress: 'blue', executed: 'green', closed: 'gray' })[s] || 'gray'
+}
+function appStatusLabel(s: string) {
+  return ({ pending: '待审批', approved: '已批准', rejected: '已驳回', in_progress: '执行中', executed: '已执行', closed: '已关闭' })[s] || s
 }
 
 function onSubmit() {

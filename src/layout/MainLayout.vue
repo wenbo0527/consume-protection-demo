@@ -158,10 +158,11 @@ const menus = computed<MenuGroup[]>(() => {
           { name: '知识检索', path: '/agent/knowledge' }
         ]},
         { key: 'g4', title: '电话', icon: 'icon-phone', items: [
-          { name: '电话工作台', path: '/agent/todo' }
+          { name: '队列/抢单', path: '/agent/phone' },
+          { name: '工作台', path: '/agent/desk' }
         ]},
         { key: 'g5', title: '在线客服', icon: 'icon-message', items: [
-          { name: '会话入口', path: '/agent/todo' }
+          { name: '会话窗口', path: '/agent/online-chat' }
         ]}
       ]
     case 'business':

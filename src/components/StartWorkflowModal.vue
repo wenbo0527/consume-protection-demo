@@ -146,6 +146,7 @@ function roleLabel(r: WorkflowNode['handlerRole']) {
     business: '支撑岗',
     review: '审查人员',
     manage: '管理层',
+    consumer: '消费者',
     system: '系统'
   }[r]
 }

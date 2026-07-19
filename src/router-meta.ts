@@ -35,6 +35,8 @@ export const ROUTE_META: RouteMetaDef[] = [
   // 业务执行
   { path: 'business/desk', name: 'BusinessDesk', title: '业务执行工作台', showInMenu: true, menuParent: '业务执行', menuOrder: 1 },
   { path: 'business/apply', name: 'BusinessApply', title: '业务申请审批', showInMenu: true, menuParent: '业务执行', menuOrder: 0 },
+  { path: 'agent/phone', name: 'AgentPhoneChannel', title: '电话工作台', showInMenu: true, menuParent: '坐席', menuOrder: 4 },
+  { path: 'agent/online-chat', name: 'AgentOnlineChat', title: '在线客服', showInMenu: true, menuParent: '坐席', menuOrder: 5 },
   { path: 'business/pending', name: 'BusinessPending', title: '待办列表', showInMenu: true, menuParent: '业务', menuOrder: 2 },
   { path: 'business/stop-coll', name: 'BusinessStopColl', title: '停催停扣', showInMenu: true, menuParent: '业务', menuOrder: 3 },
   { path: 'business/negotiate', name: 'BusinessNegotiate', title: '协商还款', showInMenu: true, menuParent: '业务', menuOrder: 4 },

@@ -18,7 +18,10 @@ export type WorkflowKind =
 
 export type NodeKind = 'apply' | 'approve' | 'execute' | 'notify' | 'auto' | 'archive'
 
-export type RoleKey = 'agent' | 'business' | 'review' | 'manage'
+import { RoleKey } from './user'
+
+// 兼容旧代码
+export type { RoleKey }
 
 export interface WorkflowNode {
   /** 节点编号(模板内唯一) */
