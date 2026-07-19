@@ -140,6 +140,63 @@
           归档完成后,自动通知<strong>立项申请人</strong>和<strong>业务部门</strong>,通知内容包括审查结论与知识库更新摘要。
         </template>
       </a-alert>
+
+      <!-- OPT-FIX-3 / P3-10:投诉管控承诺同步(可选项,提交归档后自动生成 follow-up 工单) -->
+      <a-divider style="margin: 12px 0" />
+      <a-form :model="promiseForm" layout="vertical">
+        <a-form-item>
+          <a-checkbox v-model="promiseForm.enabled">
+            <b>提交投诉管控同步承诺(OPT-FIX-3 P3-10)</b>
+          </a-checkbox>
+        </a-form-item>
+        <template v-if="promiseForm.enabled">
+          <a-row :gutter="12">
+            <a-col :span="12">
+              <a-form-item label="承诺指标">
+                <a-select v-model="promiseForm.metric">
+                  <a-option value="complaint_new_rate">新户投诉率</a-option>
+                  <a-option value="repeat_complaint_rate">重复投诉率</a-option>
+                  <a-option value="handle_time">平均处理时长</a-option>
+                  <a-option value="satisfaction_score">满意度评分</a-option>
+                  <a-option value="overdue_complaint_count">超时投诉数</a-option>
+                  <a-option value="custom">自定义</a-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="目标值">
+                <a-input v-model="promiseForm.targetValue" placeholder="例:≤ 0.5%" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row :gutter="12">
+            <a-col :span="12">
+              <a-form-item label="当前值(可选)">
+                <a-input v-model="promiseForm.currentValue" placeholder="例:0.62%" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="承诺截止日">
+                <a-input v-model="promiseForm.deadline" placeholder="2026-09-30" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-form-item label="承诺理由">
+            <a-textarea v-model="promiseForm.reason" :rows="2" placeholder="说明为什么设这个目标" />
+          </a-form-item>
+          <a-alert type="info" style="margin-top: 8px" show-icon>
+            <template #content>
+              <div style="font-size: 13px">
+                <b>提交归档后会自动生成:</b><br />
+                ① 一条 <code>CompliancePromise</code> 同步承诺记录(关联此审查项目)<br />
+                ② 一个 follow-up 工单(草稿),由管理层接管后续跟踪<br />
+                系统到截止日会自动把状态置为 <code>overdue</code>,可前往 <code>/review/promises</code> 跟踪
+              </div>
+            </template>
+          </a-alert>
+        </template>
+      </a-form>
+
       <template #footer>
         <a-button @click="showArchive = false">取消</a-button>
         <a-button type="primary" @click="doArchive">确认归档</a-button>
@@ -153,11 +210,13 @@ import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { reviewProjects, reviewStandards, knowledge } from '@/mock/data'
 import { useWorkflowStore } from '@/stores/workflow'
+import { useCompliancePromiseStore, PromiseMetric } from '@/stores/compliancePromise'
 import { Message } from '@arco-design/web-vue'
 
 const route = useRoute()
 const router = useRouter()
 const wf = useWorkflowStore()
+const cpStore = useCompliancePromiseStore()
 
 const project = computed(() => reviewProjects.find(p => p.id === route.params.id))
 
@@ -172,6 +231,16 @@ const notes = reactive<Record<string, string>>({})
 const conclusion = ref('')
 const comment = ref('')
 const showArchive = ref(false)
+
+// OPT-FIX-3 / P3-10 投诉管控承诺
+const promiseForm = reactive({
+  enabled: false,
+  metric: 'complaint_new_rate' as PromiseMetric,
+  targetValue: '',
+  currentValue: '',
+  deadline: '',
+  reason: ''
+})
 
 const requiredTotal = computed(() => standards.value.filter(s => s.required).length)
 const requiredDone = computed(() => standards.value.filter(s => s.required && results[s.id]).length)
@@ -228,6 +297,34 @@ function doArchive() {
   } else {
     Message.success('归档完成!已通知申请人,知识库已自动同步(待审核)')
   }
+
+  // OPT-FIX-3 / P3-10 投诉管控承诺 + 自动 follow-up 工单
+  if (promiseForm.enabled && project.value) {
+    if (!promiseForm.targetValue || !promiseForm.deadline || !promiseForm.reason) {
+      Message.warning('已勾选承诺但未填全必填项(目标值 / 截止日 / 理由)')
+    } else {
+      const result = cpStore.createWithFollowUp({
+        reviewProjectId: project.value.id,
+        reviewer: '刘丽',
+        reviewerRole: 'review',
+        metric: promiseForm.metric,
+        targetValue: promiseForm.targetValue,
+        currentValue: promiseForm.currentValue || undefined,
+        deadline: promiseForm.deadline,
+        reason: promiseForm.reason
+      })
+      Message.success(
+        `同步承诺 ${result.promise.id} 已创建,已自动生成 follow-up 工单 ${result.ticketId}`
+      )
+    }
+    // 重置
+    promiseForm.enabled = false
+    promiseForm.targetValue = ''
+    promiseForm.currentValue = ''
+    promiseForm.deadline = ''
+    promiseForm.reason = ''
+  }
+
   setTimeout(() => router.push('/review/pending'), 800)
 }
 </script>

@@ -62,7 +62,8 @@ export const ROUTE_META: RouteMetaDef[] = [
   { path: 'review/create', name: 'ReviewCreate', title: '创建立项', showInMenu: true, menuParent: '审查', menuOrder: 2 },
   { path: 'review/execute/:id', name: 'ReviewExecute', title: '审查执行', showInMenu: false },
   { path: 'review/standards', name: 'ReviewStandards', title: '审查标准', showInMenu: true, menuParent: '审查', menuOrder: 3 },
-  { path: 'review/audit-trail', name: 'ReviewAuditTrail', title: '审查追溯', showInMenu: true, menuParent: '审查', menuOrder: 4 },
+  { path: 'review/promises', name: 'ReviewPromises', title: '投诉管控承诺', showInMenu: true, menuParent: '审查', menuOrder: 4 },
+  { path: 'review/audit-trail', name: 'ReviewAuditTrail', title: '审查追溯', showInMenu: true, menuParent: '审查', menuOrder: 5 },
 
   // 消费者
   { path: 'consumer/complaints', name: 'ConsumerComplaints', title: '我的投诉', showInMenu: false },

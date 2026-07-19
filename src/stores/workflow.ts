@@ -288,6 +288,24 @@ export const useWorkflowStore = defineStore('workflow', {
   getters: {
     templateByKind: (s) => (kind: WorkflowKind) => s.templates.find(t => t.kind === kind),
     instanceById: (s) => (id: string) => s.instances.find(i => i.id === id),
+    /**
+     * OPT-FIX-2 / P3-8:角色守卫
+     * 判断给定角色 + 操作者是否可以对指定实例的当前节点执行 approve/reject
+     * - 当前节点 handlerRole 必须 === role
+     * - instance 必须 running
+     * - 当前节点 kind 必须 === approve(其他 kind 是 auto/notify/archive 不应让手动操作)
+     */
+    canApproveFor: (s) => (instanceId: string, role: string): boolean => {
+      const inst = s.instances.find(i => i.id === instanceId)
+      if (!inst) return false
+      if (inst.status !== 'running') return false
+      const tpl = s.templates.find(t => t.kind === inst.kind)
+      if (!tpl) return false
+      const node = tpl.nodes.find(n => n.code === inst.currentNode)
+      if (!node) return false
+      if (node.kind !== 'approve') return false
+      return node.handlerRole === role
+    },
     /** 坐席端待办(节点指派给 agent 且未完成) */
     agentTodos: (s) => s.instances.filter(i => {
       if (i.status !== 'running') return false
@@ -457,14 +475,22 @@ export const useWorkflowStore = defineStore('workflow', {
       void tpl
     },
 
-    /** 审批通过(任意审批/执行节点) */
-    approve(instanceId: string, operator: string, comment?: string) {
+    /** 审批通过(任意审批/执行节点)
+     *  OPT-FIX-2 / P3-8:可选 operatorRole 参数,等于 handlerRole 才允许审批
+     *  (不传则保留兼容 - 但新代码应该传)
+     */
+    approve(instanceId: string, operator: string, comment?: string, operatorRole?: string) {
       const inst = this.instances.find(i => i.id === instanceId)
       if (!inst) return
       const tpl = this.templates.find(t => t.kind === inst.kind)
       if (!tpl) return
       const cur = tpl.nodes.find(n => n.code === inst.currentNode)
       if (!cur) return
+      // 角色守卫(可选):传入 operatorRole 时校验
+      if (operatorRole && cur.kind === 'approve' && cur.handlerRole !== operatorRole) {
+        log('warn', 'approve', `拒绝:${inst.id} 由 ${operatorRole} 越权审批 ${cur.handlerRole} 节点`)
+        return
+      }
       const exec = inst.executions.find(e => e.nodeCode === inst.currentNode && (e.status === 'running' || e.status === 'pending'))
       if (exec) {
         exec.status = 'approved'
@@ -473,17 +499,23 @@ export const useWorkflowStore = defineStore('workflow', {
         exec.comment = comment
       }
       inst.status = 'running'
-      log('log', 'approve', `${inst.id} node=${inst.currentNode} by ${operator}`)
+      log('log', 'approve', `${inst.id} node=${inst.currentNode} by ${operator}${operatorRole ? ` (${operatorRole})` : ''}`)
       this._advance(inst, tpl, operator, 'approve')
       this.persist()
     },
 
-    /** 审批驳回 */
-    reject(instanceId: string, operator: string, comment: string) {
+    /** 审批驳回(同 approve 加角色守卫) */
+    reject(instanceId: string, operator: string, comment: string, operatorRole?: string) {
       const inst = this.instances.find(i => i.id === instanceId)
       if (!inst) return
       const tpl = this.templates.find(t => t.kind === inst.kind)
       if (!tpl) return
+      const cur = tpl.nodes.find(n => n.code === inst.currentNode)
+      if (!cur) return
+      if (operatorRole && cur.kind === 'approve' && cur.handlerRole !== operatorRole) {
+        log('warn', 'reject', `拒绝驳回:${inst.id} 由 ${operatorRole} 越权驳回 ${cur.handlerRole} 节点`)
+        return
+      }
       const exec = inst.executions.find(e => e.nodeCode === inst.currentNode && (e.status === 'running' || e.status === 'pending'))
       if (exec) {
         exec.status = 'rejected'

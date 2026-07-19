@@ -196,6 +196,9 @@ const menus = computed<MenuGroup[]>(() => {
         ]},
         { key: 'g3', title: '审查记录', icon: 'icon-history', items: [
           { name: '审查追溯', path: '/review/audit-trail' }
+        ]},
+        { key: 'g4', title: '投诉管控', icon: 'icon-safety', items: [
+          { name: '承诺跟踪', path: '/review/promises' }
         ]}
       ]
     case 'manage':

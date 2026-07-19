@@ -34,3 +34,14 @@ app.use(ArcoVue)
 app.use(ArcoVueIcon)
 app.use(router)
 app.mount('#app')
+
+// ============ OPT-FIX-3 / P3-10 daily sweep ============
+// 每天扫一次投诉管控承诺,把过期的标记为 overdue
+import { useCompliancePromiseStore } from './stores/compliancePromise'
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    try {
+      useCompliancePromiseStore().markOverdue()
+    } catch (e) { /* 静默 */ }
+  }, 60_000) // 与 workflow tick 同频,简单可靠
+}

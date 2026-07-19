@@ -11,8 +11,8 @@
 | **P0 主流程闭环** | 4 | 4 | 0 | 0 | **100%** |
 | **P1 高频但非阻断** | 10 | 9 | 1 | 0 | **95%** |
 | **P2 治理闭环与运营** | 10 | 10 | 0 | 0 | **100%** |
-| **P3 细节与体验** | 10 | 8 | 2 | 0 | **80%** |
-| **总计** | **34** | **31** | **3** | **0** | **91% (完全实现) · 100% (含部分)** |
+| **P3 细节与体验** | 10 | 10 | 0 | 0 | **100%** |
+| **总计** | **34** | **33** | **1** | **0** | **97% (完全实现) · 100% (含部分)** |
 
 ---
 
@@ -79,15 +79,9 @@
 | P3-5 | 重复工单检测未接 | ⚠️ 未实现(同 P1-6) | TicketCreate 现在不会主动查 `wf.instances`;P1-6 是同一项 |
 | P3-6 | 工作流超时未驱动状态 | ✅ 已实现 | [workflow.ts:537-550](../src/stores/workflow.ts#L537-L550) `tickOverdue()` action + [line 558-560](../src/stores/workflow.ts#L558-L560) `setInterval(60s)` 在 `main.ts` 范围内调度定时把超时实例转 `expired` |
 | P3-7 | `RoleKey` 在 user/workflow 两处定义 | ✅ 已实现 | [workflow.ts:21-24](../src/stores/workflow.ts#L21-L24) `import { RoleKey } from './user'`,然后 `export type { RoleKey }` 兼容旧代码;**唯一真相源 = user.ts**;StartWorkflowModal 加了 consumer 映射 |
-| P3-8 | 审批 drawer 按节点 kind 切换 UI | 🟡 部分 | drawer 的 UI 现已经按模板里 `kind: 'approve'/'auto'/'notify'/'archive'` 区分显示;`roleLabelByKey(n.handlerRole)` 在 [WorkflowTodosCard.vue:79](../src/components/WorkflowTodosCard.vue#L79) 显示;`wf.approve(...)` **仍未校验 `currentRole === node.handlerRole`**;优化方向:`canApprove` getter |
+| P3-8 | 审批 drawer 按节点 kind 切换 UI | ✅ 已实现 | [WorkflowTodosCard.vue:42-56](../src/components/WorkflowTodosCard.vue#L42-L56) `快速通过/驳回` 按钮 `:disabled="!canApproveInDrawer(inst)"` + [line 76-92](../src/components/WorkflowTodosCard.vue#L76-L92) drawer 内 `:disabled` 全部接 `canApproveFor(inst.id, userStore.currentRole)`;showApproveType 时传 `operatorRole` 给 workflow 守卫 |
 | P3-9 | KPI 不含 workflow 实例数 | ✅ 已实现 | [WorkflowMonitor.vue:381](../src/pages/ManageWorkbench/WorkflowMonitor.vue#L381) `wf.instances.filter(...)` 驱动 KPI |
-| P3-10 | 审查归档"投诉管控目标"同步承诺未落地 | 🟡 部分 | [KnowledgeManage.vue:159](../src/pages/ManageWorkbench/KnowledgeManage.vue#L159) 显示同步历史 + [CreateReview.vue:61](../src/pages/ReviewWorkbench/CreateReview.vue#L61) + [ReviewExecute.vue:38](../src/pages/ReviewWorkbench/ReviewExecute.vue#L38) UI 字段均已就位;**但"自动 follow-up 工单"未实现** |
-
-### P3 剩余 **2 项**(2026-07-19 二次核对):
-1. **P3-8** 审批 drawer role 守卫 (`canApprove` getter)
-2. **P3-10** 投诉管控自动 follow-up 工单
-
-> 之前标注的 **P3-6 / P3-9** 在第 2 次核对时被发现在代码里已实现(`tickOverdue` + `setInterval`,WorkflowMonitor 用 `wf.instances`)
+| P3-10 | 审查归档"投诉管控目标"同步承诺未落地 | ✅ 已实现 | 自动化三方链路:**[useCompliancePromiseStore](../src/stores/compliancePromise.ts)** `CompliancePromise` 模型 + `createWithFollowUp()`(一次返回 `promise` + 自动生成 follow-up `ticketId`) + 跟踪页 [PromiseTracking.vue](../src/pages/ReviewWorkbench/PromiseTracking.vue)(检查时间线 + 标记达成 + 即将到期预警) + [ReviewExecute.vue:138-201](../src/pages/ReviewWorkbench/ReviewExecute.vue#L138-L201) 归档时勾选"提交投诉管控同步承诺",提交时自动创建承诺 + follow-up 工单 + [main.ts:38-46](../src/main.ts#L38-L46) 定时扫描 `markOverdue()` |
 
 ---
 

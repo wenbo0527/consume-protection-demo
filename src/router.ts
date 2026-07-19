@@ -37,9 +37,10 @@ const routes: RouteRecordRaw[] = [
       { path: 'review', redirect: '/review/pending' },
       { path: 'review/pending', name: 'ReviewPending', component: () => import('./pages/ReviewWorkbench/PendingReview.vue'), meta: { title: '待审查立项' } },
       { path: 'review/create', name: 'ReviewCreate', component: () => import('./pages/ReviewWorkbench/CreateReview.vue'), meta: { title: '创建立项' } },
-      { path: 'review/execute/:id', name: 'ReviewExecute', component: () => import('./pages/ReviewWorkbench/ReviewExecute.vue'), meta: { title: '审查执行' } },
+      { path: 'review/promises', name: 'ReviewPromises', component: () => import('./pages/ReviewWorkbench/PromiseTracking.vue'), meta: { title: '投诉管控承诺跟踪' } },
       { path: 'review/standards', name: 'ReviewStandards', component: () => import('./pages/ReviewWorkbench/Standards.vue'), meta: { title: '审查标准' } },
       { path: 'review/audit-trail', name: 'ReviewAuditTrail', component: () => import('./pages/ReviewWorkbench/AuditTrail.vue'), meta: { title: '审查追溯' } },
+      { path: 'review/execute/:id', name: 'ReviewExecute', component: () => import('./pages/ReviewWorkbench/ReviewExecute.vue'), meta: { title: '审查执行' } },
 
       // 管理工作台
       { path: 'manage', redirect: '/manage/dashboard' },

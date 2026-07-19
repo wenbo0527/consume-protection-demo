@@ -39,8 +39,22 @@
         </div>
         <div class="cp-wf-row-actions">
           <template v-if="canQuickAct(inst)">
-            <a-button size="small" type="primary" status="success" @click.stop="quickApprove(inst)">通过</a-button>
-            <a-button size="small" status="danger" @click.stop="quickReject(inst)">驳回</a-button>
+            <a-button
+              size="small"
+              type="primary"
+              status="success"
+              :disabled="!canApproveInDrawer(inst)"
+              @click.stop="quickApprove(inst)"
+            >通过</a-button>
+            <a-button
+              size="small"
+              status="danger"
+              :disabled="!canApproveInDrawer(inst)"
+              @click.stop="quickReject(inst)"
+            >驳回</a-button>
+            <a-tag v-if="!canApproveInDrawer(inst)" size="small" color="gray">
+              需 {{ wf.templateByKind(inst.kind)?.nodes.find(n => n.code === inst.currentNode)?.handlerRole }} 角色
+            </a-tag>
           </template>
           <a-button v-else size="small" disabled>系统节点</a-button>
         </div>
@@ -105,8 +119,20 @@
               <a-textarea v-model="opForm.comment" :rows="3" placeholder="请输入意见" />
             </a-form-item>
             <a-space>
-              <a-button type="primary" status="success" @click="doApprove">通过 / 完成</a-button>
-              <a-button status="danger" @click="doReject">驳回</a-button>
+              <a-button
+                type="primary"
+                status="success"
+                :disabled="detailInst ? !canApproveInDrawer(detailInst) : true"
+                @click="doApprove"
+              >通过 / 完成</a-button>
+              <a-button
+                status="danger"
+                :disabled="detailInst ? !canApproveInDrawer(detailInst) : true"
+                @click="doReject"
+              >驳回</a-button>
+              <span v-if="detailInst && !canApproveInDrawer(detailInst)" style="font-size: 12px; color: var(--cp-text-tertiary)">
+                (当前角色 {{ userStore.currentRole }} 无权审批,需 {{ wf.templateByKind(detailInst.kind)?.nodes.find(n => n.code === detailInst!.currentNode)?.handlerRole }})
+              </span>
               <a-button @click="detailVisible = false">关闭</a-button>
             </a-space>
           </a-form>
@@ -120,7 +146,7 @@
 import { computed, ref } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { useWorkflowStore, WorkflowInstance, RoleKey } from '@/stores/workflow'
-import { useUserStore } from '@/stores/user'
+import { useUserStore, getRoleInfo } from '@/stores/user'
 
 const props = defineProps<{
   /** 当前角色,用于过滤待办 */
@@ -260,29 +286,57 @@ function openDetail(inst: WorkflowInstance) {
 }
 
 function getOperator() {
-  return props.operatorName || userStore.currentRole || '操作员'
+  return props.operatorName || (userStore.currentRole ? (getRoleInfo(userStore.currentRole)?.username || userStore.currentRole) : '操作员')
 }
 
+/** 当前登录角色(没登录则返回 'guest',admin/escalation 强制放行) */
+function getOperatorRole(): string {
+  const role = userStore.currentRole || 'guest'
+  // 管理层永远可以审批任意角色节点(行政特权)
+  if (role === 'manage') return role
+  return role
+}
+
+/**
+ * OPT-FIX-2 / P3-8:角色守卫
+ * 当前实例的当前节点对当前角色不可审批 → 完全禁用按钮
+ */
+function canApproveInDrawer(inst: WorkflowInstance): boolean {
+  if (!userStore.currentRole) return false
+  return wf.canApproveFor(inst.id, userStore.currentRole)
+}
+
+/** 兼容老接口:仍支持对所有非系统节点触发动作(但快速操作已收紧) */
 function canQuickAct(inst: WorkflowInstance) {
-  const tpl = wf.templateByKind(inst.kind)
-  if (!tpl) return false
-  const node = tpl.nodes.find(n => n.code === inst.currentNode)
-  if (!node) return false
-  return !['auto', 'notify', 'archive'].includes(node.kind)
+  return canApproveInDrawer(inst)
 }
 
 function quickApprove(inst: WorkflowInstance) {
-  wf.approve(inst.id, getOperator(), '快速通过')
+  // OPT-FIX-2 / P3-8: 传 role 给 workflow 守卫
+  if (!canApproveInDrawer(inst)) {
+    Message.warning(`当前角色无权审批 ${inst.id} (节点要求 ${wf.templateByKind(inst.kind)?.nodes.find(n => n.code === inst.currentNode)?.handlerRole})`)
+    return
+  }
+  wf.approve(inst.id, getOperator(), '快速通过', getOperatorRole())
   Message.success(`${inst.id} 已通过`)
 }
 function quickReject(inst: WorkflowInstance) {
-  wf.reject(inst.id, getOperator(), '快速驳回')
+  if (!canApproveInDrawer(inst)) {
+    Message.warning(`当前角色无权驳回 ${inst.id}`)
+    return
+  }
+  wf.reject(inst.id, getOperator(), '快速驳回', getOperatorRole())
   Message.warning(`${inst.id} 已驳回`)
 }
 
 function doApprove() {
   if (!detailInst.value) return
-  wf.approve(detailInst.value.id, getOperator(), opForm.value.comment || '通过')
+  // OPT-FIX-2 / P3-8 角色守卫
+  if (!canApproveInDrawer(detailInst.value)) {
+    Message.warning(`当前角色无权审批 (节点要求 ${wf.templateByKind(detailInst.value.kind)?.nodes.find(n => n.code === detailInst.value!.currentNode)?.handlerRole})`)
+    return
+  }
+  wf.approve(detailInst.value.id, getOperator(), opForm.value.comment || '通过', getOperatorRole())
   Message.success('已通过')
   detailVisible.value = false
 }
@@ -292,7 +346,11 @@ function doReject() {
     Message.warning('驳回必须填写意见')
     return
   }
-  wf.reject(detailInst.value.id, getOperator(), opForm.value.comment)
+  if (!canApproveInDrawer(detailInst.value)) {
+    Message.warning(`当前角色无权驳回`)
+    return
+  }
+  wf.reject(detailInst.value.id, getOperator(), opForm.value.comment, getOperatorRole())
   Message.warning('已驳回')
   detailVisible.value = false
 }
