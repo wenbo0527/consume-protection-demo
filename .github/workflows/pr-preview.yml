@@ -1,0 +1,80 @@
+name: PR Preview
+
+# 每个 PR 推送一个 preview build + 在 PR 内评论预览 URL
+# 用 surge.sh / cloudflare-pages 不需要,直接利用 GitHub Pages 的 pull-request 模式:
+# - 用 gh-pages 的 PR preview action
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+# 防止同 PR 同时跑多个
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Build & Comment Preview URL
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event.action != 'closed'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+        env:
+          # 临时直接用本地 file 路径;surge 与 cloudflare 自动升级可后补
+          VITE_BASE: ./
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-${{ github.event.pull_request.number }}
+          path: dist
+          retention-days: 7
+
+      - name: Comment PR with artifact URL
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-preview
+          message: |
+            ✅ **PR Preview 构建成功**
+
+            - 📦 artifact: `preview-${{ github.event.pull_request.number }}` (7 天有效)
+            - 📋 summary:
+              - base: `${{ github.event.pull_request.base.sha }}`
+              - head: `${{ github.event.pull_request.head.sha }}`
+              - by: @${{ github.event.pull_request.user.login }}
+
+            > GitHub Pages PR preview 在私有仓库需 PRO,此方案:下载 artifact → unzip → `python -m http.server` 本地预览。
+
+  close:
+    name: Cleanup on PR close
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - name: Delete artifact
+        uses: actions/delete-workflow-run@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
