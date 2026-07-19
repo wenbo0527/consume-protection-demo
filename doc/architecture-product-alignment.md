@@ -112,7 +112,7 @@ export default createRouter({
 | **4.2** 事中→事后 | 溯源整改 | 投诉趋势/监管件超时/溯源页 | ✅ `Rectify.vue`(`/manage/rectify`)+ `Dashboard` 投诉趋势 + `WorkflowMonitor.vue` 超时看板 | 已实现 |
 | **4.3** 事后→事前 | 整改 → 审查标准更新 | `source: 'rectify'` 字段 + 整改完成后一键生成标准项 | ✅ **已闭环(2026-07-19 OPT-2)**:`Rectify.vue` 验证弹窗增加"同步沉淀为审查标准"开关 + 表单 → `useReviewStore.generateFromRectify()` 写入 `source: 'rectify'` → `Standards.vue` 新增"整改沉淀" Tab | **缺口已消除** |
 | **4.4** 标签联动 → 坐席弹屏 | `riskTags` 联动规则 | 标签命中 → 弹屏提示 | ✅ **已闭环(2026-07-19 OPT-3)**:`tagRule.applyToCustomer()` 一站式返回命中信息 → `CustomerProfile.vue` banner 显示命中规则名称 + `AgentDesk.vue` 来电弹屏显示命中预警 | **缺口已消除** |
-| **4.5** 坐席 ↔ 支撑岗 | 业务申请 → 审批 → 生效 | 坐席发起,支撑岗处理,管理层批 | ⚠️ 反向:支撑岗处理,坐席接收通知 → **半实现**。**坐席端的"发起业务申请"按钮未挂** | 缺口:`AgentDesk` 顶部"发起申请"快捷入口(可作未来 OPT-5) |
+| **4.5** 坐席 ↔ 支撑岗 | 业务申请 → 审批 → 生效 | 坐席发起,支撑岗处理,管理层批 | ✅ **已闭环(2026-07-19 OPT-5)**:`useBusinessAppStore` + `AgentDesk` 顶部"发起申请"快捷入口 + `BusinessApply.vue` 业务执行岗审批页;审批通过自动调用 `workflow.start()` 启动对应类型工作流实例 | **缺口已消除** |
 | **4.6** 管理层下达指令 → 坐席 | "指令"模型 + 指令中心 | AlertHandle 处置时下达指令,坐席接收 | ✅ **已闭环(2026-07-19 OPT-1)**:`useInstructionStore` 模型 + create/ack/done/cancel/expire + `InstructionCenter` 组件挂 MainLayout 顶部 banner;`AlertHandle` 加"下达指令"表单,接收方可在 banner 一键 ack/done | **缺口已消除** |
 
 ### 2. P0/P1 清单对账
@@ -328,3 +328,84 @@ Standards.vue "整改沉淀" Tab 自动展示 ◀━━━ 新生成项
 | Vite build | ✅ 0 error |
 | 7 路由 HTTP smoke | ✅ 全部 200 |
 | 三道防线产品闭环 | ✅ 6/6(剩 4.5 反向入口可作未来 OPT-5) |
+
+---
+
+## 七、实施日志(2026-07-19 续)
+
+### OPT-5 · 坐席发起申请 → 业务执行岗审批 → 工作流实例(产品 § 4.5)
+
+**新增文件**:
+- [src/stores/businessApp.ts](file:///Users/mac/Documents/trae_projects/Customer_service/src/stores/businessApp.ts) · `useBusinessAppStore`
+- [src/pages/BusinessWorkbench/BusinessApply.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/pages/BusinessWorkbench/BusinessApply.vue) · 业务执行岗审批页
+
+**修改文件**:
+- [src/pages/AgentWorkbench/AgentDesk.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/pages/AgentWorkbench/AgentDesk.vue) · 顶部加"发起业务申请"按钮 + 弹窗
+- [src/router.ts](file:///Users/mac/Documents/trae_projects/Customer_service/src/router.ts) · 新增 `/business/apply` 路由
+- [src/router-meta.ts](file:///Users/mac/Documents/trae_projects/Customer_service/src/router-meta.ts) · 业务执行组首位
+- [src/layout/MainLayout.vue](file:///Users/mac/Documents/trae_projects/Customer_service/src/layout/MainLayout.vue) · 业务执行菜单组首位
+
+**数据模型**:
+```
+BusinessApplication {
+  id / type (5 种)/ title / priority
+  applicantId / applicantName (坐席)
+  customerId / customerName / ticketId?
+  reason / context?
+  status (pending / approved / rejected / in_progress / executed / closed)
+  reviewer? / reviewedAt? / reviewNote?
+  workflowInstanceId? / executedAt? / contractId?
+}
+```
+
+**业务流程**:
+```
+[坐席 AgentDesk 提交申请]
+       ↓
+[落 useBusinessAppStore; 进入 pending]
+       ↓
+[业务执行岗 BusinessApply.vue 收件箱]
+       ↓ 批准
+[自动调用 workflow.start({ kind: 'stop_collection' | 'negotiate' | ... })]
+       ↓
+[status: approved → in_progress → executed]
+       ↓
+[坐席 customer profile / AgentDesk 实时显示进度]
+```
+
+### OPT-9 · gh-pages 自动部署
+
+**新增文件**: [.github/workflows/deploy.yml](file:///Users/mac/Documents/trae_projects/Customer_service/.github/workflows/deploy.yml)
+
+3 job 全链路:
+1. `build`:checkout → setup-node → setup-pnpm → install → type-check → 设置 VITE_BASE → build → configure-pages → upload-pages-artifact → deploy-pages
+2. `smoke`:部署后验证 URL 200
+
+**触发条件**:`push` 到 `main` 分支 OR `workflow_dispatch`(手动)
+
+### OPT-10 · base path 适配
+
+**修改文件**: [vite.config.ts](file:///Users/mac/Documents/trae_projects/Customer_service/vite.config.ts)
+
+```typescript
+const basePath = process.env.VITE_BASE
+  || (process.env.GITHUB_ACTIONS ? '/consume-protection-demo/' : '/')
+```
+
+- 本地开发:默认 `/`
+- CI 环境:`github.event.repository.name` 子路径 base
+
+### 添加文档
+
+- [doc/gh-pages-deployment.md](file:///Users/mac/Documents/trae_projects/Customer_service/doc/gh-pages-deployment.md) · gh-pages 部署 5 步配置 + 故障排查
+
+### 验证
+
+| 维度 | 结果 |
+| --- | --- |
+| TypeScript strict | ✅ 0 错误 |
+| Vite build(本地 `base: /`) | ✅ 0 error |
+| Vite build(gitHub `base: /consume-protection-demo/`) | ✅ 0 error(1260 modules) |
+| 6 路由 HTTP smoke | ✅ 全部 200 |
+| **产品文档 § 4 · 三道防线对账** | **6/6 全部 100% 闭环** ✅ |
+| GitHub Actions 部署 | 推送后自动运行,URL 见 environment |
