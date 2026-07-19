@@ -1,0 +1,187 @@
+<template>
+  <div class="cp-page">
+    <div class="cp-page-header">
+      <div>
+        <h1 class="cp-page-title">预警处置中心</h1>
+        <div class="cp-page-subtitle">未处置预警 · 超时 24 小时自动升级 · 处置后自动验证</div>
+      </div>
+    </div>
+
+    <div class="cp-stat-row">
+      <div class="cp-stat-card">
+        <div class="cp-stat-label">未处置</div>
+        <div class="cp-stat-value mono" style="color: var(--cp-danger)">2</div>
+        <div class="cp-stat-extra cp-pulse" style="color: var(--cp-danger)">超时 0</div>
+      </div>
+      <div class="cp-stat-card">
+        <div class="cp-stat-label">处置中</div>
+        <div class="cp-stat-value mono" style="color: var(--cp-warning)">1</div>
+      </div>
+      <div class="cp-stat-card">
+        <div class="cp-stat-label">已处置/验证</div>
+        <div class="cp-stat-value mono" style="color: var(--cp-success)">2</div>
+      </div>
+      <div class="cp-stat-card">
+        <div class="cp-stat-label">本月处置率</div>
+        <div class="cp-stat-value mono">92%</div>
+        <div class="cp-stat-extra">目标 ≥95%</div>
+      </div>
+    </div>
+
+    <!-- 业务工作流待办(P1 引入:管理层在此也可处理指令类工作流) -->
+    <div style="margin-bottom: 16px">
+      <workflow-todos-card role="manage" :operator-name="'陈强'" />
+    </div>
+
+    <div class="cp-card" style="padding: 0">
+      <a-table :data="alerts" :pagination="false">
+        <template #columns>
+          <a-table-column title="预警编号" data-index="id" />
+          <a-table-column title="类型">
+            <template #cell="{ record }">
+              <a-tag :color="typeColor(record.type)">{{ record.typeLabel }}</a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="标题" data-index="title" />
+          <a-table-column title="等级">
+            <template #cell="{ record }">
+              <a-tag :color="record.level === 'urgent' ? 'red' : record.level === 'warning' ? 'orange' : 'blue'">
+                {{ record.level === 'urgent' ? '紧急' : record.level === 'warning' ? '警告' : '提示' }}
+              </a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="触发时间" data-index="triggerTime" />
+          <a-table-column title="状态">
+            <template #cell="{ record }">
+              <status-badge :status="record.status" />
+            </template>
+          </a-table-column>
+          <a-table-column title="操作">
+            <template #cell="{ record }">
+              <a-space :size="4">
+                <a-button v-if="record.status === 'alert_open'" size="small" type="primary" @click="openHandle(record)">处置</a-button>
+                <a-button size="small">详情</a-button>
+                <a-button v-if="record.relatedTicket" size="small">查看工单</a-button>
+              </a-space>
+            </template>
+          </a-table-column>
+        </template>
+      </a-table>
+    </div>
+
+    <!-- 处置抽屉 -->
+    <a-drawer v-model:visible="showDrawer" :width="520" title="预警处置">
+      <div v-if="current">
+        <a-descriptions :column="1" bordered size="small">
+          <a-descriptions-item label="预警编号">{{ current.id }}</a-descriptions-item>
+          <a-descriptions-item label="类型">{{ current.typeLabel }}</a-descriptions-item>
+          <a-descriptions-item label="标题">{{ current.title }}</a-descriptions-item>
+          <a-descriptions-item label="描述">{{ current.desc }}</a-descriptions-item>
+        </a-descriptions>
+
+        <h4 style="margin: 20px 0 12px; font-size: 14px">处置动作</h4>
+        <a-radio-group v-model="action" style="display: flex; flex-direction: column; gap: 8px">
+          <a-radio value="confirm">确认 - 填写处置意见并关联工单</a-radio>
+          <a-radio value="upgrade">升级 - 转交上级处理</a-radio>
+          <a-radio value="ignore">忽略 - 仅限低优先级预警</a-radio>
+        </a-radio-group>
+
+        <div class="cp-form" style="margin-top: 16px">
+          <a-form-item label="处置意见" required>
+            <a-textarea v-model="opinion" :rows="4" placeholder="请填写处置意见..." />
+          </a-form-item>
+          <a-form-item v-if="action === 'confirm'" label="关联工单">
+            <a-select v-model="relatedTicket" placeholder="选择关联工单">
+              <a-option v-for="t in ticketOptions" :key="t" :value="t">{{ t }}</a-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item v-if="action === 'confirm'" label="指令下达">
+            <a-input v-model="instruction" placeholder="备注处置要求,通知对应坐席/支撑岗" />
+          </a-form-item>
+          <a-form-item v-if="action === 'upgrade'" label="升级原因" required>
+            <a-textarea v-model="upgradeReason" :rows="2" />
+          </a-form-item>
+          <a-form-item v-if="action === 'ignore'" label="忽略原因" required>
+            <a-textarea v-model="ignoreReason" :rows="2" />
+          </a-form-item>
+        </div>
+
+        <div style="margin-top: 16px; padding: 12px; background: var(--cp-bg-soft); border-radius: 6px; font-size: 12px; color: var(--cp-text-secondary)">
+          <icon-info-circle /> 关联工单关单后,本预警将自动标记为"已验证"。
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px">
+          <a-button @click="showDrawer = false">取消</a-button>
+          <a-button type="primary" @click="confirm">确认处置</a-button>
+        </div>
+      </div>
+    </a-drawer>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import StatusBadge from '@/components/StatusBadge.vue'
+import { useWorkflowStore } from '@/stores/workflow'
+import { useAlertStore } from '@/stores/alert'
+import WorkflowTodosCard from '@/components/WorkflowTodosCard.vue'
+import { Message } from '@arco-design/web-vue'
+
+const wf = useWorkflowStore()
+const alertStore = useAlertStore()
+const alerts = alertStore.items
+
+const showDrawer = ref(false)
+const current = ref<any>(null)
+const action = ref('confirm')
+const opinion = ref('')
+const relatedTicket = ref('')
+const instruction = ref('')
+const upgradeReason = ref('')
+const ignoreReason = ref('')
+const ticketOptions = ['GD-20260712-0001', 'GD-20260714-0008', 'GD-20260709-0015']
+
+function typeColor(t: string) {
+  if (t === 'volume') return 'blue'
+  if (t === 'regulator') return 'red'
+  if (t === 'collection') return 'orange'
+  return 'gray'
+}
+
+function openHandle(record: any) {
+  current.value = record
+  action.value = 'confirm'
+  opinion.value = ''
+  relatedTicket.value = ''
+  showDrawer.value = true
+}
+
+function confirm() {
+  if (!opinion.value) { Message.warning('请填写处置意见'); return }
+  // 走 alert_directive 工作流
+  // 节点1:管理层确认预警(含指令内容/指派坐席) → 自动推进
+  // 节点2:坐席执行指令
+  // 节点3:预警标记已验证(副作用 mark_alert_verified)
+  const inst = wf.start({
+    kind: 'alert_directive',
+    initiator: '陈强',
+    initiatorRole: 'manage',
+    alertId: current.value?.id,
+    ticketId: relatedTicket.value || undefined,
+    payload: {
+      instruction: instruction.value || '请尽快处置关联工单',
+      assignTo: '张敏',
+      opinion: opinion.value,
+      alertTitle: current.value?.title
+    }
+  })
+  if (inst) {
+    Message.success(`已生成指令实例 ${inst.id},坐席端可在工作台"工作流待办"中查看并执行`)
+  } else {
+    Message.success('处置完成,指令已下达')
+  }
+  // 原 mock 状态变更
+  if (current.value) current.value.status = 'alert_handle'
+  showDrawer.value = false
+}
+</script>

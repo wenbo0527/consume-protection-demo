@@ -1,0 +1,198 @@
+/* ============ Arco Design 企业最佳实践 · 白色系专业风格 ============ */
+:root {
+  /* 中性色 */
+  --cp-bg: #f5f6f7;
+  --cp-bg-soft: #f7f8fa;
+  --cp-bg-hover: #f2f3f5;
+  --cp-border: #e5e6eb;
+  --cp-border-light: #f2f3f5;
+  --cp-text: #1d2129;
+  --cp-text-secondary: #4e5969;
+  --cp-text-tertiary: #86909c;
+  --cp-text-quaternary: #c9cdd4;
+
+  /* 品牌色 - Arco 默认 */
+  --cp-brand: #165dff;
+  --cp-brand-hover: #4080ff;
+  --cp-brand-soft: #f2f5ff;
+  --cp-brand-active: #0e42d2;
+
+  /* 语义色 */
+  --cp-success: #00b42a;
+  --cp-success-soft: #e8f7e6;
+  --cp-warning: #ff7d00;
+  --cp-warning-soft: #fff3e0;
+  --cp-danger: #f53f3f;
+  --cp-danger-soft: #ffece8;
+  --cp-purple: #722ed1;
+
+  /* 阴影 - 克制 */
+  --cp-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --cp-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --cp-shadow-md: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono {
+  font-family: 'DIN Alternate', 'Roboto Mono', 'SF Mono', Menlo, monospace;
+  font-feature-settings: 'tnum';
+}
+
+/* ============ 页面通用 ============ */
+.cp-page {
+  padding: 16px 24px;
+  min-height: calc(100vh - 56px);
+}
+
+.cp-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: var(--cp-shadow-sm);
+  border: 1px solid var(--cp-border-light);
+}
+
+.cp-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 4px 0;
+}
+
+.cp-page-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--cp-text);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.cp-page-subtitle {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-top: 4px;
+}
+
+/* ============ 统计卡片 ============ */
+.cp-stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.cp-stat-card {
+  background: #fff;
+  border-radius: 6px;
+  padding: 14px 18px;
+  border: 1px solid var(--cp-border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.cp-stat-card:hover {
+  box-shadow: var(--cp-shadow);
+  border-color: var(--cp-border);
+}
+
+.cp-stat-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+}
+
+.cp-stat-value {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--cp-text);
+  font-family: 'DIN Alternate', 'Roboto Mono', monospace;
+  letter-spacing: -0.5px;
+}
+
+.cp-stat-extra {
+  font-size: 11px;
+  color: var(--cp-text-tertiary);
+}
+
+/* ============ 章节标题 ============ */
+.cp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cp-text);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ============ 微动画 ============ */
+@keyframes cp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.cp-pulse { animation: cp-pulse 2s ease-in-out infinite; }
+
+/* ============ Arco 表格增强 ============ */
+.arco-table { font-size: 13px; }
+.arco-table-th {
+  background: var(--cp-bg-soft) !important;
+  font-weight: 500 !important;
+  color: var(--cp-text-secondary) !important;
+  font-size: 12px !important;
+}
+.arco-table-tr:hover .arco-table-td {
+  background-color: var(--cp-bg-hover) !important;
+}
+.arco-table-td { padding: 10px 12px !important; }
+
+/* Arco Tag 紧凑 */
+.arco-tag { font-size: 12px; }
+
+/* Arco Button 主次层级 */
+.arco-btn-size-medium { font-size: 13px; }
+
+/* Arco Card padding 调整 */
+.arco-card { border-radius: 6px !important; }
+.arco-card-header { padding: 12px 20px !important; border-bottom: 1px solid var(--cp-border-light) !important; }
+.arco-card-body { padding: 16px 20px !important; }
+
+/* Arco Modal padding */
+.arco-modal-header { padding: 14px 20px !important; border-bottom: 1px solid var(--cp-border-light) !important; }
+.arco-modal-body { padding: 20px !important; }
+.arco-modal-footer { padding: 12px 20px !important; border-top: 1px solid var(--cp-border-light) !important; }
+
+/* Arco Tabs 紧凑 */
+.arco-tabs-header-title { font-size: 13px !important; }
+.arco-tabs-header { padding: 0 0 8px !important; }
+
+/* Arco Drawer */
+.arco-drawer-header { padding: 14px 20px !important; border-bottom: 1px solid var(--cp-border-light) !important; }
+
+/* Arco Form item 间距紧凑 */
+.arco-form-item { margin-bottom: 16px !important; }
+.arco-form-item-label { font-size: 13px !important; padding-bottom: 4px !important; color: var(--cp-text-secondary) !important; }
+
+/* Arco Descriptions */
+.arco-descriptions-item-label { color: var(--cp-text-tertiary) !important; font-size: 12px !important; }
+
+/* Arco Alert */
+.arco-alert { padding: 10px 14px !important; }
+
+/* ============ 滚动条 ============ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #d4d6d9; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #b4b7bb; }
+::-webkit-scrollbar-track { background: transparent; }
