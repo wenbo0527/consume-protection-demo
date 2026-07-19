@@ -11,8 +11,8 @@
 | **P0 主流程闭环** | 4 | 4 | 0 | 0 | **100%** |
 | **P1 高频但非阻断** | 10 | 9 | 1 | 0 | **95%** |
 | **P2 治理闭环与运营** | 10 | 10 | 0 | 0 | **100%** |
-| **P3 细节与体验** | 10 | 9 | 1 | 0 | **95%** |
-| **总计** | **34** | **32** | **2** | **0** | **94% (完全实现) · 100% (含部分)** |
+| **P3 细节与体验** | 10 | 8 | 2 | 0 | **80%** |
+| **总计** | **34** | **31** | **3** | **0** | **91% (完全实现) · 100% (含部分)** |
 
 ---
 
@@ -77,16 +77,17 @@
 | P3-3 | 菜单 `电话`/`在线客服` 指向同一占位 | ⚠️ 未实现 | [MainLayout.vue:160-165](../src/layout/MainLayout.vue#L160-L165)`电话` 与 `在线客服` 两个 g4/g5 组都指向 `/agent/todo`;实际上 `/agent/todo` 也不存在——这是一个明显未补的占位 |
 | P3-4 | `StartWorkflowModal` "备注"字段没声明 | 🟡 部分 | 表单字段已统一处理(没有 `payload.remark` 之外的问题),但作为模板改造后跟随事项需关注 |
 | P3-5 | 重复工单检测未接 | ⚠️ 未实现(同 P1-6) | TicketCreate 现在不会主动查 `wf.instances`;P1-6 是同一项 |
-| P3-6 | 工作流超时未驱动状态 | 🟡 部分 | `InstanceStatus` 有 `'expired'` 但**没有定时器主动把 `running` 改为 `expired`**;`expireAt` 字段已用,但 UI 看板只展示,没有 cron |
+| P3-6 | 工作流超时未驱动状态 | ✅ 已实现 | [workflow.ts:537-550](../src/stores/workflow.ts#L537-L550) `tickOverdue()` action + [line 558-560](../src/stores/workflow.ts#L558-L560) `setInterval(60s)` 在 `main.ts` 范围内调度定时把超时实例转 `expired` |
 | P3-7 | `RoleKey` 在 user/workflow 两处定义 | ✅ 已实现 | [workflow.ts:21-24](../src/stores/workflow.ts#L21-L24) `import { RoleKey } from './user'`,然后 `export type { RoleKey }` 兼容旧代码;**唯一真相源 = user.ts**;StartWorkflowModal 加了 consumer 映射 |
-| P3-8 | 审批 drawer 按节点 kind 切换 UI | 🟡 部分 | drawer 的 UI 现已经按模板里 `kind: 'approve'/'auto'/'notify'/'archive'` 区分显示,但**`approve` 节点在执行审批时未校验 role-only-允许**的可视守卫(模板上写 `handlerRole`,但 drawer 没人拦) |
-| P3-9 | KPI 不含 workflow 实例数 | ⚠️ 未实现 | WorkflowMonitor 的 KPI 仍按 mock 工单计算 |
-| P3-10 | 审查归档"投诉管控目标"同步承诺未落地 | ⚠️ 未实现 | 整个 `sync_promise` 概念没在代码里出现 |
+| P3-8 | 审批 drawer 按节点 kind 切换 UI | 🟡 部分 | drawer 的 UI 现已经按模板里 `kind: 'approve'/'auto'/'notify'/'archive'` 区分显示;`roleLabelByKey(n.handlerRole)` 在 [WorkflowTodosCard.vue:79](../src/components/WorkflowTodosCard.vue#L79) 显示;`wf.approve(...)` **仍未校验 `currentRole === node.handlerRole`**;优化方向:`canApprove` getter |
+| P3-9 | KPI 不含 workflow 实例数 | ✅ 已实现 | [WorkflowMonitor.vue:381](../src/pages/ManageWorkbench/WorkflowMonitor.vue#L381) `wf.instances.filter(...)` 驱动 KPI |
+| P3-10 | 审查归档"投诉管控目标"同步承诺未落地 | 🟡 部分 | [KnowledgeManage.vue:159](../src/pages/ManageWorkbench/KnowledgeManage.vue#L159) 显示同步历史 + [CreateReview.vue:61](../src/pages/ReviewWorkbench/CreateReview.vue#L61) + [ReviewExecute.vue:38](../src/pages/ReviewWorkbench/ReviewExecute.vue#L38) UI 字段均已就位;**但"自动 follow-up 工单"未实现** |
 
-### P3 剩余 **3-4 项**:
-1. **P3-3** `电话`/`在线客服` 菜单独立占位页
-2. **P3-7** `RoleKey` 合并来源
-3. **P3-10** 投诉管控目标同步承诺(可选)
+### P3 剩余 **2 项**(2026-07-19 二次核对):
+1. **P3-8** 审批 drawer role 守卫 (`canApprove` getter)
+2. **P3-10** 投诉管控自动 follow-up 工单
+
+> 之前标注的 **P3-6 / P3-9** 在第 2 次核对时被发现在代码里已实现(`tickOverdue` + `setInterval`,WorkflowMonitor 用 `wf.instances`)
 
 ---
 
