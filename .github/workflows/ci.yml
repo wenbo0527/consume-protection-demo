@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'release/**']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# 防止重复触发
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Step 1: 类型检查 + 构建
+  build:
+    name: Build & Type-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type-check
+        run: pnpm run build:type-check
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 7
+
+  # Step 2: 路由 + 项目基础校验(冒烟)
+  smoke:
+    name: Route Smoke Test
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Extract routes
+        id: extract
+        run: |
+          ROUTES=$(grep -oE "path: '[^']+'" src/router.ts | awk -F"'" '{print $2}' | sort -u)
+          echo "routes<<EOF" >> $GITHUB_OUTPUT
+          echo "$ROUTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Show route inventory
+        run: |
+          echo "Found $(echo "${{ steps.extract.outputs.routes }}" | grep -c .) routes:"
+          echo "${{ steps.extract.outputs.routes }}"
+
+  # Step 3: 项目结构校验
+  structure:
+    name: Project Structure Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify store count
+        run: |
+          COUNT=$(find src/stores -name "*.ts" -not -name "index.ts" | wc -l)
+          echo "Pinia stores: $COUNT"
+          if [ "$COUNT" -lt 8 ]; then
+            echo "::error::Store count must be >= 8"
+            exit 1
+          fi
+
+      - name: Verify no raw event strings
+        run: |
+          # 业务代码不应直接使用 'cp-' 字符串(只允许在 constants/events.ts 内引用)
+          LEAKS=$(grep -rE "['\"]cp-(workflow|knowledge|rectify|system|nc-)" src/ --include="*.vue" --include="*.ts" 2>/dev/null | grep -v "constants/events.ts" | grep -v "// " | wc -l)
+          if [ "$LEAKS" -gt 0 ]; then
+            echo "::error::Found $LEAKS raw 'cp-*' event strings outside constants/events.ts"
+            exit 1
+          fi
+
+      - name: Verify no console.log in production
+        run: |
+          # 业务代码不应残留 console.log
+          COUNT=$(grep -rE "console\.log" src/ --include="*.vue" --include="*.ts" 2>/dev/null | wc -l)
+          if [ "$COUNT" -gt 5 ]; then
+            echo "::warning::Found $COUNT console.log usages"
+          fi

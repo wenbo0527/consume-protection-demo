@@ -1,0 +1,54 @@
+{
+  "name": "consume-protection-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "消保客服工作台 · 跨角色业务全链路演示(坐席/业务执行/管理层/审查/消费者 五角色 + 11 个领域 store)",
+  "author": "MiniMax <demo@example.com>",
+  "license": "MIT",
+  "keywords": [
+    "vue",
+    "vue3",
+    "arco-design",
+    "pinia",
+    "consumer-protection",
+    "workbench",
+    "demo",
+    "showcase"
+  ],
+  "homepage": "https://github.com/MiniMax/consume-protection-demo#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MiniMax/consume-protection-demo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MiniMax/consume-protection-demo/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "build:type-check": "vue-tsc --noEmit",
+    "preview": "vite preview --port 5170",
+    "preview:build": "npm run build && npm run preview",
+    "lint:no-emit": "vue-tsc --noEmit",
+    "ci": "npm run lint:no-emit && npm run build"
+  },
+  "dependencies": {
+    "@arco-design/web-vue": "^2.55.2",
+    "dayjs": "^1.11.19",
+    "lodash-es": "^4.17.23",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.0",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "typescript": "^5.5.0",
+    "vite": "^5.0.0",
+    "vue-tsc": "^2.0.0"
+  }
+}
