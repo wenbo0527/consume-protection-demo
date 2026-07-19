@@ -1,0 +1,94 @@
+name: Deploy to GitHub Pages
+
+# 仅在 main 分支推送时触发,支持版本发布同时自动部署
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 防止 race condition
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+# 部署权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type-check
+        run: pnpm run build:type-check
+
+      # OPT-10:CI 内置 basePath 为 <repo 名>
+      - name: Set base path for gh-pages
+        run: |
+          echo "VITE_BASE=/${{ github.event.repository.name }}/" >> $GITHUB_ENV
+
+      - name: Build (SPA, gh-pages base)
+        run: pnpm run build
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "🚀 部署成功!"
+          echo "URL: ${{ steps.deployment.outputs.page_url }}"
+
+  smoke:
+    name: Post-deploy Smoke
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Health check
+        run: |
+          URL="${{ needs.build.outputs.deployment-url }}"
+          if [ -z "$URL" ]; then
+            echo "ℹ️  无部署 URL,跳过 smoke"
+            exit 0
+          fi
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo "000")
+          echo "  $URL: $HTTP"
+          if [ "$HTTP" != "200" ]; then
+            echo "::error::Deployment health check failed"
+            exit 1
+          fi

@@ -23,7 +23,8 @@ const routes: RouteRecordRaw[] = [
 
       // 业务执行台
       { path: 'business', redirect: '/business/desk' },
-      { path: 'business/desk', name: 'BusinessDesk', component: () => import('./pages/BusinessWorkbench/BusinessDesk.vue'), meta: { title: '工作台' } },
+      { path: 'business/desk', name: 'BusinessDesk', component: () => import('./pages/BusinessWorkbench/BusinessDesk.vue'), meta: { title: '业务执行工作台' } },
+      { path: 'business/apply', name: 'BusinessApply', component: () => import('./pages/BusinessWorkbench/BusinessApply.vue'), meta: { title: '业务申请审批' } },
       { path: 'business/pending', name: 'BusinessPending', component: () => import('./pages/BusinessWorkbench/PendingTickets.vue'), meta: { title: '待办列表' } },
       { path: 'business/stop-coll', name: 'BusinessStopColl', component: () => import('./pages/BusinessWorkbench/StopCollection.vue'), meta: { title: '停催停扣' } },
       { path: 'business/negotiate', name: 'BusinessNegotiate', component: () => import('./pages/BusinessWorkbench/Negotiate.vue'), meta: { title: '协商还款' } },

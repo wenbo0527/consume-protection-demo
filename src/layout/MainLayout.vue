@@ -168,6 +168,7 @@ const menus = computed<MenuGroup[]>(() => {
       return [
         { key: 'g0', title: '工作台', icon: 'icon-desktop', items: [
           { name: '工作台(事件驱动)', path: '/business/desk' },
+          { name: '业务申请审批', path: '/business/apply' },
           { name: '待办列表', path: '/business/pending' }
         ]},
         { key: 'g2', title: '停催停扣', icon: 'icon-pause-circle', items: [

@@ -21,8 +21,60 @@
         <a-button size="small" @click="simulateIncoming">
           <icon-plus /> 模拟来电
         </a-button>
+        <!-- OPT-5:坐席发起业务申请入口 -->
+        <a-button size="small" type="primary" status="warning" @click="showAppForm = true">
+          <icon-plus /> 发起业务申请
+        </a-button>
       </a-space>
     </div>
+
+    <!-- OPT-5 发起申请弹窗 -->
+    <a-modal v-model:visible="showAppForm" title="发起业务申请" :width="600" :ok-text="'提交申请'" @ok="onCreateApp">
+      <a-alert v-if="!selectedCustomer" type="warning" style="margin-bottom: 12px">
+        请先在右侧选择一个客户
+      </a-alert>
+      <a-form :model="appForm" layout="vertical">
+        <a-row :gutter="12">
+          <a-col :span="12">
+            <a-form-item label="申请类型" required>
+              <a-select v-model="appForm.type">
+                <a-option value="stop_collection">停催停扣</a-option>
+                <a-option value="negotiate">协商还款</a-option>
+                <a-option value="credit_objection">征信异议</a-option>
+                <a-option value="transfer_mediate">转调解</a-option>
+                <a-option value="extended_repayment">延期还款</a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="优先级" required>
+              <a-radio-group v-model="appForm.priority">
+                <a-radio value="low">低</a-radio>
+                <a-radio value="normal">普通</a-radio>
+                <a-radio value="high">紧急</a-radio>
+              </a-radio-group>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-form-item label="申请标题">
+          <a-input v-model="appForm.title" :placeholder="titlePlaceholder" />
+        </a-form-item>
+        <a-form-item label="申请说明" required>
+          <a-textarea v-model="appForm.reason" :rows="2" placeholder="例:客户希望分 6 期还款" />
+        </a-form-item>
+        <a-form-item label="前情提要">
+          <a-textarea v-model="appForm.context" :rows="3" placeholder="给业务执行岗的背景介绍 + 处置建议" />
+        </a-form-item>
+        <a-form-item label="关联客户">
+          <a-select v-model="appForm.customerId" placeholder="选择客户">
+            <a-option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }} ({{ c.id }})</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="关联工单(可选)">
+          <a-input v-model="appForm.ticketId" placeholder="工单 ID" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
 
     <!-- 客户列表 -->
     <div class="cp-desk-body">
@@ -181,10 +233,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWorkbenchStore } from '@/stores/workbench'
 import { useTagRuleStore, RiskTag as RiskTagType } from '@/stores/tagRule'
+import { useBusinessAppStore, AppType, AppPriority } from '@/stores/businessApp'
+import { useUserStore, getRoleInfo } from '@/stores/user'
 import { customers, tickets } from '@/mock/data'
 import RiskTag from '@/components/RiskTag.vue'
 import TicketDetail from './TicketDetail.vue'
@@ -304,6 +358,70 @@ const incomingHitRules = computed(() => {
   if (!incomingCustomer.value) return []
   return tagRuleStore.applyToCustomer(incomingCustomer.value.riskTags as RiskTagType[]).hitRules
 })
+
+// OPT-5:发起业务申请
+const businessApp = useBusinessAppStore()
+const userStore = useUserStore()
+const showAppForm = ref(false)
+const appForm = reactive({
+  type: 'negotiate' as AppType,
+  priority: 'normal' as AppPriority,
+  title: '',
+  reason: '',
+  context: '',
+  customerId: '',
+  ticketId: ''
+})
+
+const titlePlaceholder = computed(() => {
+  const map: Record<AppType, string> = {
+    stop_collection: '为客户 XXX 申请停催 N 天',
+    negotiate: '为客户 XXX 申请协商还款方案',
+    credit_objection: '为客户 XXX 申请征信异议',
+    transfer_mediate: '为客户 XXX 申请转调解',
+    extended_repayment: '为客户 XXX 申请延期还款'
+  }
+  return map[appForm.type] || ''
+})
+
+const selectedCustomer = computed(() => {
+  if (!appForm.customerId) return null
+  return customers.find(c => c.id === appForm.customerId)
+})
+
+function onCreateApp() {
+  if (!appForm.reason || !appForm.customerId) {
+    Message.warning('客户 + 申请说明必填')
+    return
+  }
+  const customer = customers.find(c => c.id === appForm.customerId)
+  if (!customer) return
+  const operator = userStore.currentRole ? (getRoleInfo(userStore.currentRole)?.username || '坐席') : '张敏'
+  const app = businessApp.create({
+    type: appForm.type,
+    title: appForm.title || titlePlaceholder.value,
+    applicantId: 'U' + (operator.length > 0 ? '1' : ''),
+    applicantName: operator,
+    customerId: customer.id,
+    customerName: customer.name,
+    ticketId: appForm.ticketId || undefined,
+    reason: appForm.reason,
+    context: appForm.context || undefined,
+    priority: appForm.priority
+  })
+  Message.success(`业务申请已提交:${app.id},等待业务执行岗审批`)
+  showAppForm.value = false
+  // 重置表单
+  Object.assign(appForm, {
+    type: 'negotiate' as AppType,
+    priority: 'normal' as AppPriority,
+    title: '',
+    reason: '',
+    context: '',
+    customerId: '',
+    ticketId: ''
+  })
+}
 
 function simulateIncoming() {
   if (!ready.value) {
