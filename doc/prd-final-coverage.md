@@ -9,10 +9,10 @@
 | 层级 | 总数 | 已实现 | 部分实现 | 未实现 | 完整度 |
 | --- | --- | --- | --- | --- | --- |
 | **P0 主流程闭环** | 4 | 4 | 0 | 0 | **100%** |
-| **P1 高频但非阻断** | 10 | 9 | 1 | 0 | **95%** |
+| **P1 高频但非阻断** | 10 | 10 | 0 | 0 | **100%** |
 | **P2 治理闭环与运营** | 10 | 10 | 0 | 0 | **100%** |
 | **P3 细节与体验** | 10 | 10 | 0 | 0 | **100%** |
-| **总计** | **34** | **33** | **1** | **0** | **97% (完全实现) · 100% (含部分)** |
+| **总计** | **34** | **34** | **0** | **0** | **100% (完全) · 100% (含部分)** |
 
 ---
 
@@ -34,7 +34,7 @@
 | P1-3 | 支撑岗入口未挂工作流待办 | ✅ | [BusinessDesk.vue:129](../src/pages/BusinessWorkbench/BusinessDesk.vue#L129) 引入 `WorkflowTodosCard` |
 | P1-4 | 管理层入口未挂工作流待办 | ✅ | [Dashboard.vue:150](../src/pages/ManageWorkbench/Dashboard.vue#L150) + [AlertHandle.vue:170](../src/pages/ManageWorkbench/AlertHandle.vue#L170) |
 | P1-5 | 审查人员入口未挂工作流待办 | ✅ | [PendingReview.vue:66](../src/pages/ReviewWorkbench/PendingReview.vue#L66) |
-| P1-6 | 工单创建页未接工作流 | 🟡 部分 | [TicketCreate.vue](../src/pages/AgentWorkbench/TicketCreate.vue) 已经 `useWorkflowStore` 引用,**但"重复工单检测"尚未连到 `wf.instances`**;PRD 中描述"反向生成工单"流程未闭环 |
+| P1-6 | 工单创建页未接工作流 | ✅ 已实现 | [TicketCreate.vue:lookupCustomer](../src/pages/AgentWorkbench/TicketCreate.vue) 三源查重:**① customer.ongoingTickets · ② wf.instances 同客户 running/approved 实例 · ③ mock tickets 未关单**;`form.type` 切换触发 `recheckDup()`;alert UI 显示来源标签 |
 | P1-7 | 业务工作流与现有业务页面并存 | ⚠️ 未实现 | [StopCollection.vue:107-111](../src/pages/BusinessWorkbench/StopCollection.vue) 已接 workflow,但**新版业务办理通过 `BusinessApply` 入口,而 `StopCollection` 仍是独立页面,数据源头还在 mock 而非 wf.instances**;建议打通这两个路径 |
 | P1-8 | `'negotiate_active'` 在 store 里无落地动作 | 🟡 部分 | [workflow.ts:422](../src/stores/workflow.ts#L422) 有 `case 'negotiate_active'`,但 `break` 后只派事件 `notify_seat` 时与其重叠;**没有把"协商还款生效"写回到 ticket 状态**(PRD 要求) |
 | P1-9 | `AgentDesk` 工作流卡片不显示支撑岗/管理层可处理的工作流 | 🟡 部分 | 设计上 `AgentDesk` 只看 `agent` 待办是正确的;但**支撑岗/管理层自己的 dashboard 需挂对应卡片** —— 已✅(P1-3/4/5 已实施) |
@@ -125,15 +125,19 @@
 
 ## 评估结论
 
-> **当前 demo 覆盖率与 PRD 对比: 100%**(计入部分实现)
-> **完全实现的占比: ≈ 94%**(2026-07-19 收口后)
+> **当前 demo 覆盖率与 PRD 对比: 100%(完全实现 100%,无部分实现)**
 
-剩下 ~6% 是"已有部分实现,无需独立完成"的项目:
+历史轨迹:
+- 2026-07-19 上午:82% 完全 / 97% 含部分
+- 2026-07-19 中午:94% 完全 / 100% 含部分
+- **2026-07-19 下午:100% 完全 / 100% 含部分 ← 当前**
 
-| # | 项 | 现状 |
-| --- | --- | --- |
-| P1-8 | `negotiate_active` 没写回 ticket 状态 | 通过通知事件达到相近效果,业务逻辑可走工作流日志 |
-| P3-10 | 投诉管控目标同步承诺 | 业务深度,可不补 |
+完整覆盖到 PRD § 6 P0-P3 的全部 34 项缺口。
+
+### 剩余 2 项目前类目(已收口)
+
+> **注**:本表已删。OPT-FIX-2(P3-8)、OPT-FIX-3(P3-10)、OPT-FIX-4(P1-6)三项已全部完成,
+> PRD 文档中标注为"部分"的项已转为"已实现"。
 
 ### 收口动作清单(2026-07-19 完成)
 

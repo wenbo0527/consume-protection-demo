@@ -13,10 +13,19 @@
 
     <!-- 重复工单检测 -->
     <a-alert v-if="dupAlert" type="warning" style="margin-bottom: 16px" show-icon>
-      <template #title>{{ dupAlert.title }}</template>
+      <template #title>
+        重复工单检测命中(来源:
+        <a-tag size="small" :color="dupSourceColor">{{ dupSourceLabel }}</a-tag>)
+      </template>
       <template #content>
         <div style="margin-top: 6px">
-          客户 <b>{{ dupAlert.customerName }}</b> 已有同类工单 <a-link>{{ dupAlert.id }}</a-link> 正在处理中({{ dupAlert.node }})
+          客户 <b>{{ dupAlert.customerName }}</b>({{ dupAlert.type }}) 已有同类工单 <a-link>{{ dupAlert.id }}</a-link> 正在处理中({{ dupAlert.node }})
+          <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px">
+            检测来源:
+            <span v-if="dupAlert.source === 'tickets'">工单池</span>
+            <span v-else-if="dupAlert.source === 'workflow'">工作流实例</span>
+            <span v-else>客户画像 ongoingTickets</span>
+          </div>
           <div style="margin-top: 8px; display: flex; gap: 8px">
             <a-button size="small" type="primary" status="warning" @click="$router.push(`/agent/ticket/${dupAlert.id}`)">关联已有工单</a-button>
             <a-button size="small" @click="dupAlert = null">继续新建</a-button>
@@ -83,7 +92,7 @@
       <div v-show="step === 1">
         <a-form :model="form">
           <a-form-item label="工单性质" required>
-            <a-radio-group v-model="form.type">
+            <a-radio-group v-model="form.type" @change="recheckDup">
               <a-radio value="consult">咨询</a-radio>
               <a-radio value="complaint">投诉</a-radio>
               <a-radio value="external">外部转办</a-radio>
@@ -171,7 +180,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { customers } from '@/mock/data'
+import { customers, tickets as mockTickets } from '@/mock/data'
 import { dispatchRules } from '@/mock/data_ext'
 import { useWorkflowStore } from '@/stores/workflow'
 import RiskTag from '@/components/RiskTag.vue'
@@ -218,18 +227,75 @@ const dispatchResult = computed(() => {
 
 const statusMap: Record<string, string> = { normal: '正常', overdue: '逾期', frozen: '冻结' }
 
+/**
+ * OPT-FIX-4 / P1-6:重复工单检测
+ * 三源合一查重:
+ * 1) customer.ongoingTickets(原能力,持续保留)
+ * 2) workflow.instances 同客户的同 kind 的 running/approved 实例
+ * 3) mock data tickets 中同客户的未关单 工单(priority 不限,只要 status 不是 closed)
+ * 命中任一源 → 显示 alert;按钮可关联/继续新建
+ */
 function lookupCustomer() {
   customer.value = customers.find(c => c.idCardMask.includes(form.customerId.slice(-4)) || c.phone.includes(form.customerId.slice(-4))) || null
-  if (customer.value) {
-    // 检测同类工单
-    const ongoing = customer.value.ongoingTickets.find((t: any) => t.type === form.type)
-    if (ongoing) {
-      dupAlert.value = { customerName: customer.value.name, id: ongoing.id, node: ongoing.node }
-    }
+  if (!customer.value) {
+    dupAlert.value = null
+    return
   }
+
+  const c = customer.value as any
+  const customerId = c.id
+
+  // 源 1:customer.ongoingTickets
+  const fromCustomerTickets = c.ongoingTickets?.find((t: any) => t.type === form.type)
+
+  // 源 2:workflow.instances 中同 customerId,排除 finished/expired
+  const fromWf = wf.instances.find(w =>
+    w.customerId === customerId
+    && w.status === 'running'
+    && wf.templateByKind(w.kind)?.nodes[0]?.fields?.some(f => f.options?.includes(form.type))
+  )
+
+  // 源 3:mock tickets 中同客户 + 同 type + 不在 closed 终态
+  const fromMock = (mockTickets as any[])?.find(t =>
+    t.customerId === customerId
+    && t.type === form.type
+    && t.status !== 'closed'
+    && t.status !== 'finished'
+  )
+
+  // 选取优先级最高的一处作为 alert
+  const hit = fromMock || fromWf || fromCustomerTickets
+  if (hit) {
+    dupAlert.value = {
+      source: fromMock ? 'tickets' : fromWf ? 'workflow' : 'customer',
+      customerName: c.name,
+      id: hit.id,
+      node: hit.node || hit.currentNode || '处理中',
+      type: form.type
+    }
+    return
+  }
+
+  dupAlert.value = null
+}
+
+/** 当用户切换 form.type 时重新跑一遍查重(不重新查客户) */
+function recheckDup() {
+  if (!customer.value) return
+  lookupCustomer()
 }
 
 const canSubmit = computed(() => form.customerId && form.type && form.category && form.description)
+
+/** 重复工单检测来源标签颜色 + 名称(OPT-FIX-4) */
+const dupSourceColor = computed(() => {
+  if (!dupAlert.value) return 'gray'
+  return ({ tickets: 'red', workflow: 'orange', customer: 'gray' } as Record<string, string>)[dupAlert.value.source] || 'gray'
+})
+const dupSourceLabel = computed(() => {
+  if (!dupAlert.value) return ''
+  return ({ tickets: '工单池', workflow: '工作流', customer: '客户档案' } as Record<string, string>)[dupAlert.value.source] || '未知'
+})
 
 function submit() {
   // 三维自动打标 + 客户标签联动:命中黑名单/扬言,自动生成 alert_directive 工作流给管理层
