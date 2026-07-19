@@ -7,19 +7,11 @@
       </div>
       <a-space>
         <a-dropdown trigger="click">
-          <a-button type="primary">
-            <icon-plus /> 高级操作 <icon-down />
-          </a-button>
+          <a-button type="primary"> <icon-plus /> 高级操作 <icon-down /> </a-button>
           <template #content>
-            <a-doption @click="$router.push('/agent/ticket-create')">
-              <icon-file /> 手动创建工单
-            </a-doption>
-            <a-doption @click="$router.push('/agent/reg-import')">
-              <icon-upload /> 监管转诉批量建单
-            </a-doption>
-            <a-doption @click="$router.push('/agent/batch')">
-              <icon-swap /> 批量作业(开票/开证明)
-            </a-doption>
+            <a-doption @click="$router.push('/agent/ticket-create')"> <icon-file /> 手动创建工单 </a-doption>
+            <a-doption @click="$router.push('/agent/reg-import')"> <icon-upload /> 监管转诉批量建单 </a-doption>
+            <a-doption @click="$router.push('/agent/batch')"> <icon-swap /> 批量作业(开票/开证明) </a-doption>
           </template>
         </a-dropdown>
         <a-button><icon-download /> 导出</a-button>
@@ -115,14 +107,14 @@ import { tickets } from '@/mock/data'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { fromNow } from '@/utils/format'
 
-const todoList = tickets.filter(t => t.status !== 'closed')
-const urgentCount = todoList.filter(t => t.urgency === 'urgent' || t.urgency === 'special').length
-const regCount = todoList.filter(t => t.isRegulator).length
+const todoList = tickets.filter((t) => t.status !== 'closed')
+const urgentCount = todoList.filter((t) => t.urgency === 'urgent' || t.urgency === 'special').length
+const regCount = todoList.filter((t) => t.isRegulator).length
 
 const filter = reactive({ keyword: '', urgency: '', type: '', regOnly: false })
 
 const filtered = computed(() => {
-  return todoList.filter(t => {
+  return todoList.filter((t) => {
     if (filter.keyword && !(t.id.includes(filter.keyword) || t.customerName.includes(filter.keyword))) return false
     if (filter.urgency && t.urgency !== filter.urgency) return false
     if (filter.type && t.type !== filter.type) return false
@@ -138,7 +130,10 @@ function rowClass(record: any) {
 }
 
 function reset() {
-  filter.keyword = ''; filter.urgency = ''; filter.type = ''; filter.regOnly = false
+  filter.keyword = ''
+  filter.urgency = ''
+  filter.type = ''
+  filter.regOnly = false
 }
 
 const columns: any[] = [
@@ -157,8 +152,14 @@ const columns: any[] = [
 </script>
 
 <style scoped>
-:deep(.cp-row-special) { background: #fff7e6 !important; }
-:deep(.cp-row-urgent) { background: #fff1f0 !important; }
+:deep(.cp-row-special) {
+  background: #fff7e6 !important;
+}
+:deep(.cp-row-urgent) {
+  background: #fff1f0 !important;
+}
 :deep(.cp-row-special:hover .arco-table-td),
-:deep(.cp-row-urgent:hover .arco-table-td) { filter: brightness(0.97); }
+:deep(.cp-row-urgent:hover .arco-table-td) {
+  filter: brightness(0.97);
+}
 </style>

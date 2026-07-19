@@ -13,7 +13,7 @@
     position="bottom"
     :arrow-width="0"
     :content-style="{ padding: 0, width: '360px' }"
-    @visible-change="(v: boolean) => popVisible = v"
+    @visible-change="(v: boolean) => (popVisible = v)"
   >
     <a-badge :count="unread" :max-count="99" :dot="false" :offset="[-4, 4]">
       <a-tooltip content="通知中心">
@@ -46,7 +46,9 @@
                 <span style="font-weight: 500; font-size: 13px">{{ n.title }}</span>
                 <span style="font-size: 11px; color: var(--cp-text-tertiary)">{{ n.time }}</span>
               </div>
-              <div style="font-size: 12px; color: var(--cp-text-secondary); margin-top: 2px; line-height: 1.5">{{ n.content }}</div>
+              <div style="font-size: 12px; color: var(--cp-text-secondary); margin-top: 2px; line-height: 1.5">
+                {{ n.content }}
+              </div>
               <a-tag v-if="n.tag" size="small" style="margin-top: 4px">{{ n.tag }}</a-tag>
             </div>
           </div>
@@ -68,7 +70,9 @@
         <span style="font-weight: 600">{{ n.title }}</span>
         <a-button size="small" type="text" @click.stop="onToastClose(n.id)"><icon-close /></a-button>
       </div>
-      <div style="font-size: 12px; color: var(--cp-text-secondary); margin-top: 4px; line-height: 1.5">{{ n.content }}</div>
+      <div style="font-size: 12px; color: var(--cp-text-secondary); margin-top: 4px; line-height: 1.5">
+        {{ n.content }}
+      </div>
     </div>
   </div>
 </template>
@@ -99,17 +103,24 @@ const toasts = ref<NotifItem[]>([])
 const popVisible = ref(false)
 let toastTimers = new Map<string, any>()
 
-const unread = computed(() => items.value.filter(n => !n.read).length)
+const unread = computed(() => items.value.filter((n) => !n.read).length)
 
 function nowStr() {
   const d = new Date()
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
-function uid() { return `N-${Date.now()}-${Math.floor(Math.random() * 1000)}` }
+function uid() {
+  return `N-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+}
 
 function levelColor(l: NotifItem['level']) {
-  return { info: 'var(--cp-brand)', success: 'var(--cp-success)', warning: 'var(--cp-warning)', error: 'var(--cp-danger)' }[l]
+  return {
+    info: 'var(--cp-brand)',
+    success: 'var(--cp-success)',
+    warning: 'var(--cp-warning)',
+    error: 'var(--cp-danger)'
+  }[l]
 }
 
 function push(n: Omit<NotifItem, 'id' | 'time' | 'read'>) {
@@ -126,7 +137,7 @@ function push(n: Omit<NotifItem, 'id' | 'time' | 'read'>) {
 function dismissToast(id: string) {
   if (!isMounted) return
   try {
-    toasts.value = toasts.value.filter(n => n.id !== id)
+    toasts.value = toasts.value.filter((n) => n.id !== id)
   } catch (e) {
     // 静默:组件卸载中
   }
@@ -141,7 +152,9 @@ function onToastClick(n: NotifItem) {
     n.read = true
     popVisible.value = true
     dismissToast(n.id)
-  } catch (e) { /* 卸载中 */ }
+  } catch (e) {
+    /* 卸载中 */
+  }
 }
 
 function onToastClose(id: string) {
@@ -149,7 +162,7 @@ function onToastClose(id: string) {
 }
 
 function markAllRead() {
-  items.value.forEach(n => n.read = true)
+  items.value.forEach((n) => (n.read = true))
 }
 
 function clearAll() {
@@ -162,7 +175,9 @@ function handleClick(n: NotifItem) {
   if (n.link) {
     window.location.hash = ''
     // 通过 hash 触发 router 跳转
-    setTimeout(() => { window.location.href = n.link! }, 0)
+    setTimeout(() => {
+      window.location.href = n.link!
+    }, 0)
   }
 }
 
@@ -219,31 +234,49 @@ onUnmounted(() => {
   if (onNotify) window.removeEventListener(EVT.WORKFLOW_NOTIFY_SEAT, onNotify)
   if (onVerified) window.removeEventListener(EVT.WORKFLOW_ALERT_VERIFIED, onVerified)
   if (onOverdue) window.removeEventListener(EVT.WORKFLOW_OVERDUE, onOverdue)
-  toastTimers.forEach(t => clearTimeout(t))
+  toastTimers.forEach((t) => clearTimeout(t))
   toastTimers.clear()
 })
 </script>
 
 <style scoped>
-.cp-nc { width: 360px; max-height: 480px; display: flex; flex-direction: column; }
+.cp-nc {
+  width: 360px;
+  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+}
 .cp-nc-head {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 10px 12px;
   border-bottom: 1px solid var(--cp-border-light);
 }
-.cp-nc-list { overflow-y: auto; max-height: 420px; }
+.cp-nc-list {
+  overflow-y: auto;
+  max-height: 420px;
+}
 .cp-nc-item {
-  display: flex; gap: 10px;
+  display: flex;
+  gap: 10px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--cp-border-light);
   cursor: pointer;
   transition: background 0.15s;
 }
-.cp-nc-item:hover { background: var(--cp-bg-hover); }
-.cp-nc-item.is-unread { background: var(--cp-brand-soft); }
+.cp-nc-item:hover {
+  background: var(--cp-bg-hover);
+}
+.cp-nc-item.is-unread {
+  background: var(--cp-brand-soft);
+}
 .cp-nc-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  margin-top: 6px; flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
 }
 
 /* 顶部 toast */
@@ -252,7 +285,9 @@ onUnmounted(() => {
   top: 70px;
   right: 24px;
   z-index: 9999;
-  display: flex; flex-direction: column; gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   pointer-events: none;
 }
 .cp-nc-toast {
@@ -260,13 +295,22 @@ onUnmounted(() => {
   background: #fff;
   border-radius: 6px;
   padding: 10px 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   border-left: 4px solid var(--cp-brand);
   pointer-events: auto;
   cursor: pointer;
 }
 
-.cp-nc-toast-enter-active, .cp-nc-toast-leave-active { transition: all 0.25s; }
-.cp-nc-toast-enter-from { opacity: 0; transform: translateX(20px); }
-.cp-nc-toast-leave-to { opacity: 0; transform: translateX(20px); }
+.cp-nc-toast-enter-active,
+.cp-nc-toast-leave-active {
+  transition: all 0.25s;
+}
+.cp-nc-toast-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+.cp-nc-toast-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
 </style>

@@ -2,12 +2,16 @@
   <div class="cp-consumer-page">
     <div class="cp-satisfaction-card">
       <h2 class="cp-c-title" style="margin-top: 0">满意度评价</h2>
-      <div style="font-size: 13px; color: var(--cp-text-tertiary); margin-bottom: 16px">工单 GD-20260712-0001 · 电话催收时间过早</div>
+      <div style="font-size: 13px; color: var(--cp-text-tertiary); margin-bottom: 16px">
+        工单 GD-20260712-0001 · 电话催收时间过早
+      </div>
 
       <div class="cp-rate-block">
         <div style="margin-bottom: 8px; font-size: 13px">整体满意度</div>
         <a-rate v-model="satisfaction" :size="32" />
-        <div style="margin-top: 6px; font-size: 12px; color: var(--cp-text-tertiary)">{{ rateText[satisfaction - 1] }}</div>
+        <div style="margin-top: 6px; font-size: 12px; color: var(--cp-text-tertiary)">
+          {{ rateText[satisfaction - 1] }}
+        </div>
       </div>
 
       <div class="cp-rate-block">
@@ -28,7 +32,13 @@
 
       <div class="cp-rate-block">
         <div style="margin-bottom: 8px; font-size: 13px">补充说明 (选填)</div>
-        <a-textarea v-model="comment" :rows="3" placeholder="您的反馈对我们非常重要..." :max-length="200" show-word-limit />
+        <a-textarea
+          v-model="comment"
+          :rows="3"
+          placeholder="您的反馈对我们非常重要..."
+          :max-length="200"
+          show-word-limit
+        />
       </div>
 
       <a-alert v-if="satisfaction <= 2" type="warning" show-icon style="margin-bottom: 16px">
@@ -57,11 +67,18 @@ function submit() {
 </script>
 
 <style scoped>
-.cp-consumer-page { max-width: 720px; margin: 0 auto; padding: 24px 20px; }
+.cp-consumer-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
 .cp-satisfaction-card {
-  background: #fff; border-radius: 8px;
+  background: #fff;
+  border-radius: 8px;
   border: 1px solid var(--cp-border);
   padding: 24px 28px;
 }
-.cp-rate-block { margin-bottom: 20px; }
+.cp-rate-block {
+  margin-bottom: 20px;
+}
 </style>

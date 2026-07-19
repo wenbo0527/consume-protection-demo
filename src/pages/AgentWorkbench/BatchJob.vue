@@ -30,7 +30,9 @@
         <template #columns>
           <a-table-column title="任务编号" data-index="id" />
           <a-table-column title="类型" data-index="type">
-            <template #cell="{ record }"><a-tag color="blue">{{ record.type }}</a-tag></template>
+            <template #cell="{ record }"
+              ><a-tag color="blue">{{ record.type }}</a-tag></template
+            >
           </a-table-column>
           <a-table-column title="总数" data-index="totalCount" />
           <a-table-column title="成功">
@@ -54,7 +56,9 @@
           <a-table-column title="操作">
             <template #cell="{ record }">
               <a-space :size="4">
-                <a-button v-if="record.failedCount" size="small" type="primary" @click="showRetry(record)">处理失败</a-button>
+                <a-button v-if="record.failedCount" size="small" type="primary" @click="showRetry(record)"
+                  >处理失败</a-button
+                >
                 <a-button size="small">详情</a-button>
               </a-space>
             </template>
@@ -68,7 +72,8 @@
       <a-alert v-if="current?.failedItems?.length" type="warning" show-icon style="margin-bottom: 16px">
         <template #title>共 {{ current.failedItems.length }} 条失败,系统将自动重试 (上限 3 次)</template>
         <template #content>
-          失败条目已尝试 {{ current.failedItems[0].retryCount }} 次,继续重试可能仍然失败,3 次后仍未成功将标记为"需人工处理"并告警。
+          失败条目已尝试 {{ current.failedItems[0].retryCount }} 次,继续重试可能仍然失败,3
+          次后仍未成功将标记为"需人工处理"并告警。
         </template>
       </a-alert>
 
@@ -97,9 +102,16 @@
         </template>
       </a-table>
 
-      <div v-if="current?.failedItems?.length" style="margin-top: 16px; padding: 12px; background: var(--cp-bg-soft); border-radius: 6px; font-size: 12px">
+      <div
+        v-if="current?.failedItems?.length"
+        style="margin-top: 16px; padding: 12px; background: var(--cp-bg-soft); border-radius: 6px; font-size: 12px"
+      >
         <div><icon-info-circle /> 已尝试重试 {{ current.failedItems[0].retryCount }} 次 / 上限 3 次</div>
-        <a-progress :percent="(current.failedItems[0].retryCount / 3) * 100" :show-text="false" style="margin-top: 8px" />
+        <a-progress
+          :percent="(current.failedItems[0].retryCount / 3) * 100"
+          :show-text="false"
+          style="margin-top: 8px"
+        />
       </div>
 
       <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px">

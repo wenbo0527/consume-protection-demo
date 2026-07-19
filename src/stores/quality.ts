@@ -20,7 +20,7 @@ export interface QaScoreItem {
 }
 
 export interface QaCase {
-  id: string                     // QA-20260715-0001
+  id: string // QA-20260715-0001
   /** 关联工单 ID */
   ticketId: string
   /** 关联客户 ID */
@@ -74,14 +74,18 @@ function loadPersisted(): QaCase[] {
       const arr = JSON.parse(raw)
       if (Array.isArray(arr)) return arr
     }
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
   return buildSeed()
 }
 
 function savePersisted(cases: QaCase[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cases))
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
 }
 
 function buildSeed(): QaCase[] {
@@ -155,15 +159,15 @@ export const useQualityStore = defineStore('quality', {
     cases: loadPersisted() as QaCase[]
   }),
   getters: {
-    pendingCount: (s) => s.cases.filter(c => c.status === 'pending').length,
-    scoringCount: (s) => s.cases.filter(c => c.status === 'scoring').length,
-    rectifyCount: (s) => s.cases.filter(c => c.status === 'rectify').length,
+    pendingCount: (s) => s.cases.filter((c) => c.status === 'pending').length,
+    scoringCount: (s) => s.cases.filter((c) => c.status === 'scoring').length,
+    rectifyCount: (s) => s.cases.filter((c) => c.status === 'rectify').length,
     avgScore: (s) => {
-      const scored = s.cases.filter(c => c.totalScore !== undefined)
+      const scored = s.cases.filter((c) => c.totalScore !== undefined)
       if (!scored.length) return 0
       return Math.round(scored.reduce((a, c) => a + (c.totalScore || 0), 0) / scored.length)
     },
-    severeCount: (s) => s.cases.filter(c => c.severity === 'severe' || c.severity === 'high').length
+    severeCount: (s) => s.cases.filter((c) => c.severity === 'severe' || c.severity === 'high').length
   },
   actions: {
     persist() {
@@ -189,7 +193,7 @@ export const useQualityStore = defineStore('quality', {
 
     /** 提交评分 */
     score(id: string, inspector: string, scores: QaScoreItem[], issues: string[], severity: QaSeverity) {
-      const c = this.cases.find(x => x.id === id)
+      const c = this.cases.find((x) => x.id === id)
       if (!c) return
       const total = scores.reduce((a, s) => a + s.score, 0)
       c.inspector = inspector
@@ -206,7 +210,7 @@ export const useQualityStore = defineStore('quality', {
 
     /** 关联整改任务(由整改模块回调) */
     attachRectify(qaId: string, rectifyTaskId: string) {
-      const c = this.cases.find(x => x.id === qaId)
+      const c = this.cases.find((x) => x.id === qaId)
       if (!c) return
       c.rectifyTaskId = rectifyTaskId
       c.updatedAt = nowStr()
@@ -215,7 +219,7 @@ export const useQualityStore = defineStore('quality', {
 
     /** 复检(由整改完成后触发) */
     recheck(qaId: string, operator: string, score: number, passed: boolean, note?: string) {
-      const c = this.cases.find(x => x.id === qaId)
+      const c = this.cases.find((x) => x.id === qaId)
       if (!c) return
       if (!c.recheckLog) c.recheckLog = []
       c.recheckLog.push({ operator, at: nowStr(), score, passed, note })

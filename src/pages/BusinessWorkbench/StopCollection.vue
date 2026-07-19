@@ -10,18 +10,18 @@
 
     <!-- OPT-5 联动横幅:展示由坐席在 AgentDesk 发起、正在此页生效的业务申请 -->
     <a-alert v-if="businessAppsForStop.length" type="info" show-icon style="margin-bottom: 16px">
-      <template #title>
-        来自坐席的业务申请({{ businessAppsForStop.length }} 条)
-      </template>
+      <template #title> 来自坐席的业务申请({{ businessAppsForStop.length }} 条) </template>
       <template #content>
         <div style="font-size: 13px">
-          这些申请由坐席在 `/agent/desk` 发起,审批通过后自动启动工作流实例并落到下方表中。
-          当前运行实例 <b>{{ runningInstances }}</b> 条 / 总 {{ list.length }} 条。
+          这些申请由坐席在 `/agent/desk` 发起,审批通过后自动启动工作流实例并落到下方表中。 当前运行实例
+          <b>{{ runningInstances }}</b> 条 / 总 {{ list.length }} 条。
         </div>
         <div v-for="a in businessAppsForStop.slice(0, 3)" :key="a.id" style="margin-top: 4px; font-size: 12px">
           <a-tag size="small" :color="baStatusColor(a.status)">{{ appStatusLabel(a.status) }}</a-tag>
           <span>{{ a.id }}</span>
-          <span style="color: var(--cp-text-tertiary); margin-left: 6px">{{ a.title }} · 客户 {{ a.customerName }}</span>
+          <span style="color: var(--cp-text-tertiary); margin-left: 6px"
+            >{{ a.title }} · 客户 {{ a.customerName }}</span
+          >
         </div>
       </template>
     </a-alert>
@@ -31,8 +31,12 @@
       <template #title>2 笔停催将于 24 小时内到期</template>
       <template #content>
         <a-space>
-          <a-tag color="orange" style="cursor: pointer" @click="$message.info('查看详情')">GD-20260710-0019 (明天到期)</a-tag>
-          <a-tag color="orange" style="cursor: pointer" @click="$message.info('查看详情')">GD-20260708-0099 (后天到期)</a-tag>
+          <a-tag color="orange" style="cursor: pointer" @click="$message.info('查看详情')"
+            >GD-20260710-0019 (明天到期)</a-tag
+          >
+          <a-tag color="orange" style="cursor: pointer" @click="$message.info('查看详情')"
+            >GD-20260708-0099 (后天到期)</a-tag
+          >
           <a-button size="small" type="primary">一键续期</a-button>
         </a-space>
       </template>
@@ -133,37 +137,64 @@ const showForm = ref(false)
 const form = reactive({ customer: '', ticket: '', reason: '', period: '30 天', urgency: 'normal', withhold: true })
 
 // 从工作流实例中取停催停扣类
-const list = computed(() => wf.instances
-  .filter(i => i.kind === 'stop_collection')
-  .map(i => {
-    const row = enrichStopCollectionRow(i)
-    const approveExec = i.executions.find(e => e.nodeCode === 'approve')
-    return {
-      ...row,
-      approval: approveExec?.operator ? `${approveExec.operator}${approveExec.comment ? ' · ' + approveExec.comment : ''}` : (approveExec?.status === 'pending' ? '待审批' : '-'),
-      effectiveAt: i.relatedTicketStatus ? i.createdAt : '-'
-    }
-  })
+const list = computed(() =>
+  wf.instances
+    .filter((i) => i.kind === 'stop_collection')
+    .map((i) => {
+      const row = enrichStopCollectionRow(i)
+      const approveExec = i.executions.find((e) => e.nodeCode === 'approve')
+      return {
+        ...row,
+        approval: approveExec?.operator
+          ? `${approveExec.operator}${approveExec.comment ? ' · ' + approveExec.comment : ''}`
+          : approveExec?.status === 'pending'
+            ? '待审批'
+            : '-',
+        effectiveAt: i.relatedTicketStatus ? i.createdAt : '-'
+      }
+    })
 )
 
 // OPT-5 业务申请来源(由坐席在 AgentDesk 发起)
 const ba = useBusinessAppStore()
 const businessAppsForStop = computed(() =>
-  ba.items.filter(a => a.type === 'stop_collection' || a.type === 'negotiate')
+  ba.items.filter((a) => a.type === 'stop_collection' || a.type === 'negotiate')
 )
-const runningInstances = computed(() => list.value.filter(r => r.status === 'running').length)
+const runningInstances = computed(() => list.value.filter((r) => r.status === 'running').length)
 
 function statusColor(s: string) {
-  return mapInstanceStatus(s).color === 'green' ? 'green'
-    : mapInstanceStatus(s).color === 'red' ? 'red'
-    : s === '已恢复' ? 'gray' : 'blue'
+  return mapInstanceStatus(s).color === 'green'
+    ? 'green'
+    : mapInstanceStatus(s).color === 'red'
+      ? 'red'
+      : s === '已恢复'
+        ? 'gray'
+        : 'blue'
 }
 
 function baStatusColor(s: string) {
-  return ({ pending: 'orange', approved: 'arcoblue', rejected: 'red', in_progress: 'blue', executed: 'green', closed: 'gray' })[s] || 'gray'
+  return (
+    {
+      pending: 'orange',
+      approved: 'arcoblue',
+      rejected: 'red',
+      in_progress: 'blue',
+      executed: 'green',
+      closed: 'gray'
+    }[s] || 'gray'
+  )
 }
 function appStatusLabel(s: string) {
-  return ({ pending: '待审批', approved: '已批准', rejected: '已驳回', in_progress: '执行中', executed: '已执行', closed: '已关闭' })[s] || s
+  return (
+    {
+      pending: '待审批',
+      approved: '已批准',
+      rejected: '已驳回',
+      in_progress: '执行中',
+      executed: '已执行',
+      closed: '已关闭'
+    }[s] || s
+  )
 }
 
 function onSubmit() {

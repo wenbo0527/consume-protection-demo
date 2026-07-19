@@ -15,12 +15,8 @@
         </template>
       </a-alert>
 
-      <div class="cp-action-row">
-        <span class="cp-label">方案编号</span><span>NX-20260601-0078</span>
-      </div>
-      <div class="cp-action-row">
-        <span class="cp-label">客户</span><span>王某某</span>
-      </div>
+      <div class="cp-action-row"><span class="cp-label">方案编号</span><span>NX-20260601-0078</span></div>
+      <div class="cp-action-row"><span class="cp-label">客户</span><span>王某某</span></div>
       <div class="cp-action-row">
         <span class="cp-label">违约记录</span><span style="color: var(--cp-danger)">已逾期 5 天</span>
       </div>
@@ -59,11 +55,46 @@ function confirm() {
 </script>
 
 <style scoped>
-.cp-action { display: flex; flex-direction: column; height: 100%; }
-.cp-action-head { padding: 16px 20px; border-bottom: 1px solid var(--cp-border-light); display: flex; justify-content: space-between; align-items: center; }
-.cp-action-title { font-size: 16px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
-.cp-action-body { flex: 1; padding: 16px 20px; overflow-y: auto; }
-.cp-action-row { display: flex; gap: 12px; margin-bottom: 10px; }
-.cp-label { font-size: 12px; color: var(--cp-text-tertiary); min-width: 70px; }
-.cp-action-foot { padding: 12px 20px; border-top: 1px solid var(--cp-border-light); display: flex; justify-content: flex-end; gap: 8px; }
+.cp-action {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.cp-action-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cp-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cp-action-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cp-action-body {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+.cp-action-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.cp-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  min-width: 70px;
+}
+.cp-action-foot {
+  padding: 12px 20px;
+  border-top: 1px solid var(--cp-border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
 </style>

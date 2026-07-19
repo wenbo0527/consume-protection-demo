@@ -95,10 +95,10 @@ const reviewStore = useReviewStore()
 const router = useRouter()
 
 function sourceColor(s: string) {
-  return ({ system: 'gray', manual: 'blue', rectify: 'orange', regulator: 'red' })[s] || 'gray'
+  return { system: 'gray', manual: 'blue', rectify: 'orange', regulator: 'red' }[s] || 'gray'
 }
 function sourceLabel(s: string) {
-  return ({ system: '系统', manual: '手工', rectify: '整改沉淀', regulator: '监管' })[s] || s
+  return { system: '系统', manual: '手工', rectify: '整改沉淀', regulator: '监管' }[s] || s
 }
 function jumpRectify(rec: ReviewStandard) {
   if (rec.rectifyTaskId) {
@@ -122,6 +122,14 @@ function jumpRectify(rec: ReviewStandard) {
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
 }
-.cp-kpi-label { font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 4px; }
-.cp-kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+.cp-kpi-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 4px;
+}
+.cp-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
 </style>

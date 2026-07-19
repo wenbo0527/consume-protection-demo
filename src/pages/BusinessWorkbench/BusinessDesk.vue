@@ -140,11 +140,55 @@ interface BizTask {
 }
 
 const stream = ref<BizTask[]>([
-  { id: 'B001', type: '停催申请', title: 'GD-20260714-0008 停催审批', desc: '周志远·扬言客户·申请 7 天停催', priority: 'critical', source: '工单系统', createdAt: '2026-07-15 09:30', customerName: '周志远' },
-  { id: 'B002', type: '协商方案', title: '刘建国·协商试算', desc: '客户已确认还款意向,试算 6 期方案', priority: 'high', source: '工单系统', createdAt: '2026-07-15 11:00', customerName: '刘建国' },
-  { id: 'B003', type: '征信异议', title: '孙丽华·征信异议核实', desc: '需调取征信报告,5 个工作日内反馈', priority: 'high', source: '工单系统', createdAt: '2026-07-15 14:20', customerName: '孙丽华' },
-  { id: 'B004', type: '审批驳回', title: 'ST-20260708-0009 停催被驳回', desc: '材料不全,请补充催收频次证据', priority: 'medium', source: 'OA系统', createdAt: '2026-07-13 14:00' },
-  { id: 'B005', type: '方案违约', title: 'NX-20260601-0078 违约', desc: '王某某·已逾期 5 天·催收已恢复', priority: 'high', source: '规则引擎', createdAt: '2026-07-15 08:00', customerName: '王某某' }
+  {
+    id: 'B001',
+    type: '停催申请',
+    title: 'GD-20260714-0008 停催审批',
+    desc: '周志远·扬言客户·申请 7 天停催',
+    priority: 'critical',
+    source: '工单系统',
+    createdAt: '2026-07-15 09:30',
+    customerName: '周志远'
+  },
+  {
+    id: 'B002',
+    type: '协商方案',
+    title: '刘建国·协商试算',
+    desc: '客户已确认还款意向,试算 6 期方案',
+    priority: 'high',
+    source: '工单系统',
+    createdAt: '2026-07-15 11:00',
+    customerName: '刘建国'
+  },
+  {
+    id: 'B003',
+    type: '征信异议',
+    title: '孙丽华·征信异议核实',
+    desc: '需调取征信报告,5 个工作日内反馈',
+    priority: 'high',
+    source: '工单系统',
+    createdAt: '2026-07-15 14:20',
+    customerName: '孙丽华'
+  },
+  {
+    id: 'B004',
+    type: '审批驳回',
+    title: 'ST-20260708-0009 停催被驳回',
+    desc: '材料不全,请补充催收频次证据',
+    priority: 'medium',
+    source: 'OA系统',
+    createdAt: '2026-07-13 14:00'
+  },
+  {
+    id: 'B005',
+    type: '方案违约',
+    title: 'NX-20260601-0078 违约',
+    desc: '王某某·已逾期 5 天·催收已恢复',
+    priority: 'high',
+    source: '规则引擎',
+    createdAt: '2026-07-15 08:00',
+    customerName: '王某某'
+  }
 ])
 
 const active = ref<BizTask | null>(null)
@@ -182,7 +226,9 @@ function pushBusinessEvent(type: string, desc: string) {
   Message.success('已推送到任务流')
 }
 
-function handle() { Message.success('已打开操作详情') }
+function handle() {
+  Message.success('已打开操作详情')
+}
 
 // 关单弹窗的响应式选择(P0-1 兼容)
 const expiringChoice = ref<'renew' | 'dispose'>('renew')
@@ -194,7 +240,7 @@ function finish() {
     if (active.value.type === '审批驳回') msg = '已修改并重新提交申请'
     else if (active.value.type === '停催到期') msg = expiringChoice.value === 'renew' ? '已一键续期' : '已确认处置'
     else if (active.value.type === '方案违约') msg = '已处置该违约方案'
-    stream.value = stream.value.filter(t => t.id !== active.value!.id)
+    stream.value = stream.value.filter((t) => t.id !== active.value!.id)
     Message.success(msg)
     active.value = null
     expiringChoice.value = 'renew'
@@ -204,17 +250,37 @@ function finish() {
 </script>
 
 <style scoped>
-.cp-desk { display: flex; flex-direction: column; height: calc(100vh - 56px); }
+.cp-desk {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 56px);
+}
 .cp-desk-header {
-  background: #fff; padding: 10px 24px;
+  background: #fff;
+  padding: 10px 24px;
   border-bottom: 1px solid var(--cp-border-light);
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex-shrink: 0;
 }
-.cp-desk-status { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-.cp-status-dot { width: 8px; height: 8px; border-radius: 50%; }
-.cp-status-idle { background: var(--cp-brand); }
-.cp-status-label { font-weight: 500; }
+.cp-desk-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.cp-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.cp-status-idle {
+  background: var(--cp-brand);
+}
+.cp-status-label {
+  font-weight: 500;
+}
 
 .cp-desk-body {
   flex: 1;
@@ -225,31 +291,139 @@ function finish() {
   overflow: hidden;
 }
 
-.cp-desk-stream { background: #fff; border: 1px solid var(--cp-border-light); border-radius: 6px; display: flex; flex-direction: column; overflow: hidden; }
-.cp-stream-head { padding: 12px 16px; border-bottom: 1px solid var(--cp-border-light); display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
-.cp-stream-list { flex: 1; overflow-y: auto; padding: 6px; }
+.cp-desk-stream {
+  background: #fff;
+  border: 1px solid var(--cp-border-light);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.cp-stream-head {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--cp-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+.cp-stream-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+}
 
-.cp-task-item { padding: 10px 12px; border-radius: 4px; cursor: pointer; margin-bottom: 4px; border-left: 3px solid transparent; transition: all 0.15s; }
-.cp-task-item:hover { background: var(--cp-bg-hover); }
-.cp-task-item.is-active { background: var(--cp-brand-soft); border-left-color: var(--cp-brand); }
-.cp-task-item.pri-critical { border-left-color: var(--cp-danger); background: var(--cp-danger-soft); }
-.cp-task-item.pri-high { border-left-color: var(--cp-warning); }
-.cp-task-head { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-.cp-task-icon { color: var(--cp-brand); font-size: 14px; }
-.cp-task-title { font-size: 13px; font-weight: 500; flex: 1; }
-.cp-task-desc { font-size: 12px; color: var(--cp-text-secondary); line-height: 1.4; }
-.cp-task-meta { font-size: 11px; color: var(--cp-text-tertiary); margin-top: 4px; display: flex; gap: 4px; }
+.cp-task-item {
+  padding: 10px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+.cp-task-item:hover {
+  background: var(--cp-bg-hover);
+}
+.cp-task-item.is-active {
+  background: var(--cp-brand-soft);
+  border-left-color: var(--cp-brand);
+}
+.cp-task-item.pri-critical {
+  border-left-color: var(--cp-danger);
+  background: var(--cp-danger-soft);
+}
+.cp-task-item.pri-high {
+  border-left-color: var(--cp-warning);
+}
+.cp-task-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.cp-task-icon {
+  color: var(--cp-brand);
+  font-size: 14px;
+}
+.cp-task-title {
+  font-size: 13px;
+  font-weight: 500;
+  flex: 1;
+}
+.cp-task-desc {
+  font-size: 12px;
+  color: var(--cp-text-secondary);
+  line-height: 1.4;
+}
+.cp-task-meta {
+  font-size: 11px;
+  color: var(--cp-text-tertiary);
+  margin-top: 4px;
+  display: flex;
+  gap: 4px;
+}
 
-.cp-desk-action { background: #fff; border: 1px solid var(--cp-border-light); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; }
-.cp-desk-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; }
+.cp-desk-action {
+  background: #fff;
+  border: 1px solid var(--cp-border-light);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.cp-desk-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
 
-.cp-biz-action { display: flex; flex-direction: column; height: 100%; }
-.cp-biz-head { padding: 16px 20px; border-bottom: 1px solid var(--cp-border-light); display: flex; justify-content: space-between; align-items: center; }
-.cp-action-title { font-size: 16px; font-weight: 600; margin: 0; }
-.cp-biz-body { flex: 1; padding: 16px 20px; overflow-y: auto; }
-.cp-biz-foot { padding: 12px 20px; border-top: 1px solid var(--cp-border-light); display: flex; justify-content: flex-end; gap: 8px; }
+.cp-biz-action {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.cp-biz-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cp-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cp-action-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+.cp-biz-body {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+.cp-biz-foot {
+  padding: 12px 20px;
+  border-top: 1px solid var(--cp-border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
 
-.cp-desk-context { background: #fff; border: 1px solid var(--cp-border-light); border-radius: 6px; overflow: hidden; }
-.cp-biz-context { padding: 16px 20px; }
-.cp-section-title { font-size: 14px; font-weight: 600; margin: 0 0 12px; color: var(--cp-text); }
+.cp-desk-context {
+  background: #fff;
+  border: 1px solid var(--cp-border-light);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.cp-biz-context {
+  padding: 16px 20px;
+}
+.cp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--cp-text);
+}
 </style>

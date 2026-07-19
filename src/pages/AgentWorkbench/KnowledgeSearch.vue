@@ -15,7 +15,13 @@
 
     <!-- 搜索框 -->
     <div class="cp-card" style="padding: 24px; margin-bottom: 16px">
-      <a-input-search v-model="keyword" placeholder="输入关键词,如:催收频次 / 息费 / 征信异议" size="large" allow-clear style="width: 100%" />
+      <a-input-search
+        v-model="keyword"
+        placeholder="输入关键词,如:催收频次 / 息费 / 征信异议"
+        size="large"
+        allow-clear
+        style="width: 100%"
+      />
       <div style="margin-top: 12px">
         <span style="color: var(--cp-text-tertiary); font-size: 12px; margin-right: 8px">热门:</span>
         <a-tag v-for="hot in hots" :key="hot" style="cursor: pointer" @click="keyword = hot">{{ hot }}</a-tag>
@@ -23,10 +29,10 @@
       <a-divider style="margin: 16px 0" />
       <a-radio-group v-model="category" type="button">
         <a-radio value="">全部 ({{ knowledge.length }})</a-radio>
-        <a-radio value="rule">业务规则 ({{ knowledge.filter(k => k.category === 'rule').length }})</a-radio>
-        <a-radio value="script">话术模板 ({{ knowledge.filter(k => k.category === 'script').length }})</a-radio>
-        <a-radio value="product">新产品知识 ({{ knowledge.filter(k => k.category === 'product').length }})</a-radio>
-        <a-radio value="review">审查意见 ({{ knowledge.filter(k => k.category === 'review').length }})</a-radio>
+        <a-radio value="rule">业务规则 ({{ knowledge.filter((k) => k.category === 'rule').length }})</a-radio>
+        <a-radio value="script">话术模板 ({{ knowledge.filter((k) => k.category === 'script').length }})</a-radio>
+        <a-radio value="product">新产品知识 ({{ knowledge.filter((k) => k.category === 'product').length }})</a-radio>
+        <a-radio value="review">审查意见 ({{ knowledge.filter((k) => k.category === 'review').length }})</a-radio>
       </a-radio-group>
     </div>
 
@@ -75,7 +81,7 @@ const category = ref('')
 const hots = ['催收频次', '征信异议', '协商还款', '扬言客户', '停催申请']
 
 const filtered = computed(() => {
-  return knowledge.filter(k => {
+  return knowledge.filter((k) => {
     if (category.value && k.category !== category.value) return false
     if (keyword.value && !k.title.includes(keyword.value) && !k.content.includes(keyword.value)) return false
     return true

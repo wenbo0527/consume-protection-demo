@@ -3,15 +3,7 @@
 // 当前所有用 `from '@/mock/data'` 的代码,可以平滑切换到 `from '@/mock'`
 
 // 类型
-export type {
-  Customer,
-  Ticket,
-  ReviewProject,
-  AlertItem,
-  BlackListItem,
-  KnowledgeItem,
-  Complaint
-} from './data'
+export type { Customer, Ticket, ReviewProject, AlertItem, BlackListItem, KnowledgeItem, Complaint } from './data'
 
 // 数据(运行时实际数据来自 data.ts)
 export {

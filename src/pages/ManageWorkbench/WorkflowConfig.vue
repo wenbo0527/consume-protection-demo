@@ -25,7 +25,13 @@
                   <icon-plus />
                 </a-button>
               </div>
-              <div v-for="s in statusList" :key="s.code" class="cp-state-card" :class="{ 'is-active': activeState === s.code }" @click="activeState = s.code">
+              <div
+                v-for="s in statusList"
+                :key="s.code"
+                class="cp-state-card"
+                :class="{ 'is-active': activeState === s.code }"
+                @click="activeState = s.code"
+              >
                 <div style="display: flex; align-items: center; gap: 8px">
                   <span class="cp-state-dot" :style="{ background: stateColor(s.code) }"></span>
                   <span style="font-weight: 500; font-size: 13px">{{ s.name }}</span>
@@ -57,10 +63,26 @@
               <div class="cp-canvas">
                 <svg viewBox="0 0 800 460" width="100%">
                   <defs>
-                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <marker
+                      id="arrow"
+                      viewBox="0 0 10 10"
+                      refX="9"
+                      refY="5"
+                      markerWidth="6"
+                      markerHeight="6"
+                      orient="auto-start-reverse"
+                    >
                       <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" />
                     </marker>
-                    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <marker
+                      id="arrow-orange"
+                      viewBox="0 0 10 10"
+                      refX="9"
+                      refY="5"
+                      markerWidth="6"
+                      markerHeight="6"
+                      orient="auto-start-reverse"
+                    >
                       <path d="M 0 0 L 10 5 L 0 10 z" fill="#ff7d00" />
                     </marker>
                   </defs>
@@ -68,43 +90,105 @@
                   <!-- 状态节点 + 流转箭头 -->
                   <g v-for="(s, idx) in statusList" :key="s.code">
                     <rect
-                      :x="100" :y="40 + idx * 70"
-                      width="180" height="48"
+                      :x="100"
+                      :y="40 + idx * 70"
+                      width="180"
+                      height="48"
                       rx="6"
                       :fill="s.isStart ? '#e8f7e6' : s.isEnd ? '#f0f1f5' : '#fff'"
                       :stroke="stateColor(s.code)"
                       stroke-width="2"
                     />
-                    <text :x="190" :y="60 + idx * 70" text-anchor="middle" font-size="13" font-weight="600" fill="#1d2129">{{ s.name }}</text>
-                    <text :x="190" :y="78 + idx * 70" text-anchor="middle" font-size="10" fill="#86909c">{{ s.code }} · 超时 {{ s.timeout }}</text>
+                    <text
+                      :x="190"
+                      :y="60 + idx * 70"
+                      text-anchor="middle"
+                      font-size="13"
+                      font-weight="600"
+                      fill="#1d2129"
+                    >
+                      {{ s.name }}
+                    </text>
+                    <text :x="190" :y="78 + idx * 70" text-anchor="middle" font-size="10" fill="#86909c">
+                      {{ s.code }} · 超时 {{ s.timeout }}
+                    </text>
                   </g>
 
                   <!-- 流转箭头(简化展示) -->
                   <g>
-                    <line x1="280" y1="64" x2="380" y2="64" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)" />
+                    <line
+                      x1="280"
+                      y1="64"
+                      x2="380"
+                      y2="64"
+                      stroke="#94a3b8"
+                      stroke-width="1.5"
+                      marker-end="url(#arrow)"
+                    />
                     <text x="330" y="58" text-anchor="middle" font-size="10" fill="#86909c">自动分单</text>
 
-                    <line x1="280" y1="134" x2="380" y2="134" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)" />
+                    <line
+                      x1="280"
+                      y1="134"
+                      x2="380"
+                      y2="134"
+                      stroke="#94a3b8"
+                      stroke-width="1.5"
+                      marker-end="url(#arrow)"
+                    />
                     <text x="330" y="128" text-anchor="middle" font-size="10" fill="#86909c">坐席接收</text>
 
-                    <line x1="280" y1="204" x2="380" y2="204" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)" />
+                    <line
+                      x1="280"
+                      y1="204"
+                      x2="380"
+                      y2="204"
+                      stroke="#94a3b8"
+                      stroke-width="1.5"
+                      marker-end="url(#arrow)"
+                    />
                     <text x="330" y="198" text-anchor="middle" font-size="10" fill="#86909c">转办/协办</text>
 
-                    <line x1="280" y1="274" x2="380" y2="274" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)" />
+                    <line
+                      x1="280"
+                      y1="274"
+                      x2="380"
+                      y2="274"
+                      stroke="#94a3b8"
+                      stroke-width="1.5"
+                      marker-end="url(#arrow)"
+                    />
                     <text x="330" y="268" text-anchor="middle" font-size="10" fill="#86909c">客户达成一致</text>
 
-                    <line x1="280" y1="344" x2="380" y2="344" stroke="#ff7d00" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow-orange)" />
+                    <line
+                      x1="280"
+                      y1="344"
+                      x2="380"
+                      y2="344"
+                      stroke="#ff7d00"
+                      stroke-width="1.5"
+                      stroke-dasharray="4,3"
+                      marker-end="url(#arrow-orange)"
+                    />
                     <text x="330" y="338" text-anchor="middle" font-size="10" fill="#ff7d00">监管件自动报送</text>
 
                     <!-- 升级分支(返回) -->
-                    <path d="M 280 204 Q 470 204 470 274" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arrow)" />
+                    <path
+                      d="M 280 204 Q 470 204 470 274"
+                      stroke="#94a3b8"
+                      stroke-width="1.5"
+                      fill="none"
+                      marker-end="url(#arrow)"
+                    />
                     <text x="475" y="240" font-size="10" fill="#86909c">升级返回</text>
                   </g>
 
                   <!-- 右侧流转规则配置 -->
                   <g>
                     <rect x="540" y="40" width="240" height="320" rx="6" fill="#fff" stroke="#e5e6eb" />
-                    <text x="660" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="#1d2129">流转规则</text>
+                    <text x="660" y="62" text-anchor="middle" font-size="13" font-weight="600" fill="#1d2129">
+                      流转规则
+                    </text>
                     <text x="560" y="90" font-size="11" fill="#86909c">源状态</text>
                     <text x="700" y="90" font-size="11" fill="#86909c">目标状态</text>
                     <text x="560" y="100" font-size="11" fill="#86909c">─────────</text>
@@ -179,7 +263,15 @@
       <!-- Tab 2: 流转规则列表 -->
       <a-tab-pane key="rules" title="流转规则 (12 条)">
         <div class="cp-card" style="padding: 0">
-          <div style="padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--cp-border-light)">
+          <div
+            style="
+              padding: 12px 16px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 1px solid var(--cp-border-light);
+            "
+          >
             <a-input-search placeholder="搜索流转规则" style="width: 280px" />
             <a-space>
               <a-button size="small">按类型筛选</a-button>
@@ -190,10 +282,14 @@
             <template #columns>
               <a-table-column title="规则名称" data-index="name" />
               <a-table-column title="源状态">
-                <template #cell="{ record }"><a-tag size="small">{{ record.from }}</a-tag></template>
+                <template #cell="{ record }"
+                  ><a-tag size="small">{{ record.from }}</a-tag></template
+                >
               </a-table-column>
               <a-table-column title="目标状态">
-                <template #cell="{ record }"><a-tag size="small" color="green">{{ record.to }}</a-tag></template>
+                <template #cell="{ record }"
+                  ><a-tag size="small" color="green">{{ record.to }}</a-tag></template
+                >
               </a-table-column>
               <a-table-column title="触发条件" data-index="trigger" />
               <a-table-column title="适用工单">
@@ -256,12 +352,12 @@
               </a-col>
               <a-col :span="12">
                 <a-form-item label="归档要求">
-                    <a-checkbox-group :default-value="['summary', 'evidence']">
-                      <a-checkbox value="summary">必须填写处理结论摘要</a-checkbox>
-                      <a-checkbox value="evidence">必须上传证明材料</a-checkbox>
-                      <a-checkbox value="review">必须经审查人员复核</a-checkbox>
-                    </a-checkbox-group>
-                  </a-form-item>
+                  <a-checkbox-group :default-value="['summary', 'evidence']">
+                    <a-checkbox value="summary">必须填写处理结论摘要</a-checkbox>
+                    <a-checkbox value="evidence">必须上传证明材料</a-checkbox>
+                    <a-checkbox value="review">必须经审查人员复核</a-checkbox>
+                  </a-checkbox-group>
+                </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item label="报送要求">
@@ -305,14 +401,21 @@
                 <h3 class="cp-section-title" style="margin: 0">工作流模板</h3>
                 <a-switch v-model="bizFlowEnabled[activeTpl]" @change="onToggleBiz(activeTpl)" />
               </div>
-              <div v-for="tpl in bizFlowTemplates" :key="tpl.kind"
+              <div
+                v-for="tpl in bizFlowTemplates"
+                :key="tpl.kind"
                 :class="['cp-bizflow-item', { 'is-active': activeTpl === tpl.kind }]"
-                @click="activeTpl = tpl.kind">
+                @click="activeTpl = tpl.kind"
+              >
                 <div style="display: flex; justify-content: space-between; align-items: center">
                   <span style="font-weight: 600">{{ tpl.name }}</span>
-                  <a-tag size="small" :color="tpl.enabled ? 'green' : 'gray'">{{ tpl.enabled ? '启用' : '停用' }}</a-tag>
+                  <a-tag size="small" :color="tpl.enabled ? 'green' : 'gray'">{{
+                    tpl.enabled ? '启用' : '停用'
+                  }}</a-tag>
                 </div>
-                <div style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 4px; line-height: 1.5">{{ tpl.desc }}</div>
+                <div style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 4px; line-height: 1.5">
+                  {{ tpl.desc }}
+                </div>
               </div>
             </div>
           </a-col>
@@ -321,7 +424,9 @@
             <div class="cp-card" style="padding: 16px">
               <div v-if="activeTemplate">
                 <h3 class="cp-section-title">{{ activeTemplate.name }} · 节点配置</h3>
-                <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 12px">{{ activeTemplate.desc }}</div>
+                <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 12px">
+                  {{ activeTemplate.desc }}
+                </div>
                 <a-table :data="activeTemplate.nodes" :pagination="false" row-key="code">
                   <template #columns>
                     <a-table-column title="#" :width="40">
@@ -335,7 +440,11 @@
                     </a-table-column>
                     <a-table-column title="处置角色" :width="180">
                       <template #cell="{ record }">
-                        <a-select :model-value="record.handlerRole" size="small" @change="(v: any) => onRoleChange(activeTpl, record.code, v)">
+                        <a-select
+                          :model-value="record.handlerRole"
+                          size="small"
+                          @change="(v: any) => onRoleChange(activeTpl, record.code, v)"
+                        >
                           <a-option value="agent">坐席</a-option>
                           <a-option value="business">支撑岗</a-option>
                           <a-option value="review">审查</a-option>
@@ -346,14 +455,23 @@
                     </a-table-column>
                     <a-table-column title="SLA(小时)" :width="110">
                       <template #cell="{ record }">
-                        <a-input-number :model-value="record.slaHours" size="small" :min="0" :max="240"
-                          @change="(v: number | undefined) => onSlaChange(activeTpl, record.code, v ?? 0)" style="width: 90px" />
+                        <a-input-number
+                          :model-value="record.slaHours"
+                          size="small"
+                          :min="0"
+                          :max="240"
+                          @change="(v: number | undefined) => onSlaChange(activeTpl, record.code, v ?? 0)"
+                          style="width: 90px"
+                        />
                       </template>
                     </a-table-column>
                     <a-table-column title="自动推进" :width="80">
                       <template #cell="{ record }">
-                        <a-switch :model-value="record.autoNext" size="small"
-                          @change="(v: any) => onAutoChange(activeTpl, record.code, v as boolean)" />
+                        <a-switch
+                          :model-value="record.autoNext"
+                          size="small"
+                          @change="(v: any) => onAutoChange(activeTpl, record.code, v as boolean)"
+                        />
                       </template>
                     </a-table-column>
                     <a-table-column title="副作用">
@@ -369,9 +487,7 @@
                   <template #title>配置即时生效</template>
                   <template #content>
                     修改后保存到 localStorage,所有角色的工作流待办立即按新规则过滤。
-                    <div style="margin-top: 6px">
-                      启用开关(右上)关闭后,坐席发起申请时该工作流不可选。
-                    </div>
+                    <div style="margin-top: 6px">启用开关(右上)关闭后,坐席发起申请时该工作流不可选。</div>
                   </template>
                 </a-alert>
               </div>
@@ -390,15 +506,69 @@ import { useWorkflowStore, WorkflowKind } from '@/stores/workflow'
 const activeState = ref('todo')
 
 const statusList = reactive([
-  { code: 'pending', name: '待分派', handler: '规则引擎', timeout: '24h', isStart: true, isEnd: false, handlerType: 'rule', timeoutAction: '自动催办' },
-  { code: 'todo', name: '待接收', handler: '分配对象', timeout: '8h', isStart: false, isEnd: false, handlerType: 'assignee', timeoutAction: '自动催办' },
-  { code: 'processing', name: '处理中', handler: '分配对象', timeout: '监管件7d / 普通件15d', isStart: false, isEnd: false, handlerType: 'assignee', timeoutAction: '升级上级' },
-  { code: 'transfer', name: '待流转', handler: '分配对象', timeout: '4h', isStart: false, isEnd: false, handlerType: 'assignee', timeoutAction: '预警通知' },
-  { code: 'closing', name: '待关单', handler: '分配对象', timeout: '72h', isStart: false, isEnd: false, handlerType: 'assignee', timeoutAction: '自动催办' },
-  { code: 'closed', name: '已关单', handler: '系统自动', timeout: '-', isStart: false, isEnd: true, handlerType: 'system', timeoutAction: '无动作' }
+  {
+    code: 'pending',
+    name: '待分派',
+    handler: '规则引擎',
+    timeout: '24h',
+    isStart: true,
+    isEnd: false,
+    handlerType: 'rule',
+    timeoutAction: '自动催办'
+  },
+  {
+    code: 'todo',
+    name: '待接收',
+    handler: '分配对象',
+    timeout: '8h',
+    isStart: false,
+    isEnd: false,
+    handlerType: 'assignee',
+    timeoutAction: '自动催办'
+  },
+  {
+    code: 'processing',
+    name: '处理中',
+    handler: '分配对象',
+    timeout: '监管件7d / 普通件15d',
+    isStart: false,
+    isEnd: false,
+    handlerType: 'assignee',
+    timeoutAction: '升级上级'
+  },
+  {
+    code: 'transfer',
+    name: '待流转',
+    handler: '分配对象',
+    timeout: '4h',
+    isStart: false,
+    isEnd: false,
+    handlerType: 'assignee',
+    timeoutAction: '预警通知'
+  },
+  {
+    code: 'closing',
+    name: '待关单',
+    handler: '分配对象',
+    timeout: '72h',
+    isStart: false,
+    isEnd: false,
+    handlerType: 'assignee',
+    timeoutAction: '自动催办'
+  },
+  {
+    code: 'closed',
+    name: '已关单',
+    handler: '系统自动',
+    timeout: '-',
+    isStart: false,
+    isEnd: true,
+    handlerType: 'system',
+    timeoutAction: '无动作'
+  }
 ])
 
-const currentState = computed(() => statusList.find(s => s.code === activeState.value))
+const currentState = computed(() => statusList.find((s) => s.code === activeState.value))
 
 function stateColor(code: string) {
   const map: Record<string, string> = {
@@ -441,9 +611,19 @@ const transitionRulesList = [
 ]
 
 const versions = [
-  { version: 'V2.3 当前', time: '2026-07-15 14:32', publisher: '陈强(管理)', changes: '优化监管件超时升级规则,新增"客户不满意升级"流转' },
+  {
+    version: 'V2.3 当前',
+    time: '2026-07-15 14:32',
+    publisher: '陈强(管理)',
+    changes: '优化监管件超时升级规则,新增"客户不满意升级"流转'
+  },
   { version: 'V2.2', time: '2026-06-28 10:15', publisher: '陈强(管理)', changes: '新增审批驳回回流规则' },
-  { version: 'V2.1', time: '2026-05-15 16:00', publisher: '陈强(管理)', changes: '工单状态拆分为 6 态,增加"待关单"节点' },
+  {
+    version: 'V2.1',
+    time: '2026-05-15 16:00',
+    publisher: '陈强(管理)',
+    changes: '工单状态拆分为 6 态,增加"待关单"节点'
+  },
   { version: 'V2.0', time: '2026-04-01 09:00', publisher: '陈强(管理)', changes: 'PRD V2.0 发布,流程重构' },
   { version: 'V1.5', time: '2026-02-10 14:00', publisher: '陈强(管理)', changes: 'Phase 0 试运行版本' }
 ]
@@ -452,12 +632,14 @@ const versions = [
 const wf = useWorkflowStore()
 const bizFlowTemplates = computed(() => wf.templates)
 const activeTpl = ref<WorkflowKind>('stop_collection')
-const activeTemplate = computed(() => wf.templates.find(t => t.kind === activeTpl.value))
+const activeTemplate = computed(() => wf.templates.find((t) => t.kind === activeTpl.value))
 
 // 启用开关的双向绑定(拷贝一份便于 v-model)
 const bizFlowEnabled = reactive<Record<string, boolean>>({})
 function refreshBizFlowEnabled() {
-  wf.templates.forEach(t => { bizFlowEnabled[t.kind] = t.enabled })
+  wf.templates.forEach((t) => {
+    bizFlowEnabled[t.kind] = t.enabled
+  })
 }
 refreshBizFlowEnabled()
 
@@ -489,9 +671,20 @@ function kindShort(k: string) {
   transition: all 0.15s;
   background: #fff;
 }
-.cp-bizflow-item:hover { border-color: var(--cp-brand); background: var(--cp-brand-soft); }
-.cp-bizflow-item.is-active { border-color: var(--cp-brand); background: var(--cp-brand-soft); }
-.cp-section-title { font-size: 14px; font-weight: 600; margin: 0 0 12px; color: var(--cp-text); }
+.cp-bizflow-item:hover {
+  border-color: var(--cp-brand);
+  background: var(--cp-brand-soft);
+}
+.cp-bizflow-item.is-active {
+  border-color: var(--cp-brand);
+  background: var(--cp-brand-soft);
+}
+.cp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--cp-text);
+}
 
 /* 状态卡片 */
 .cp-state-card {
@@ -502,14 +695,19 @@ function kindShort(k: string) {
   cursor: pointer;
   transition: all 0.15s;
 }
-.cp-state-card:hover { background: var(--cp-bg-hover); }
+.cp-state-card:hover {
+  background: var(--cp-bg-hover);
+}
 .cp-state-card.is-active {
   border-color: var(--cp-brand);
   background: var(--cp-brand-soft);
 }
 .cp-state-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  display: inline-block; flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
 }
 
 /* 画布 */
@@ -529,13 +727,18 @@ function kindShort(k: string) {
   border-top: 1px dashed var(--cp-border);
 }
 .cp-legend-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  display: inline-block; vertical-align: middle;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
   margin-right: 4px;
 }
 .cp-legend-line {
-  width: 16px; height: 2px;
-  display: inline-block; vertical-align: middle;
+  width: 16px;
+  height: 2px;
+  display: inline-block;
+  vertical-align: middle;
   margin-right: 4px;
 }
 </style>

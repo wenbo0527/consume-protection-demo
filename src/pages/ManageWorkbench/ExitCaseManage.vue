@@ -54,7 +54,9 @@
         <a-table-column title="剩余/总余额" :width="170">
           <template #cell="{ record }">
             <div>¥{{ record.loanBalance.toLocaleString() }}</div>
-            <div style="font-size: 11px; color: var(--cp-text-tertiary)">{{ record.loanId }} · 余 {{ record.remainingDays }} 天</div>
+            <div style="font-size: 11px; color: var(--cp-text-tertiary)">
+              {{ record.loanId }} · 余 {{ record.remainingDays }} 天
+            </div>
           </template>
         </a-table-column>
         <a-table-column title="触发原因" :width="180">
@@ -72,11 +74,11 @@
             <div style="display: flex; align-items: center; gap: 4px">
               <template v-for="(a, idx) in record.approvals" :key="idx">
                 <a-tag
-                  :color="a.approved ? 'green' : (a.pending ? 'orange' : 'red')"
+                  :color="a.approved ? 'green' : a.pending ? 'orange' : 'red'"
                   size="small"
                   style="font-weight: 600"
                 >
-                  {{ a.approved ? '✓' : (a.pending ? '…' : '✗') }}
+                  {{ a.approved ? '✓' : a.pending ? '…' : '✗' }}
                   {{ roleShort(a.role) }}
                 </a-tag>
                 <span v-if="idx < record.approvals.length - 1" style="color: var(--cp-text-tertiary)">›</span>
@@ -94,11 +96,36 @@
           <template #cell="{ record }">
             <a-space :size="4">
               <a-button size="small" type="text" @click="openDetail(record)">详情</a-button>
-              <a-button v-if="canApproveFor(record, 'business')" size="small" type="text" status="success" @click="openApprove(record, 'business')">业务批</a-button>
-              <a-button v-if="canApproveFor(record, 'review')" size="small" type="text" status="success" @click="openApprove(record, 'review')">审查批</a-button>
-              <a-button v-if="canApproveFor(record, 'manage')" size="small" type="text" status="success" @click="openApprove(record, 'manage')">管理批</a-button>
-              <a-button v-if="canNotify(record)" size="small" type="text" status="warning" @click="openNotify(record)">告知</a-button>
-              <a-button v-if="canSettle(record)" size="small" type="text" status="success" @click="openSettle(record)">结清</a-button>
+              <a-button
+                v-if="canApproveFor(record, 'business')"
+                size="small"
+                type="text"
+                status="success"
+                @click="openApprove(record, 'business')"
+                >业务批</a-button
+              >
+              <a-button
+                v-if="canApproveFor(record, 'review')"
+                size="small"
+                type="text"
+                status="success"
+                @click="openApprove(record, 'review')"
+                >审查批</a-button
+              >
+              <a-button
+                v-if="canApproveFor(record, 'manage')"
+                size="small"
+                type="text"
+                status="success"
+                @click="openApprove(record, 'manage')"
+                >管理批</a-button
+              >
+              <a-button v-if="canNotify(record)" size="small" type="text" status="warning" @click="openNotify(record)"
+                >告知</a-button
+              >
+              <a-button v-if="canSettle(record)" size="small" type="text" status="success" @click="openSettle(record)"
+                >结清</a-button
+              >
             </a-space>
           </template>
         </a-table-column>
@@ -109,7 +136,9 @@
     <a-drawer v-model:visible="detailVisible" :width="640" :title="`清退详情 ${currentCase?.id || ''}`">
       <div v-if="currentCase" style="padding: 0 8px">
         <a-descriptions :column="2" bordered size="small">
-          <a-descriptions-item label="客户">{{ currentCase.customerName }} ({{ currentCase.customerId }})</a-descriptions-item>
+          <a-descriptions-item label="客户"
+            >{{ currentCase.customerName }} ({{ currentCase.customerId }})</a-descriptions-item
+          >
           <a-descriptions-item label="剩余余额">¥{{ currentCase.loanBalance.toLocaleString() }}</a-descriptions-item>
           <a-descriptions-item label="借据号">{{ currentCase.loanId }}</a-descriptions-item>
           <a-descriptions-item label="剩余天数">{{ currentCase.remainingDays }} 天</a-descriptions-item>
@@ -124,7 +153,11 @@
 
         <h3 style="margin: 16px 0 8px">审批流程</h3>
         <a-timeline>
-          <a-timeline-item v-for="(a, idx) in currentCase.approvals" :key="idx" :label="a.approvedAt || (a.pending ? '待审批' : '已拒绝')">
+          <a-timeline-item
+            v-for="(a, idx) in currentCase.approvals"
+            :key="idx"
+            :label="a.approvedAt || (a.pending ? '待审批' : '已拒绝')"
+          >
             <div>
               <b>{{ roleLabel(a.role) }}</b>
               <a-tag v-if="a.approved" color="green" style="margin-left: 6px">通过</a-tag>
@@ -143,16 +176,23 @@
           <a-timeline-item v-for="(n, idx) in currentCase.notifies" :key="idx" :label="n.at">
             <div>
               <a-tag :color="n.result === '成功' ? 'green' : 'red'">{{ n.channel }} · {{ n.result }}</a-tag>
-              <span v-if="n.note" style="margin-left: 6px; font-size: 12px; color: var(--cp-text-tertiary)">{{ n.note }}</span>
+              <span v-if="n.note" style="margin-left: 6px; font-size: 12px; color: var(--cp-text-tertiary)">{{
+                n.note
+              }}</span>
             </div>
           </a-timeline-item>
         </a-timeline>
 
         <h3 style="margin: 16px 0 8px">资产处置</h3>
         <div style="padding: 10px 12px; border: 1px solid var(--cp-border-light); border-radius: 4px">
-          <div><b>方案:</b><a-tag color="arcoblue">{{ assetLabel(currentCase.assetAction) }}</a-tag></div>
+          <div>
+            <b>方案:</b><a-tag color="arcoblue">{{ assetLabel(currentCase.assetAction) }}</a-tag>
+          </div>
           <div style="margin-top: 6px; font-size: 13px">{{ currentCase.assetProgress }}</div>
-          <div v-if="currentCase.settledAmount !== undefined" style="margin-top: 6px; font-size: 13px; color: var(--cp-success); font-weight: 600">
+          <div
+            v-if="currentCase.settledAmount !== undefined"
+            style="margin-top: 6px; font-size: 13px; color: var(--cp-success); font-weight: 600"
+          >
             已结算:¥{{ currentCase.settledAmount.toLocaleString() }}
           </div>
         </div>
@@ -164,7 +204,9 @@
       <a-form :model="createForm">
         <a-form-item label="客户" required>
           <a-select v-model="createForm.customerId" @change="onCreateCustomerChange">
-            <a-option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }} ({{ c.id }}) - 余 ¥{{ ((c as any).loanBalance || 0).toLocaleString() }}</a-option>
+            <a-option v-for="c in customers" :key="c.id" :value="c.id"
+              >{{ c.name }} ({{ c.id }}) - 余 ¥{{ ((c as any).loanBalance || 0).toLocaleString() }}</a-option
+            >
           </a-select>
         </a-form-item>
         <a-row :gutter="12">
@@ -189,7 +231,11 @@
           </a-radio-group>
         </a-form-item>
         <a-form-item label="触发描述">
-          <a-textarea v-model="createForm.description" :rows="3" placeholder="如:客户已被法院列入失信 + 6 个月内 6 次投诉..." />
+          <a-textarea
+            v-model="createForm.description"
+            :rows="3"
+            placeholder="如:客户已被法院列入失信 + 6 个月内 6 次投诉..."
+          />
         </a-form-item>
         <a-form-item label="处置方案">
           <a-select v-model="createForm.assetAction">
@@ -204,11 +250,23 @@
     </a-modal>
 
     <!-- 审批弹窗 -->
-    <a-modal v-model:visible="approveVisible" :title="`签批(${roleLabel(approveRole)})`" :width="480" :ok-text="'提交'" @ok="onSubmitApprove">
+    <a-modal
+      v-model:visible="approveVisible"
+      :title="`签批(${roleLabel(approveRole)})`"
+      :width="480"
+      :ok-text="'提交'"
+      @ok="onSubmitApprove"
+    >
       <div v-if="approveTarget">
-        <p>清退单:<b>{{ approveTarget.id }}</b></p>
-        <p>客户:<b>{{ approveTarget.customerName }}</b></p>
-        <p>层级:<a-tag :color="tierColor(approveTarget.tier)">{{ tierLabel(approveTarget.tier) }}</a-tag></p>
+        <p>
+          清退单:<b>{{ approveTarget.id }}</b>
+        </p>
+        <p>
+          客户:<b>{{ approveTarget.customerName }}</b>
+        </p>
+        <p>
+          层级:<a-tag :color="tierColor(approveTarget.tier)">{{ tierLabel(approveTarget.tier) }}</a-tag>
+        </p>
         <p>审批意见:</p>
         <a-radio-group v-model="approveResult">
           <a-radio :value="true">通过</a-radio>
@@ -221,16 +279,22 @@
     <!-- 客户告知 -->
     <a-modal v-model:visible="notifyVisible" title="客户告知" :width="480" :ok-text="'提交'" @ok="onSubmitNotify">
       <div v-if="notifyTarget">
-        <p>清退单:<b>{{ notifyTarget.id }}</b> · 客户 {{ notifyTarget.customerName }}</p>
-        <p>渠道:<a-radio-group v-model="notifyChannel">
-          <a-radio value="短信">短信</a-radio>
-          <a-radio value="邮件">邮件</a-radio>
-          <a-radio value="电话">电话</a-radio>
-        </a-radio-group></p>
-        <p>结果:<a-radio-group v-model="notifyResult">
-          <a-radio value="成功">成功</a-radio>
-          <a-radio value="失败">失败</a-radio>
-        </a-radio-group></p>
+        <p>
+          清退单:<b>{{ notifyTarget.id }}</b> · 客户 {{ notifyTarget.customerName }}
+        </p>
+        <p>
+          渠道:<a-radio-group v-model="notifyChannel">
+            <a-radio value="短信">短信</a-radio>
+            <a-radio value="邮件">邮件</a-radio>
+            <a-radio value="电话">电话</a-radio>
+          </a-radio-group>
+        </p>
+        <p>
+          结果:<a-radio-group v-model="notifyResult">
+            <a-radio value="成功">成功</a-radio>
+            <a-radio value="失败">失败</a-radio>
+          </a-radio-group>
+        </p>
         <a-textarea v-model="notifyNote" :rows="2" placeholder="备注(可选)" />
       </div>
     </a-modal>
@@ -238,7 +302,9 @@
     <!-- 结清 -->
     <a-modal v-model:visible="settleVisible" title="结算 / 结清" :width="480" :ok-text="'提交'" @ok="onSubmitSettle">
       <div v-if="settleTarget">
-        <p>清退单:<b>{{ settleTarget.id }}</b> · 客户 {{ settleTarget.customerName }}</p>
+        <p>
+          清退单:<b>{{ settleTarget.id }}</b> · 客户 {{ settleTarget.customerName }}
+        </p>
         <p>最终结算金额:¥<a-input-number v-model="settleAmount" :min="0" /></p>
         <a-textarea v-model="settleNote" :rows="3" placeholder="结清说明(将作为资产进度记录)" />
       </div>
@@ -260,14 +326,14 @@ const customers = customersMock
 const statusFilter = ref<string>('')
 const filteredList = computed(() => {
   if (!statusFilter.value) return exitStore.cases
-  return exitStore.cases.filter(c => c.status === statusFilter.value)
+  return exitStore.cases.filter((c) => c.status === statusFilter.value)
 })
 
 // 权限判断
 const currentRole = computed(() => userStore.currentRole)
 function canApproveFor(c: ExitCase, role: 'business' | 'review' | 'manage') {
   if (c.status !== 'pending_review') return false
-  if (!c.approvals.some(a => a.role === role && a.pending)) return false
+  if (!c.approvals.some((a) => a.role === role && a.pending)) return false
   if (role === 'business') return currentRole.value === 'business' || currentRole.value === 'manage'
   if (role === 'review') return currentRole.value === 'review' || currentRole.value === 'manage'
   if (role === 'manage') return currentRole.value === 'manage'
@@ -300,7 +366,7 @@ const createForm = reactive({
 })
 
 function onCreateCustomerChange() {
-  const c = customers.find(c => c.id === createForm.customerId)
+  const c = customers.find((c) => c.id === createForm.customerId)
   if (c) {
     createForm.loanBalance = (c as any).loanBalance || 0
     createForm.loanId = `L-2024-${String(Math.floor(Math.random() * 9000) + 1000)}`
@@ -312,7 +378,7 @@ function onCreate() {
     Message.warning('请填写完整')
     return
   }
-  const customer = customers.find(c => c.id === createForm.customerId)
+  const customer = customers.find((c) => c.id === createForm.customerId)
   exitStore.create({
     customerId: createForm.customerId,
     customerName: customer?.name || '-',
@@ -327,8 +393,13 @@ function onCreate() {
   Message.success('清退已启动')
   showCreate.value = false
   Object.assign(createForm, {
-    customerId: '', loanId: '', loanBalance: 0,
-    reason: 'high_risk', description: '', assetAction: 'settle_all', remainingDays: 30
+    customerId: '',
+    loanId: '',
+    loanBalance: 0,
+    reason: 'high_risk',
+    description: '',
+    assetAction: 'settle_all',
+    remainingDays: 30
   })
 }
 
@@ -353,7 +424,7 @@ function openApprove(c: ExitCase, role: 'business' | 'review' | 'manage') {
 
 function onSubmitApprove() {
   if (!approveTarget.value) return
-  const approver = userStore.currentRole ? (getRoleInfo(userStore.currentRole)?.username || '审批人') : '审批人'
+  const approver = userStore.currentRole ? getRoleInfo(userStore.currentRole)?.username || '审批人' : '审批人'
   exitStore.approve(approveTarget.value.id, approveRole.value, approver, approveComment.value, approveResult.value)
   Message.success(approveResult.value ? '已通过' : '已驳回')
   approveVisible.value = false
@@ -397,7 +468,12 @@ function openSettle(c: ExitCase) {
 function onSubmitSettle() {
   if (!settleTarget.value) return
   // 更新资产进度
-  exitStore.updateAsset(settleTarget.value.id, settleTarget.value.assetAction, `结清完成:${settleNote.value || '客户一次性结清'}`, settleAmount.value)
+  exitStore.updateAsset(
+    settleTarget.value.id,
+    settleTarget.value.assetAction,
+    `结清完成:${settleNote.value || '客户一次性结清'}`,
+    settleAmount.value
+  )
   exitStore.close(settleTarget.value.id, settleAmount.value)
   Message.success('已结清')
   settleVisible.value = false
@@ -405,31 +481,73 @@ function onSubmitSettle() {
 
 // 工具
 function reasonColor(r: ExitReason) {
-  return ({ high_risk: 'orange', regulator_blacklist: 'red', overdue_extreme: 'red', refinance_failed: 'gray', payment_dispute: 'magenta' })[r] || 'gray'
+  return (
+    {
+      high_risk: 'orange',
+      regulator_blacklist: 'red',
+      overdue_extreme: 'red',
+      refinance_failed: 'gray',
+      payment_dispute: 'magenta'
+    }[r] || 'gray'
+  )
 }
 function reasonLabel(r: ExitReason) {
-  return ({ high_risk: '高风险', regulator_blacklist: '监管/失信', overdue_extreme: '极度逾期', refinance_failed: '重组失败', payment_dispute: '支付争议' })[r] || r
+  return (
+    {
+      high_risk: '高风险',
+      regulator_blacklist: '监管/失信',
+      overdue_extreme: '极度逾期',
+      refinance_failed: '重组失败',
+      payment_dispute: '支付争议'
+    }[r] || r
+  )
 }
 function tierColor(t: ExitTier) {
-  return ({ normal: 'gray', extra_review: 'orange', management_extra: 'red' })[t] || 'gray'
+  return { normal: 'gray', extra_review: 'orange', management_extra: 'red' }[t] || 'gray'
 }
 function tierLabel(t: ExitTier) {
-  return ({ normal: '一审', extra_review: '二审', management_extra: '三审(管理层)' })[t] || t
+  return { normal: '一审', extra_review: '二审', management_extra: '三审(管理层)' }[t] || t
 }
 function statusColor(s: ExitStatus) {
-  return ({ pending_review: 'orange', approved: 'arcoblue', rejected: 'red', notified: 'warning', settled: 'cyan', closed: 'gray' })[s] || 'gray'
+  return (
+    {
+      pending_review: 'orange',
+      approved: 'arcoblue',
+      rejected: 'red',
+      notified: 'warning',
+      settled: 'cyan',
+      closed: 'gray'
+    }[s] || 'gray'
+  )
 }
 function statusLabel(s: ExitStatus) {
-  return ({ pending_review: '待审批', approved: '已批准', rejected: '已驳回', notified: '已告知', settled: '已处置', closed: '已关闭' })[s] || s
+  return (
+    {
+      pending_review: '待审批',
+      approved: '已批准',
+      rejected: '已驳回',
+      notified: '已告知',
+      settled: '已处置',
+      closed: '已关闭'
+    }[s] || s
+  )
 }
 function roleLabel(r: string) {
-  return ({ business: '业务执行', review: '消保审查', manage: '管理层' })[r] || r
+  return { business: '业务执行', review: '消保审查', manage: '管理层' }[r] || r
 }
 function roleShort(r: string) {
-  return ({ business: '业', review: '审', manage: '管' })[r] || r
+  return { business: '业', review: '审', manage: '管' }[r] || r
 }
 function assetLabel(a: AssetAction) {
-  return ({ settle_all: '要求结清全部', settle_remain: '结清剩余本金', refinance: '重组/再融资', litigation: '诉讼程序', writeoff: '核销' })[a] || a
+  return (
+    {
+      settle_all: '要求结清全部',
+      settle_remain: '结清剩余本金',
+      refinance: '重组/再融资',
+      litigation: '诉讼程序',
+      writeoff: '核销'
+    }[a] || a
+  )
 }
 </script>
 
@@ -446,6 +564,14 @@ function assetLabel(a: AssetAction) {
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
 }
-.cp-kpi-label { font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 4px; }
-.cp-kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+.cp-kpi-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 4px;
+}
+.cp-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
 </style>

@@ -37,7 +37,15 @@
 
     <!-- 搜索结果 -->
     <div v-if="searched" class="cp-card" style="padding: 0">
-      <div style="padding: 12px 20px; border-bottom: 1px solid var(--cp-border-light); display: flex; justify-content: space-between; align-items: center">
+      <div
+        style="
+          padding: 12px 20px;
+          border-bottom: 1px solid var(--cp-border-light);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
         <span style="font-size: 13px">
           共 <b style="color: var(--cp-brand)">{{ results.length }}</b> 位客户匹配
           <span v-if="keyword" style="color: var(--cp-text-tertiary)">关键词:{{ keyword }}</span>
@@ -59,10 +67,21 @@
               <span class="mono" style="font-size: 12px; color: var(--cp-text-tertiary)">{{ c.id }}</span>
               <risk-tag v-for="t in c.riskTags" :key="t" :type="t" />
             </div>
-            <div style="font-size: 12px; color: var(--cp-text-secondary); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap">
+            <div
+              style="
+                font-size: 12px;
+                color: var(--cp-text-secondary);
+                margin-top: 4px;
+                display: flex;
+                gap: 12px;
+                flex-wrap: wrap;
+              "
+            >
               <span class="mono">{{ c.phone }}</span>
               <span>{{ c.idCardMask }}</span>
-              <span>在贷 <b class="mono">¥{{ c.loanBalance.toLocaleString() }}</b></span>
+              <span
+                >在贷 <b class="mono">¥{{ c.loanBalance.toLocaleString() }}</b></span
+              >
               <span>逾期 {{ c.maxOverdueDays }} 天</span>
               <span>近 6 月投诉 {{ c.complaintCount6m }} 次</span>
               <span>在办工单 {{ c.ongoingTickets.length }} 张</span>
@@ -130,15 +149,13 @@ const tagFilter = ref<string[]>([])
 const searched = ref(false)
 
 // 待办客户:在办工单数 > 0
-const todoCustomers = computed(() =>
-  customers.filter(c => c.ongoingTickets.length > 0)
-)
+const todoCustomers = computed(() => customers.filter((c) => c.ongoingTickets.length > 0))
 
 const quickList = computed(() => customers.slice(0, 6))
 
 const results = computed(() => {
   const k = keyword.value.trim().toLowerCase()
-  return customers.filter(c => {
+  return customers.filter((c) => {
     // 关键词匹配
     if (k) {
       const matchK =
@@ -150,7 +167,7 @@ const results = computed(() => {
     }
     // 风险标签筛选(AND 关系:所有选中的标签都要有)
     if (tagFilter.value.length > 0) {
-      const hasAll = tagFilter.value.every(t => (c.riskTags as readonly string[]).includes(t))
+      const hasAll = tagFilter.value.every((t) => (c.riskTags as readonly string[]).includes(t))
       if (!hasAll) return false
     }
     return true
@@ -178,17 +195,28 @@ function goDetail(c: any) {
 </script>
 
 <style scoped>
-.cp-section-title { font-size: 14px; font-weight: 600; margin: 0 0 12px; color: var(--cp-text); }
+.cp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--cp-text);
+}
 
 .cp-search-row {
-  display: flex; align-items: center; gap: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 12px 20px;
   border-bottom: 1px solid var(--cp-border-light);
   cursor: pointer;
   transition: background 0.15s;
 }
-.cp-search-row:hover { background: var(--cp-bg-hover); }
-.cp-search-row:last-child { border-bottom: none; }
+.cp-search-row:hover {
+  background: var(--cp-bg-hover);
+}
+.cp-search-row:last-child {
+  border-bottom: none;
+}
 
 .cp-quick-grid {
   display: grid;
@@ -196,7 +224,9 @@ function goDetail(c: any) {
   gap: 10px;
 }
 .cp-quick-card {
-  display: flex; align-items: center; gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px 12px;
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;

@@ -23,15 +23,14 @@
   >
     <a-alert type="info" show-icon style="margin-bottom: 12px">
       <template #title>选择工作流类型</template>
-      <template #content>
-        工作流将按模板逐节点推进:申请 → 审批 → 执行 → 归档;坐席可在"我的待办"中跟踪进度。
-      </template>
+      <template #content> 工作流将按模板逐节点推进:申请 → 审批 → 执行 → 归档;坐席可在"我的待办"中跟踪进度。 </template>
     </a-alert>
 
     <a-radio-group v-model="kind" style="display: flex; flex-direction: column; gap: 8px; width: 100%">
       <a-radio v-for="tpl in templates" :key="tpl.kind" :value="tpl.kind" :disabled="!tpl.enabled">
         <div style="display: flex; flex-direction: column">
-          <span style="font-weight: 600">{{ tpl.name }}
+          <span style="font-weight: 600"
+            >{{ tpl.name }}
             <a-tag v-if="!tpl.enabled" size="small" color="gray">已停用</a-tag>
           </span>
           <span style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px">{{ tpl.desc }}</span>
@@ -112,20 +111,23 @@ const form = reactive({
   payload: {} as Record<string, any>
 })
 
-watch(() => props.visible, (v) => {
-  if (v) {
-    form.customerId = props.customerId || ''
-    form.ticketId = props.ticketId || ''
-    form.remark = ''
-    form.payload = {}
-    // 默认选择第一个启用的模板
-    const first = wf.templates.find(t => t.enabled)
-    if (first) kind.value = first.kind
+watch(
+  () => props.visible,
+  (v) => {
+    if (v) {
+      form.customerId = props.customerId || ''
+      form.ticketId = props.ticketId || ''
+      form.remark = ''
+      form.payload = {}
+      // 默认选择第一个启用的模板
+      const first = wf.templates.find((t) => t.enabled)
+      if (first) kind.value = first.kind
+    }
   }
-})
+)
 
 const templates = computed(() => wf.templates)
-const currentTpl = computed(() => wf.templates.find(t => t.kind === kind.value))
+const currentTpl = computed(() => wf.templates.find((t) => t.kind === kind.value))
 const currentFields = computed<WorkflowNode['fields']>(() => currentTpl.value?.nodes[0]?.fields || [])
 const canSubmit = computed(() => !!currentTpl.value && currentTpl.value.enabled)
 
@@ -179,22 +181,32 @@ function onSubmit() {
 
 <style scoped>
 .cp-flow-preview {
-  display: flex; flex-direction: column; gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding: 8px 12px;
   background: var(--cp-bg-soft);
   border-radius: 6px;
 }
 .cp-flow-node {
-  display: flex; align-items: center; gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 8px 10px;
   background: #fff;
   border: 1px solid var(--cp-border-light);
   border-radius: 4px;
 }
 .cp-flow-node-dot {
-  width: 22px; height: 22px; border-radius: 50%;
-  color: #fff; font-size: 12px; font-weight: 600;
-  display: flex; align-items: center; justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 </style>

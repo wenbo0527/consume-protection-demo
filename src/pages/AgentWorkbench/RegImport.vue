@@ -11,12 +11,7 @@
       <a-col :span="14">
         <div class="cp-card" style="padding: 24px">
           <h3 class="cp-section-title">第 1 步:上传 Excel</h3>
-          <a-upload
-            :auto-upload="false"
-            :limit="1"
-            accept=".xlsx,.xls"
-            list-type="picture-card"
-          >
+          <a-upload :auto-upload="false" :limit="1" accept=".xlsx,.xls" list-type="picture-card">
             <template #upload-button>
               <div class="cp-upload-area">
                 <icon-upload size="32" />
@@ -95,9 +90,7 @@
           <a-timeline>
             <a-timeline-item label="导出失败清单" dot-color="red">
               <div style="font-size: 13px">下载 893 条失败记录 Excel</div>
-              <a-button size="small" type="primary" style="margin-top: 6px">
-                <icon-download /> 下载清单
-              </a-button>
+              <a-button size="small" type="primary" style="margin-top: 6px"> <icon-download /> 下载清单 </a-button>
             </a-timeline-item>
             <a-timeline-item label="补录方式 A: 系统内逐条补录" dot-color="blue">
               <div style="font-size: 13px; color: var(--cp-text-secondary)">在系统中补充客户信息后重新匹配</div>
@@ -127,10 +120,19 @@ const preview = [
 </script>
 
 <style scoped>
-.cp-section-title { font-size: 14px; font-weight: 600; margin: 0 0 12px; color: var(--cp-text); }
+.cp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--cp-text);
+}
 .cp-upload-area {
-  width: 100%; height: 100px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 100%;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   color: var(--cp-text-tertiary);
 }
 </style>

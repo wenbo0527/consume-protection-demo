@@ -9,9 +9,7 @@
         <a-tag :color="queueStore.onlineAgents.length >= 8 ? 'red' : 'orange'">
           在线坐席 {{ queueStore.onlineAgents.length }} 人
         </a-tag>
-        <a-button @click="queueStore.tickSimulation" type="primary">
-          <icon-plus /> 模拟新来电(给队列)
-        </a-button>
+        <a-button @click="queueStore.tickSimulation" type="primary"> <icon-plus /> 模拟新来电(给队列) </a-button>
       </a-space>
     </div>
 
@@ -35,9 +33,7 @@
       </div>
       <div class="cp-kpi-card">
         <div class="cp-kpi-label">坐席负载</div>
-        <div class="cp-kpi-value">
-          {{ avgLoad }}%
-        </div>
+        <div class="cp-kpi-value">{{ avgLoad }}%</div>
       </div>
     </div>
 
@@ -61,9 +57,7 @@
               <template #cell="{ record }">{{ record.channel }}</template>
             </a-table-column>
             <a-table-column title="等待时长" :width="100">
-              <template #cell="{ record }">
-                {{ waitingMinutes(record) }} 分钟
-              </template>
+              <template #cell="{ record }"> {{ waitingMinutes(record) }} 分钟 </template>
             </a-table-column>
             <a-table-column title="分配情况" :width="160">
               <template #cell="{ record }">
@@ -87,33 +81,30 @@
                     type="text"
                     status="success"
                     @click="onClaim(record)"
-                  >抢单</a-button>
-                  <a-button
-                    v-if="record.status === 'waiting'"
-                    size="mini"
-                    type="text"
-                    @click="onAutoAssign(record)"
-                  >自动分单</a-button>
+                    >抢单</a-button
+                  >
+                  <a-button v-if="record.status === 'waiting'" size="mini" type="text" @click="onAutoAssign(record)"
+                    >自动分单</a-button
+                  >
                   <a-button
                     v-if="record.status === 'assigned'"
                     size="mini"
                     type="text"
                     status="success"
                     @click="onConnect(record)"
-                  >接通</a-button>
+                    >接通</a-button
+                  >
                   <a-button
                     v-if="record.status === 'connected'"
                     size="mini"
                     type="text"
                     status="warning"
                     @click="onHangup(record)"
-                  >挂断</a-button>
-                  <a-button
-                    v-if="record.status === 'finished'"
-                    size="mini"
-                    type="text"
-                    @click="onDrop(record)"
-                  >移除</a-button>
+                    >挂断</a-button
+                  >
+                  <a-button v-if="record.status === 'finished'" size="mini" type="text" @click="onDrop(record)"
+                    >移除</a-button
+                  >
                 </a-space>
               </template>
             </a-table-column>
@@ -125,13 +116,25 @@
         <a-card title="坐席负载">
           <div v-for="a in queueStore.agents" :key="a.id" style="margin-bottom: 12px">
             <div style="display: flex; justify-content: space-between; margin-bottom: 4px">
-              <span><b>{{ a.name }}</b> <a-tag size="small" :color="a.skillTags.length ? 'arcoblue' : 'gray'">{{ a.skillTags.join('·') || '通用' }}</a-tag></span>
+              <span
+                ><b>{{ a.name }}</b>
+                <a-tag size="small" :color="a.skillTags.length ? 'arcoblue' : 'gray'">{{
+                  a.skillTags.join('·') || '通用'
+                }}</a-tag></span
+              >
               <a-tag size="small" :color="a.status === 'online' ? 'green' : a.status === 'busy' ? 'orange' : 'gray'">
                 {{ a.status === 'online' ? '空闲' : a.status === 'busy' ? '通话中' : '离线' }}
               </a-tag>
             </div>
             <div style="height: 6px; background: var(--cp-bg-soft); border-radius: 3px; overflow: hidden">
-              <div :style="{ width: a.currentLoad * 10 + '%', height: '100%', background: a.currentLoad >= 8 ? '#f5222d' : a.currentLoad >= 5 ? '#fa8c16' : '#52c41a', transition: 'width 0.3s' }" />
+              <div
+                :style="{
+                  width: a.currentLoad * 10 + '%',
+                  height: '100%',
+                  background: a.currentLoad >= 8 ? '#f5222d' : a.currentLoad >= 5 ? '#fa8c16' : '#52c41a',
+                  transition: 'width 0.3s'
+                }"
+              />
             </div>
             <div style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 2px">
               通话数 {{ a.currentLoad }} / 上限 10 · 平均处理时长 {{ a.avgHandleSeconds }}s
@@ -141,7 +144,7 @@
 
         <a-card title="规则说明" style="margin-top: 16px">
           <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 2">
-            <li>优先级 <b style="color:#f5222d">紧急</b> 来电 → 自动分配给负载最低的空闲坐席</li>
+            <li>优先级 <b style="color: #f5222d">紧急</b> 来电 → 自动分配给负载最低的空闲坐席</li>
             <li>其他优先级 → 抢单模式,坐席手动接</li>
             <li>坐席负载 ≥ 8 时不再分配新单</li>
             <li>等待时长 &gt; 5 分钟 → 红色高亮提示</li>
@@ -171,13 +174,13 @@ const sortedEntries = computed(() =>
   })
 )
 
-const waitingCount = computed(() => queueStore.entries.filter(e => e.status === 'waiting').length)
-const assignedCount = computed(() => queueStore.entries.filter(e => e.status === 'assigned').length)
-const connectedCount = computed(() => queueStore.entries.filter(e => e.status === 'connected').length)
+const waitingCount = computed(() => queueStore.entries.filter((e) => e.status === 'waiting').length)
+const assignedCount = computed(() => queueStore.entries.filter((e) => e.status === 'assigned').length)
+const connectedCount = computed(() => queueStore.entries.filter((e) => e.status === 'connected').length)
 const avgLoad = computed(() => {
-  const online = queueStore.agents.filter(a => a.status !== 'offline')
+  const online = queueStore.agents.filter((a) => a.status !== 'offline')
   if (!online.length) return 0
-  return Math.round(online.reduce((sum, a) => sum + a.currentLoad, 0) / online.length * 10)
+  return Math.round((online.reduce((sum, a) => sum + a.currentLoad, 0) / online.length) * 10)
 })
 
 function waitingMinutes(e: CallQueueEntry): number {
@@ -186,7 +189,7 @@ function waitingMinutes(e: CallQueueEntry): number {
 }
 
 function onClaim(e: CallQueueEntry) {
-  const agent = queueStore.agents.find(a => a.status === 'online')
+  const agent = queueStore.agents.find((a) => a.status === 'online')
   if (!agent) {
     Message.warning('暂无可用坐席')
     return
@@ -198,7 +201,7 @@ function onClaim(e: CallQueueEntry) {
 function onAutoAssign(e: CallQueueEntry) {
   // 按负载最低分配
   const target = [...queueStore.agents]
-    .filter(a => a.status === 'online' && a.currentLoad < 8)
+    .filter((a) => a.status === 'online' && a.currentLoad < 8)
     .sort((a, b) => a.currentLoad - b.currentLoad)[0]
   if (!target) {
     Message.warning('没有空闲坐席可分配')
@@ -238,16 +241,16 @@ function onDrop(e: CallQueueEntry) {
 }
 
 function priorityColor(p: CallPriority) {
-  return ({ urgent: 'red', high: 'orange', normal: 'arcoblue', low: 'gray' })[p] || 'gray'
+  return { urgent: 'red', high: 'orange', normal: 'arcoblue', low: 'gray' }[p] || 'gray'
 }
 function priorityLabel(p: CallPriority) {
-  return ({ urgent: '紧急', high: '高', normal: '普通', low: '低' })[p] || p
+  return { urgent: '紧急', high: '高', normal: '普通', low: '低' }[p] || p
 }
 function statusColor(s: CallStatus) {
-  return ({ waiting: 'orange', assigned: 'arcoblue', connected: 'green', finished: 'gray', dropped: 'red' })[s] || 'gray'
+  return { waiting: 'orange', assigned: 'arcoblue', connected: 'green', finished: 'gray', dropped: 'red' }[s] || 'gray'
 }
 function statusLabel(s: CallStatus) {
-  return ({ waiting: '待分配', assigned: '已分配', connected: '接通中', finished: '已完成', dropped: '已丢弃' })[s] || s
+  return { waiting: '待分配', assigned: '已分配', connected: '接通中', finished: '已完成', dropped: '已丢弃' }[s] || s
 }
 </script>
 
@@ -264,6 +267,14 @@ function statusLabel(s: CallStatus) {
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
 }
-.cp-kpi-label { font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 4px; }
-.cp-kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+.cp-kpi-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 4px;
+}
+.cp-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
 </style>

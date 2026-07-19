@@ -56,10 +56,19 @@
               <b>{{ e.title }}</b>
               <a-tag v-if="e.refType" size="small" color="gray">{{ e.refType }}</a-tag>
               <a-link v-if="e.jumpPath" size="small" @click="$router.push(e.jumpPath)">{{ e.refId }}</a-link>
-              <span v-else-if="e.refId" class="mono" style="font-size: 12px; color: var(--cp-text-tertiary)">{{ e.refId }}</span>
+              <span v-else-if="e.refId" class="mono" style="font-size: 12px; color: var(--cp-text-tertiary)">{{
+                e.refId
+              }}</span>
             </div>
-            <div v-if="e.detail" style="font-size: 12px; color: var(--cp-text-secondary); margin-top: 4px; line-height: 1.5">{{ e.detail }}</div>
-            <div v-if="e.meta" style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px">{{ e.meta }}</div>
+            <div
+              v-if="e.detail"
+              style="font-size: 12px; color: var(--cp-text-secondary); margin-top: 4px; line-height: 1.5"
+            >
+              {{ e.detail }}
+            </div>
+            <div v-if="e.meta" style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px">
+              {{ e.meta }}
+            </div>
           </a-timeline-item>
         </a-timeline>
       </div>
@@ -68,16 +77,28 @@
       <div class="cp-card" style="padding: 20px; flex: 0 0 380px; max-height: 70vh; overflow: auto">
         <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 12px">审查项目反向追溯</h3>
         <a-input-search v-model="searchProject" placeholder="搜项目编号/标题" />
-        <div v-for="p in filteredProjects" :key="p.id" style="margin-top: 12px; padding: 10px 12px; border: 1px solid var(--cp-border-light); border-radius: 6px">
+        <div
+          v-for="p in filteredProjects"
+          :key="p.id"
+          style="margin-top: 12px; padding: 10px 12px; border: 1px solid var(--cp-border-light); border-radius: 6px"
+        >
           <div style="display: flex; justify-content: space-between; align-items: center">
             <span class="mono" style="font-size: 12px; color: var(--cp-text-tertiary)">{{ p.id }}</span>
             <a-tag :color="projectStatusColor(p.status)" size="small">{{ projectStatusLabel(p.status) }}</a-tag>
           </div>
           <div style="font-weight: 600; margin-top: 4px">{{ p.title }}</div>
-          <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px">{{ p.applyTime }} · 审查人 {{ p.reviewer || '-' }}</div>
+          <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px">
+            {{ p.applyTime }} · 审查人 {{ p.reviewer || '-' }}
+          </div>
           <a-divider style="margin: 10px 0" />
-          <div style="font-size: 12px">反向追溯到 <b>{{ eventsByProject(p.id).length }}</b> 个事件:</div>
-          <div v-for="e in eventsByProject(p.id).slice(0, 4)" :key="e.id" style="margin-top: 6px; padding-left: 8px; border-left: 2px solid var(--cp-brand-light); font-size: 12px">
+          <div style="font-size: 12px">
+            反向追溯到 <b>{{ eventsByProject(p.id).length }}</b> 个事件:
+          </div>
+          <div
+            v-for="e in eventsByProject(p.id).slice(0, 4)"
+            :key="e.id"
+            style="margin-top: 6px; padding-left: 8px; border-left: 2px solid var(--cp-brand-light); font-size: 12px"
+          >
             <a-tag size="small" :color="eventColor(e.type)">{{ eventLabel(e.type) }}</a-tag>
             {{ e.title }}
           </div>
@@ -102,9 +123,9 @@ interface AuditEvent {
   title: string
   detail?: string
   meta?: string
-  refType?: string      // '审查项目' | '工单' | '知识' | '整改' | '质检'
+  refType?: string // '审查项目' | '工单' | '知识' | '整改' | '质检'
   refId?: string
-  projectId?: string    // 反向追溯键
+  projectId?: string // 反向追溯键
   jumpPath?: string
 }
 
@@ -164,7 +185,7 @@ function buildTrail(): AuditEvent[] {
   }
 
   // 2) 工作流实例(归档类)
-  for (const inst of wf.instances.filter(i => i.kind === 'review_archive')) {
+  for (const inst of wf.instances.filter((i) => i.kind === 'review_archive')) {
     list.push({
       id: `EVT-WF-${inst.id}`,
       at: inst.createdAt,
@@ -210,7 +231,7 @@ function buildTrail(): AuditEvent[] {
   }
 
   // 5) 知识库条目(由审查归档生成的)
-  for (const k of kb.items.filter(x => x.source?.includes('消保审查'))) {
+  for (const k of kb.items.filter((x) => x.source?.includes('消保审查'))) {
     const reviewId = k.source?.split('·')[1]?.trim()
     list.push({
       id: `EVT-KB-${k.id}`,
@@ -234,30 +255,40 @@ function rebuildTrail() {
 
 const filteredEvents = computed(() => {
   if (!filterType.value) return events.value
-  return events.value.filter(e => e.type === filterType.value)
+  return events.value.filter((e) => e.type === filterType.value)
 })
 
 const filteredProjects = computed(() => {
   const k = searchProject.value.trim().toLowerCase()
   if (!k) return projects
-  return projects.filter(p =>
-    p.id.toLowerCase().includes(k) || (p.title || '').toLowerCase().includes(k)
-  )
+  return projects.filter((p) => p.id.toLowerCase().includes(k) || (p.title || '').toLowerCase().includes(k))
 })
 
 function eventsByProject(projectId: string) {
-  return events.value.filter(e => e.projectId === projectId)
+  return events.value.filter((e) => e.projectId === projectId)
 }
 
-const archivedCount = computed(() => projects.filter(p => p.status === 'archive').length)
+const archivedCount = computed(() => projects.filter((p) => p.status === 'archive').length)
 const rectifyLinkedCount = computed(() => rectify.tasks.length)
-const qualityLinkedCount = computed(() => qa.cases.filter(c => c.totalScore !== undefined).length)
+const qualityLinkedCount = computed(() => qa.cases.filter((c) => c.totalScore !== undefined).length)
 
 function eventColor(t: string) {
-  return { created: 'blue', scoring: 'orange', concluded: 'green', archived: 'gray', quality: 'arcoblue', rectify: 'magenta' }[t] || 'gray'
+  return (
+    {
+      created: 'blue',
+      scoring: 'orange',
+      concluded: 'green',
+      archived: 'gray',
+      quality: 'arcoblue',
+      rectify: 'magenta'
+    }[t] || 'gray'
+  )
 }
 function eventLabel(t: string) {
-  return { created: '立项', scoring: '评分中', concluded: '结论', archived: '归档', quality: '质检', rectify: '整改' }[t] || t
+  return (
+    { created: '立项', scoring: '评分中', concluded: '结论', archived: '归档', quality: '质检', rectify: '整改' }[t] ||
+    t
+  )
 }
 function dotType(t: string) {
   return { concluded: 'success', archived: 'default', rectify: 'warning', quality: 'primary' }[t] as any
@@ -283,6 +314,14 @@ function projectStatusLabel(s: string) {
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
 }
-.cp-kpi-label { font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 4px; }
-.cp-kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+.cp-kpi-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 4px;
+}
+.cp-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
 </style>

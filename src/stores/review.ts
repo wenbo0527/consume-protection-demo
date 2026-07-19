@@ -7,7 +7,7 @@ import { reviewStandards as seedStandards } from '@/mock/data'
 export type StandardSource = 'manual' | 'rectify' | 'regulator' | 'system'
 
 export interface ReviewStandard {
-  id: string                       // 'S001' 或新生成的 'R-001'
+  id: string // 'S001' 或新生成的 'R-001'
   category: string
   item: string
   basis: string
@@ -35,7 +35,9 @@ function loadPersisted(): ReviewStandard[] {
       const arr = JSON.parse(raw)
       if (Array.isArray(arr)) return arr
     }
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
   // 从 seed 重建:确保所有 seed 项被标注 source = 'system'(原始规则)
   const now = new Date().toISOString().slice(0, 16).replace('T', ' ')
   return (seedStandards as any[]).map((s, idx) => ({
@@ -49,7 +51,9 @@ function loadPersisted(): ReviewStandard[] {
 function savePersisted(items: ReviewStandard[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
 }
 
 export const useReviewStore = defineStore('review', {
@@ -62,14 +66,14 @@ export const useReviewStore = defineStore('review', {
     /** 按来源统计 */
     bySource: (s) => {
       const result: Record<StandardSource, number> = { manual: 0, rectify: 0, regulator: 0, system: 0 }
-      s.standards.forEach(st => {
+      s.standards.forEach((st) => {
         result[st.source] = (result[st.source] || 0) + 1
       })
       return result
     },
     /** 来源为 rectify 的标准 */
     rectifyStandards(s): ReviewStandard[] {
-      return s.standards.filter(st => st.source === 'rectify')
+      return s.standards.filter((st) => st.source === 'rectify')
     }
   },
   actions: {

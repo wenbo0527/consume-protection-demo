@@ -54,7 +54,13 @@
 import StatusBadge from '@/components/StatusBadge.vue'
 
 const list = [
-  { id: 'GD-20260714-0008', customerName: '周志远', action: '停催申请审批', status: 'processing', expire: '2026-07-17' },
+  {
+    id: 'GD-20260714-0008',
+    customerName: '周志远',
+    action: '停催申请审批',
+    status: 'processing',
+    expire: '2026-07-17'
+  },
   { id: 'GD-20260712-0001', customerName: '刘建国', action: '协商还款试算', status: 'closing', expire: '2026-07-16' },
   { id: 'GD-20260710-0019', customerName: '孙丽华', action: '征信异议核实', status: 'processing', expire: '2026-07-20' }
 ]

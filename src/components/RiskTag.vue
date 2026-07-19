@@ -36,10 +36,27 @@ const label = computed(() => props.label || labelMap[props.type])
   font-weight: 500;
   line-height: 20px;
 }
-.cp-risk-blacklist { background: var(--cp-danger-soft); color: var(--cp-danger); }
-.cp-risk-complaint { background: #fff3e0; color: var(--cp-warning); }
-.cp-risk-agent { background: #fff7e6; color: #d48806; }
-.cp-risk-threat { background: #ffecf0; color: #c41d7f; }
-.cp-risk-normal { background: #e8f5e9; color: var(--cp-success); }
-.cp-risk-text { line-height: 20px; }
+.cp-risk-blacklist {
+  background: var(--cp-danger-soft);
+  color: var(--cp-danger);
+}
+.cp-risk-complaint {
+  background: #fff3e0;
+  color: var(--cp-warning);
+}
+.cp-risk-agent {
+  background: #fff7e6;
+  color: #d48806;
+}
+.cp-risk-threat {
+  background: #ffecf0;
+  color: #c41d7f;
+}
+.cp-risk-normal {
+  background: #e8f5e9;
+  color: var(--cp-success);
+}
+.cp-risk-text {
+  line-height: 20px;
+}
 </style>

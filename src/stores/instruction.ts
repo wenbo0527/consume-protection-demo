@@ -12,7 +12,7 @@ export type InstructionPriority = 'low' | 'normal' | 'high' | 'urgent'
 export type InstructionRole = string
 
 export interface Instruction {
-  id: string                                     // IN-20260715-0001
+  id: string // IN-20260715-0001
   /** 下达人 */
   fromRole: InstructionRole
   fromOperator: string
@@ -58,14 +58,18 @@ function loadPersisted(): Instruction[] {
       const arr = JSON.parse(raw)
       if (Array.isArray(arr)) return arr
     }
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
   return buildSeed()
 }
 
 function savePersisted(items: Instruction[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
 }
 
 function buildSeed(): Instruction[] {
@@ -129,22 +133,22 @@ export const useInstructionStore = defineStore('instruction', {
   }),
   getters: {
     pendingCount(s): number {
-      return s.items.filter(i => i.status === 'pending').length
+      return s.items.filter((i) => i.status === 'pending').length
     },
     ackCount(s): number {
-      return s.items.filter(i => i.status === 'ack').length
+      return s.items.filter((i) => i.status === 'ack').length
     },
     doneCount(s): number {
-      return s.items.filter(i => i.status === 'done').length
+      return s.items.filter((i) => i.status === 'done').length
     },
     /** 某角色当前 pending 指令数 */
     pendingForRole: (s) => (role: InstructionRole) => {
-      return s.items.filter(i => i.status === 'pending' && i.toRole === role).length
+      return s.items.filter((i) => i.status === 'pending' && i.toRole === role).length
     },
     /** 给指定角色的指令列表(pending 在前) */
     listForRole: (s) => (role: InstructionRole, operator?: string) => {
       return [...s.items]
-        .filter(i => i.toRole === role && (!operator || !i.toOperator || i.toOperator === operator))
+        .filter((i) => i.toRole === role && (!operator || !i.toOperator || i.toOperator === operator))
         .sort((a, b) => {
           const pOrder: Record<InstructionPriority, number> = { urgent: 0, high: 1, normal: 2, low: 3 }
           if (a.status === 'pending' && b.status !== 'pending') return -1
@@ -176,7 +180,7 @@ export const useInstructionStore = defineStore('instruction', {
 
     /** 接收方确认接收(ack) */
     ack(id: string, operator: string, note?: string) {
-      const i = this.items.find(x => x.id === id)
+      const i = this.items.find((x) => x.id === id)
       if (!i) return false
       if (i.status !== 'pending') return false
       i.status = 'ack'
@@ -190,7 +194,7 @@ export const useInstructionStore = defineStore('instruction', {
 
     /** 完成 */
     done(id: string, note?: string) {
-      const i = this.items.find(x => x.id === id)
+      const i = this.items.find((x) => x.id === id)
       if (!i) return false
       if (i.status === 'done' || i.status === 'canceled') return false
       i.status = 'done'
@@ -203,7 +207,7 @@ export const useInstructionStore = defineStore('instruction', {
 
     /** 撤回/取消(由下达人执行) */
     cancel(id: string) {
-      const i = this.items.find(x => x.id === id)
+      const i = this.items.find((x) => x.id === id)
       if (!i) return false
       if (i.status === 'done') return false
       i.status = 'canceled'
@@ -215,7 +219,7 @@ export const useInstructionStore = defineStore('instruction', {
     /** 标记过期(由调度器调用) */
     expireOverdue() {
       const now = nowStr()
-      this.items.forEach(i => {
+      this.items.forEach((i) => {
         if (i.deadline && i.status === 'pending' && i.deadline < now) {
           i.status = 'expired'
           i.updatedAt = now

@@ -1,6 +1,9 @@
 <template>
   <div class="cp-page" v-if="project">
-    <a-page-header :title="`审查执行 - ${project.productName}`" :subtitle="`立项编号 ${project.id} · 申请人 ${project.applicant}`">
+    <a-page-header
+      :title="`审查执行 - ${project.productName}`"
+      :subtitle="`立项编号 ${project.id} · 申请人 ${project.applicant}`"
+    >
       <template #back-icon><icon-left /></template>
       <template #extra>
         <a-space>
@@ -33,7 +36,9 @@
 
       <a-collapse style="margin-top: 12px">
         <a-collapse-item header="项目说明书" key="1">
-          <p style="color: var(--cp-text-secondary)">速贷宝 Pro 是面向优质客户的循环额度产品,授信额度 1-30 万,年化利率 18%-24%...</p>
+          <p style="color: var(--cp-text-secondary)">
+            速贷宝 Pro 是面向优质客户的循环额度产品,授信额度 1-30 万,年化利率 18%-24%...
+          </p>
         </a-collapse-item>
         <a-collapse-item header="投诉管控目标" key="2">
           <p style="color: var(--cp-text-secondary)">新户投诉率 ≤0.5%, 重复投诉率 ≤8%, 监管件超时率 ≤5%</p>
@@ -47,8 +52,12 @@
         <h3 class="cp-section-title" style="margin: 0">
           审查标准清单
           <a-tag size="small" style="margin-left: 8px">{{ standards.length }} 项</a-tag>
-          <a-tag v-if="requiredDone === requiredTotal" size="small" color="green" style="margin-left: 4px">必选已全确认</a-tag>
-          <a-tag v-else size="small" color="orange" style="margin-left: 4px">必选待确认 {{ requiredTotal - requiredDone }}</a-tag>
+          <a-tag v-if="requiredDone === requiredTotal" size="small" color="green" style="margin-left: 4px"
+            >必选已全确认</a-tag
+          >
+          <a-tag v-else size="small" color="orange" style="margin-left: 4px"
+            >必选待确认 {{ requiredTotal - requiredDone }}</a-tag
+          >
         </h3>
         <a-space>
           <span style="font-size: 12px; color: var(--cp-text-tertiary)">
@@ -102,18 +111,25 @@
           </a-radio-group>
         </a-form-item>
         <a-form-item label="审查意见说明" required>
-          <a-textarea v-model="comment" :rows="4" placeholder="请填写详细的审查意见,归档后将作为知识库内容自动同步..." />
+          <a-textarea
+            v-model="comment"
+            :rows="4"
+            placeholder="请填写详细的审查意见,归档后将作为知识库内容自动同步..."
+          />
         </a-form-item>
       </div>
     </div>
 
     <!-- 归档同步预览(SC-003) -->
-    <a-modal v-model:visible="showArchive" title="审查归档 - 知识库同步预览" :width="720" :ok-text="'确认归档并同步知识库'">
+    <a-modal
+      v-model:visible="showArchive"
+      title="审查归档 - 知识库同步预览"
+      :width="720"
+      :ok-text="'确认归档并同步知识库'"
+    >
       <a-alert type="info" show-icon style="margin-bottom: 16px">
         <template #title>SC-003 提取规则</template>
-        <template #content>
-          归档时系统将自动按规则提取信息推送至知识库(状态"待审核",管理员确认后生效)。
-        </template>
+        <template #content> 归档时系统将自动按规则提取信息推送至知识库(状态"待审核",管理员确认后生效)。 </template>
       </a-alert>
       <div style="display: flex; flex-direction: column; gap: 12px">
         <div class="cp-extract-row">
@@ -127,7 +143,13 @@
         <div class="cp-extract-row">
           <div class="cp-extract-key">审查标准通过/不通过项 → 知识条目风险提示</div>
           <div class="cp-extract-val">
-            <a-tag v-for="(v, k) in results" :key="k" :color="v === 'pass' ? 'green' : v === 'reject' ? 'red' : 'gray'" size="small" style="margin: 2px">
+            <a-tag
+              v-for="(v, k) in results"
+              :key="k"
+              :color="v === 'pass' ? 'green' : v === 'reject' ? 'red' : 'gray'"
+              size="small"
+              style="margin: 2px"
+            >
               {{ getStandardItem(k) }}: {{ v === 'pass' ? '通过' : v === 'reject' ? '不通过' : '不适用' }}
             </a-tag>
           </div>
@@ -218,12 +240,12 @@ const router = useRouter()
 const wf = useWorkflowStore()
 const cpStore = useCompliancePromiseStore()
 
-const project = computed(() => reviewProjects.find(p => p.id === route.params.id))
+const project = computed(() => reviewProjects.find((p) => p.id === route.params.id))
 
 const standards = computed(() => {
   if (!project.value) return []
   const typeMap: Record<string, string> = { newProduct: '产品审查', marketing: '营销审查', change: '变更审查' }
-  return reviewStandards.filter(s => s.category === typeMap[project.value!.type])
+  return reviewStandards.filter((s) => s.category === typeMap[project.value!.type])
 })
 
 const results = reactive<Record<string, string>>({})
@@ -242,15 +264,15 @@ const promiseForm = reactive({
   reason: ''
 })
 
-const requiredTotal = computed(() => standards.value.filter(s => s.required).length)
-const requiredDone = computed(() => standards.value.filter(s => s.required && results[s.id]).length)
+const requiredTotal = computed(() => standards.value.filter((s) => s.required).length)
+const requiredDone = computed(() => standards.value.filter((s) => s.required && results[s.id]).length)
 
 const canSubmit = computed(() => {
   return conclusion.value && comment.value && requiredDone.value === requiredTotal.value
 })
 
 function getStandardItem(id: string) {
-  return standards.value.find(s => s.id === id)?.item || id
+  return standards.value.find((s) => s.id === id)?.item || id
 }
 
 function typeColor(t: string) {
@@ -313,9 +335,7 @@ function doArchive() {
         deadline: promiseForm.deadline,
         reason: promiseForm.reason
       })
-      Message.success(
-        `同步承诺 ${result.promise.id} 已创建,已自动生成 follow-up 工单 ${result.ticketId}`
-      )
+      Message.success(`同步承诺 ${result.promise.id} 已创建,已自动生成 follow-up 工单 ${result.ticketId}`)
     }
     // 重置
     promiseForm.enabled = false
@@ -330,12 +350,29 @@ function doArchive() {
 </script>
 
 <style scoped>
-.cp-section-title { font-size: 14px; font-weight: 600; color: var(--cp-text); margin: 0; }
+.cp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cp-text);
+  margin: 0;
+}
 .cp-extract-row {
-  display: grid; grid-template-columns: 200px 1fr; gap: 12px;
-  padding: 10px 12px; background: var(--cp-bg-soft); border-radius: 6px;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--cp-bg-soft);
+  border-radius: 6px;
   align-items: start;
 }
-.cp-extract-key { font-size: 12px; color: var(--cp-text-tertiary); font-weight: 500; }
-.cp-extract-val { font-size: 13px; color: var(--cp-text); line-height: 1.6; }
+.cp-extract-key {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  font-weight: 500;
+}
+.cp-extract-val {
+  font-size: 13px;
+  color: var(--cp-text);
+  line-height: 1.6;
+}
 </style>

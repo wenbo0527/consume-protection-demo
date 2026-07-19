@@ -43,7 +43,9 @@ function animate() {
 }
 
 onMounted(animate)
-watchEffect(() => { if (props.value) animate() })
+watchEffect(() => {
+  if (props.value) animate()
+})
 </script>
 
 <style scoped>
@@ -61,12 +63,37 @@ watchEffect(() => { if (props.value) animate() })
   box-shadow: var(--cp-shadow-md);
   transform: translateY(-1px);
 }
-.cp-kpi-alert { border-color: var(--cp-danger); }
-.cp-kpi-head { display: flex; justify-content: space-between; align-items: center; }
-.cp-kpi-label { font-size: 13px; color: var(--cp-text-tertiary); }
-.cp-kpi-value { font-size: 28px; font-weight: 600; color: var(--cp-text); letter-spacing: -0.5px; }
-.cp-kpi-foot { display: flex; justify-content: space-between; align-items: center; }
-.cp-kpi-extra { font-size: 12px; color: var(--cp-text-tertiary); }
-.cp-trend-up { color: var(--cp-success); }
-.cp-trend-down { color: var(--cp-danger); }
+.cp-kpi-alert {
+  border-color: var(--cp-danger);
+}
+.cp-kpi-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cp-kpi-label {
+  font-size: 13px;
+  color: var(--cp-text-tertiary);
+}
+.cp-kpi-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--cp-text);
+  letter-spacing: -0.5px;
+}
+.cp-kpi-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cp-kpi-extra {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+}
+.cp-trend-up {
+  color: var(--cp-success);
+}
+.cp-trend-down {
+  color: var(--cp-danger);
+}
 </style>

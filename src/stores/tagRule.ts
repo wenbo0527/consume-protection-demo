@@ -54,7 +54,12 @@ function buildMock(): TagRule[] {
       priority: 100,
       enabled: true,
       actions: [
-        { kind: 'show_alert', level: 'error', title: '紧急:扬言标签客户', actions: ['转紧急流程', '通知组长', '开启录音'] },
+        {
+          kind: 'show_alert',
+          level: 'error',
+          title: '紧急:扬言标签客户',
+          actions: ['转紧急流程', '通知组长', '开启录音']
+        },
         { kind: 'auto_upgrade', target: 'manage', note: '扬言客户进线,请立即关注' }
       ]
     },
@@ -122,17 +127,19 @@ export const useTagRuleStore = defineStore('tagRule', {
     rules: loadPersisted() as TagRule[]
   }),
   getters: {
-    enabled: (s) => s.rules.filter(r => r.enabled).sort((a, b) => b.priority - a.priority)
+    enabled: (s) => s.rules.filter((r) => r.enabled).sort((a, b) => b.priority - a.priority)
   },
   actions: {
-    persist() { savePersisted(this.rules) },
+    persist() {
+      savePersisted(this.rules)
+    },
 
     /** 评估某客户的标签,返回触发的所有动作(按规则优先级) */
     evaluate(tags: RiskTag[]): { rule: TagRule; actions: RuleAction[] }[] {
       if (!tags?.length) return []
       const triggered: { rule: TagRule; actions: RuleAction[] }[] = []
       for (const rule of this.enabled) {
-        const hit = rule.tags.some(t => tags.includes(t))
+        const hit = rule.tags.some((t) => tags.includes(t))
         if (hit) triggered.push({ rule, actions: rule.actions })
       }
       log('log', 'evaluate', `tags=${tags.join(',')} hit=${triggered.length}`)
@@ -142,9 +149,9 @@ export const useTagRuleStore = defineStore('tagRule', {
     /** 找出第一条 show_alert 动作(用于弹窗) */
     firstAlert(tags: RiskTag[]): { type: 'error' | 'warning'; title: string; actions: string[] } | null {
       for (const r of this.enabled) {
-        const hit = r.tags.some(t => tags.includes(t))
+        const hit = r.tags.some((t) => tags.includes(t))
         if (!hit) continue
-        const a = r.actions.find(x => x.kind === 'show_alert') as any
+        const a = r.actions.find((x) => x.kind === 'show_alert') as any
         if (a) return { type: a.level, title: a.title, actions: a.actions }
       }
       return null
@@ -154,8 +161,8 @@ export const useTagRuleStore = defineStore('tagRule', {
     restrictNotes(tags: RiskTag[]): string[] {
       const notes: string[] = []
       for (const r of this.enabled) {
-        if (!r.tags.some(t => tags.includes(t))) continue
-        const a = r.actions.find(x => x.kind === 'restrict_call') as any
+        if (!r.tags.some((t) => tags.includes(t))) continue
+        const a = r.actions.find((x) => x.kind === 'restrict_call') as any
         if (a) notes.push(a.note)
       }
       return notes
@@ -165,8 +172,8 @@ export const useTagRuleStore = defineStore('tagRule', {
     autoUpgradeNotes(tags: RiskTag[]): string[] {
       const notes: string[] = []
       for (const r of this.enabled) {
-        if (!r.tags.some(t => tags.includes(t))) continue
-        const a = r.actions.find(x => x.kind === 'auto_upgrade') as any
+        if (!r.tags.some((t) => tags.includes(t))) continue
+        const a = r.actions.find((x) => x.kind === 'auto_upgrade') as any
         if (a) notes.push(a.note)
       }
       return notes
@@ -183,7 +190,7 @@ export const useTagRuleStore = defineStore('tagRule', {
         firstAlert: this.firstAlert(tags),
         restrictNotes: this.restrictNotes(tags),
         autoUpgradeNotes: this.autoUpgradeNotes(tags),
-        hitRules: this.evaluate(tags).map(r => ({
+        hitRules: this.evaluate(tags).map((r) => ({
           ruleId: r.rule.id,
           ruleName: r.rule.name,
           ruleDesc: r.rule.desc
@@ -192,7 +199,7 @@ export const useTagRuleStore = defineStore('tagRule', {
     },
 
     updateRule(id: string, patch: Partial<TagRule>) {
-      const r = this.rules.find(x => x.id === id)
+      const r = this.rules.find((x) => x.id === id)
       if (!r) return
       Object.assign(r, patch)
       log('log', 'update', id, patch)
@@ -208,7 +215,7 @@ export const useTagRuleStore = defineStore('tagRule', {
     },
 
     remove(id: string) {
-      this.rules = this.rules.filter(r => r.id !== id)
+      this.rules = this.rules.filter((r) => r.id !== id)
       this.persist()
     }
   }

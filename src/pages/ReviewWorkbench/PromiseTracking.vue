@@ -52,12 +52,20 @@
         <a-table-column title="承诺人" :width="100">
           <template #cell="{ record }">
             {{ record.reviewer }}
-            <a-tag size="small" color="arcoblue" style="margin-left: 4px">{{ record.reviewerRole === 'manage' ? '管理层' : '审查' }}</a-tag>
+            <a-tag size="small" color="arcoblue" style="margin-left: 4px">{{
+              record.reviewerRole === 'manage' ? '管理层' : '审查'
+            }}</a-tag>
           </template>
         </a-table-column>
         <a-table-column title="截止" :width="120">
           <template #cell="{ record }">
-            <span :style="daysToDeadline(record.deadline) <= 14 && record.status !== 'closed' ? 'color:#fa8c16;font-weight:600' : ''">
+            <span
+              :style="
+                daysToDeadline(record.deadline) <= 14 && record.status !== 'closed'
+                  ? 'color:#fa8c16;font-weight:600'
+                  : ''
+              "
+            >
               {{ record.deadline }}
             </span>
             <div style="font-size: 11px; color: var(--cp-text-tertiary)">
@@ -88,7 +96,8 @@
                 type="text"
                 status="success"
                 @click="onClose(record)"
-              >标记达成</a-button>
+                >标记达成</a-button
+              >
             </a-space>
           </template>
         </a-table-column>
@@ -100,7 +109,9 @@
       <div v-if="current">
         <a-descriptions :column="2" bordered size="small">
           <a-descriptions-item label="承诺指标">{{ metricLabel(current.metric) }}</a-descriptions-item>
-          <a-descriptions-item label="目标值"><b>{{ current.targetValue }}</b></a-descriptions-item>
+          <a-descriptions-item label="目标值"
+            ><b>{{ current.targetValue }}</b></a-descriptions-item
+          >
           <a-descriptions-item label="当前值">{{ current.currentValue || '-' }}</a-descriptions-item>
           <a-descriptions-item label="状态">
             <a-tag :color="statusColor(current.status)">{{ statusLabel(current.status) }}</a-tag>
@@ -126,15 +137,36 @@
         <h3 style="font-size: 14px; margin: 0 0 12px">跟踪检查时间线</h3>
         <a-empty v-if="!current.checks.length" description="暂无检查记录,点击下方发起检查" />
         <div v-else>
-          <div v-for="(c, i) in current.checks" :key="i" style="position: relative; padding: 8px 0 8px 24px; border-left: 2px solid var(--cp-border-light); margin-left: 8px">
-            <div style="position: absolute; left: -8px; top: 12px; width: 12px; height: 12px; border-radius: 50%; background: var(--cp-brand)" />
+          <div
+            v-for="(c, i) in current.checks"
+            :key="i"
+            style="
+              position: relative;
+              padding: 8px 0 8px 24px;
+              border-left: 2px solid var(--cp-border-light);
+              margin-left: 8px;
+            "
+          >
+            <div
+              style="
+                position: absolute;
+                left: -8px;
+                top: 12px;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: var(--cp-brand);
+              "
+            />
             <div>
               <a-tag :color="checkColor(c.result)" size="small">
                 {{ c.result === 'good' ? '达标' : c.result === 'warn' ? '预警' : '失败' }}
               </a-tag>
               <span style="margin-left: 8px">{{ c.operator }} · {{ c.at }}</span>
             </div>
-            <div style="font-size: 13px; color: var(--cp-text-secondary); margin-top: 4px; line-height: 1.6">{{ c.comment }}</div>
+            <div style="font-size: 13px; color: var(--cp-text-secondary); margin-top: 4px; line-height: 1.6">
+              {{ c.comment }}
+            </div>
           </div>
         </div>
 
@@ -184,10 +216,13 @@ const sortedItems = computed(() =>
   })
 )
 
-const withTicketCount = computed(() => cpStore.items.filter(i => i.followUpTicketId).length)
+const withTicketCount = computed(() => cpStore.items.filter((i) => i.followUpTicketId).length)
 const totalChecks = computed(() => cpStore.items.reduce((sum, i) => sum + i.checks.length, 0))
-const nearDeadlineCount = computed(() =>
-  cpStore.items.filter(i => i.status !== 'closed' && daysToDeadline(i.deadline) <= 14 && daysToDeadline(i.deadline) >= 0).length
+const nearDeadlineCount = computed(
+  () =>
+    cpStore.items.filter(
+      (i) => i.status !== 'closed' && daysToDeadline(i.deadline) <= 14 && daysToDeadline(i.deadline) >= 0
+    ).length
 )
 
 function daysToDeadline(deadline: string): number {
@@ -202,13 +237,18 @@ function metricLabel(m: string): string {
 }
 
 function statusColor(s: PromiseStatus): string {
-  return ({ open: 'orange', ticket_created: 'arcoblue', in_progress: 'arcoblue', closed: 'green', overdue: 'red' })[s] || 'gray'
+  return (
+    { open: 'orange', ticket_created: 'arcoblue', in_progress: 'arcoblue', closed: 'green', overdue: 'red' }[s] ||
+    'gray'
+  )
 }
 function statusLabel(s: PromiseStatus): string {
-  return ({ open: '待发起', ticket_created: '工单已生成', in_progress: '跟踪中', closed: '已达成', overdue: '已超时' })[s] || s
+  return (
+    { open: '待发起', ticket_created: '工单已生成', in_progress: '跟踪中', closed: '已达成', overdue: '已超时' }[s] || s
+  )
 }
 function checkColor(r: string): string {
-  return ({ good: 'green', warn: 'orange', fail: 'red' })[r] || 'gray'
+  return { good: 'green', warn: 'orange', fail: 'red' }[r] || 'gray'
 }
 
 function openDetail(c: CompliancePromise) {
@@ -234,7 +274,7 @@ function onAddCheck() {
   Message.success('检查已记录')
   checkForm.value = { result: 'good', comment: '', operator: '刘丽' }
   // 刷新 current
-  current.value = cpStore.items.find(p => p.id === current.value!.id) || current.value
+  current.value = cpStore.items.find((p) => p.id === current.value!.id) || current.value
 }
 
 function jumpTicket(c: CompliancePromise) {
@@ -260,6 +300,14 @@ function jumpReview(c: CompliancePromise) {
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
 }
-.cp-kpi-label { font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 4px; }
-.cp-kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+.cp-kpi-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 4px;
+}
+.cp-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
 </style>

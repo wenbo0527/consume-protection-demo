@@ -27,7 +27,9 @@
       </div>
       <div class="cp-kpi-card">
         <div class="cp-kpi-label">均分</div>
-        <div class="cp-kpi-value" :style="{ color: qa.avgScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)' }">{{ qa.avgScore }}</div>
+        <div class="cp-kpi-value" :style="{ color: qa.avgScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)' }">
+          {{ qa.avgScore }}
+        </div>
       </div>
       <div class="cp-kpi-card">
         <div class="cp-kpi-label">高严重</div>
@@ -53,11 +55,16 @@
           <a-link @click="openDetail(record)">{{ record.id }}</a-link>
         </template>
         <template #severity="{ record }">
-          <a-tag v-if="record.severity" :color="severityColor(record.severity)">{{ severityLabel(record.severity) }}</a-tag>
+          <a-tag v-if="record.severity" :color="severityColor(record.severity)">{{
+            severityLabel(record.severity)
+          }}</a-tag>
           <span v-else style="color: var(--cp-text-tertiary)">-</span>
         </template>
         <template #totalScore="{ record }">
-          <span v-if="record.totalScore !== undefined" :style="{ color: record.totalScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)', fontWeight: 600 }">
+          <span
+            v-if="record.totalScore !== undefined"
+            :style="{ color: record.totalScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)', fontWeight: 600 }"
+          >
             {{ record.totalScore }}
           </span>
           <span v-else style="color: var(--cp-text-tertiary)">未评分</span>
@@ -68,9 +75,29 @@
         <template #actions="{ record }">
           <a-space :size="4">
             <a-button size="small" type="text" @click="openDetail(record)">详情</a-button>
-            <a-button v-if="record.status === 'pending' || record.status === 'scoring'" size="small" type="text" status="success" @click="openScore(record)">评分</a-button>
-            <a-button v-if="record.status === 'rectify'" size="small" type="text" status="warning" @click="pushToRectify(record)">推整改</a-button>
-            <a-button v-if="record.status === 'rectify' && record.recheckLog && record.recheckLog.length" size="small" type="text" @click="openRecheck(record)">复检</a-button>
+            <a-button
+              v-if="record.status === 'pending' || record.status === 'scoring'"
+              size="small"
+              type="text"
+              status="success"
+              @click="openScore(record)"
+              >评分</a-button
+            >
+            <a-button
+              v-if="record.status === 'rectify'"
+              size="small"
+              type="text"
+              status="warning"
+              @click="pushToRectify(record)"
+              >推整改</a-button
+            >
+            <a-button
+              v-if="record.status === 'rectify' && record.recheckLog && record.recheckLog.length"
+              size="small"
+              type="text"
+              @click="openRecheck(record)"
+              >复检</a-button
+            >
           </a-space>
         </template>
       </a-table>
@@ -80,17 +107,28 @@
     <a-drawer v-model:visible="detailVisible" :width="640" :title="`质检详情 ${currentCase?.id || ''}`">
       <div v-if="currentCase" style="padding: 0 8px">
         <a-descriptions :column="2" bordered size="small">
-          <a-descriptions-item label="客户">{{ currentCase.customerName }} ({{ currentCase.customerId }})</a-descriptions-item>
+          <a-descriptions-item label="客户"
+            >{{ currentCase.customerName }} ({{ currentCase.customerId }})</a-descriptions-item
+          >
           <a-descriptions-item label="坐席">{{ currentCase.agentName }}</a-descriptions-item>
           <a-descriptions-item label="关联工单">{{ currentCase.ticketId }}</a-descriptions-item>
           <a-descriptions-item label="触发原因">{{ currentCase.reason }}</a-descriptions-item>
           <a-descriptions-item label="质检员">{{ currentCase.inspector || '-' }}</a-descriptions-item>
           <a-descriptions-item label="严重程度">
-            <a-tag v-if="currentCase.severity" :color="severityColor(currentCase.severity)">{{ severityLabel(currentCase.severity) }}</a-tag>
+            <a-tag v-if="currentCase.severity" :color="severityColor(currentCase.severity)">{{
+              severityLabel(currentCase.severity)
+            }}</a-tag>
             <span v-else>-</span>
           </a-descriptions-item>
           <a-descriptions-item label="总分" :span="2">
-            <span v-if="currentCase.totalScore !== undefined" :style="{ fontSize: '20px', fontWeight: 700, color: currentCase.totalScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)' }">
+            <span
+              v-if="currentCase.totalScore !== undefined"
+              :style="{
+                fontSize: '20px',
+                fontWeight: 700,
+                color: currentCase.totalScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)'
+              }"
+            >
               {{ currentCase.totalScore }} / 100
             </span>
             <span v-else>未评分</span>
@@ -98,12 +136,19 @@
         </a-descriptions>
 
         <h3 style="margin: 16px 0 8px">评分明细</h3>
-        <a-table v-if="currentCase.scores.length" :data="currentCase.scores" :pagination="false" :columns="scoreColumns" />
+        <a-table
+          v-if="currentCase.scores.length"
+          :data="currentCase.scores"
+          :pagination="false"
+          :columns="scoreColumns"
+        />
         <a-empty v-else description="尚未评分" />
 
         <h3 style="margin: 16px 0 8px">问题点</h3>
         <div v-if="currentCase.issues?.length">
-          <a-tag v-for="(it, i) in currentCase.issues" :key="i" color="orange" style="margin-bottom: 6px">{{ it }}</a-tag>
+          <a-tag v-for="(it, i) in currentCase.issues" :key="i" color="orange" style="margin-bottom: 6px">{{
+            it
+          }}</a-tag>
         </div>
         <a-empty v-else description="无问题点" />
 
@@ -112,13 +157,26 @@
           <a-timeline-item v-for="(r, i) in currentCase.recheckLog" :key="i">
             <div>
               <b>{{ r.operator }}</b> · {{ r.at }} · 复检分 {{ r.score }}
-              <a-tag :color="r.passed ? 'green' : 'red'" style="margin-left: 6px">{{ r.passed ? '通过' : '未通过' }}</a-tag>
+              <a-tag :color="r.passed ? 'green' : 'red'" style="margin-left: 6px">{{
+                r.passed ? '通过' : '未通过'
+              }}</a-tag>
             </div>
-            <div v-if="r.note" style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px">{{ r.note }}</div>
+            <div v-if="r.note" style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px">
+              {{ r.note }}
+            </div>
           </a-timeline-item>
         </a-timeline>
 
-        <div v-if="currentCase.rectifyTaskId" style="margin-top: 16px; padding: 8px 12px; background: var(--cp-warning-soft); border-radius: 4px; font-size: 13px">
+        <div
+          v-if="currentCase.rectifyTaskId"
+          style="
+            margin-top: 16px;
+            padding: 8px 12px;
+            background: var(--cp-warning-soft);
+            border-radius: 4px;
+            font-size: 13px;
+          "
+        >
           已推送整改任务:<b>{{ currentCase.rectifyTaskId }}</b>
         </div>
       </div>
@@ -129,15 +187,25 @@
       <div v-if="scoreTarget">
         <a-alert style="margin-bottom: 12px">
           <template #content>
-            <div>客户:<b>{{ scoreTarget.customerName }}</b>({{ scoreTarget.customerId }}) · 工单 {{ scoreTarget.ticketId }} · 坐席 {{ scoreTarget.agentName }}</div>
+            <div>
+              客户:<b>{{ scoreTarget.customerName }}</b
+              >({{ scoreTarget.customerId }}) · 工单 {{ scoreTarget.ticketId }} · 坐席 {{ scoreTarget.agentName }}
+            </div>
             <div style="margin-top: 4px">触发原因:{{ scoreTarget.reason }}</div>
           </template>
         </a-alert>
 
         <h4 style="margin: 8px 0">评分项</h4>
-        <div v-for="(s, idx) in scoreForm.scores" :key="idx" style="margin-bottom: 12px; padding: 8px 12px; border: 1px solid var(--cp-border-light); border-radius: 4px">
+        <div
+          v-for="(s, idx) in scoreForm.scores"
+          :key="idx"
+          style="margin-bottom: 12px; padding: 8px 12px; border: 1px solid var(--cp-border-light); border-radius: 4px"
+        >
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px">
-            <span><b>{{ s.dimension }}</b>(满分 {{ s.maxScore }})</span>
+            <span
+              ><b>{{ s.dimension }}</b
+              >(满分 {{ s.maxScore }})</span
+            >
             <a-input-number v-model="s.score" :min="0" :max="s.maxScore" size="small" style="width: 80px" />
           </div>
           <a-input v-model="s.comment" placeholder="评分说明(可选)" size="small" />
@@ -160,9 +228,13 @@
     <!-- 复检弹窗 -->
     <a-modal v-model:visible="recheckVisible" title="复检" :width="480" :ok-text="'提交复检'" @ok="onSubmitRecheck">
       <div v-if="recheckTarget">
-        <p>质检:<b>{{ recheckTarget.id }}</b>(原分 {{ recheckTarget.totalScore }})</p>
+        <p>
+          质检:<b>{{ recheckTarget.id }}</b
+          >(原分 {{ recheckTarget.totalScore }})
+        </p>
         <p>复检分:<a-input-number v-model="recheckForm.score" :min="0" :max="100" /></p>
-        <p>结果:
+        <p>
+          结果:
           <a-radio-group v-model="recheckForm.passed">
             <a-radio :value="true">通过</a-radio>
             <a-radio :value="false">未通过</a-radio>
@@ -213,11 +285,11 @@ const rectify = useRectifyStore()
 const ops = useOpsStore()
 
 const statusFilter = ref<string>('')
-const closedCount = computed(() => qa.cases.filter(c => c.status === 'closed' || c.status === 'rechecked').length)
+const closedCount = computed(() => qa.cases.filter((c) => c.status === 'closed' || c.status === 'rechecked').length)
 
 const filteredList = computed(() => {
   if (!statusFilter.value) return qa.cases
-  return qa.cases.filter(c => c.status === statusFilter.value)
+  return qa.cases.filter((c) => c.status === statusFilter.value)
 })
 
 // 表格列
@@ -266,7 +338,7 @@ const SCORE_DIMENSIONS: QaScoreItem[] = [
 
 function openScore(c: QaCase) {
   scoreTarget.value = c
-  scoreForm.scores = SCORE_DIMENSIONS.map(d => ({ ...d }))
+  scoreForm.scores = SCORE_DIMENSIONS.map((d) => ({ ...d }))
   scoreForm.issuesText = ''
   scoreForm.severity = 'mid'
   scoreVisible.value = true
@@ -274,15 +346,20 @@ function openScore(c: QaCase) {
 
 function onSubmitScore() {
   if (!scoreTarget.value) return
-  const issues = scoreForm.issuesText.split(/[,，]/).map(s => s.trim()).filter(Boolean)
+  const issues = scoreForm.issuesText
+    .split(/[,，]/)
+    .map((s) => s.trim())
+    .filter(Boolean)
   qa.score(scoreTarget.value.id, '刘丽', scoreForm.scores, issues, scoreForm.severity)
   const total = scoreForm.scores.reduce((a, s) => a + s.score, 0)
   // 联动 ops:把当前质检刷新到坐席绩效
-  ops.refreshAllFromQuality(qa.cases.map(c => ({
-    agentName: c.agentName,
-    totalScore: c.totalScore,
-    status: c.status
-  })))
+  ops.refreshAllFromQuality(
+    qa.cases.map((c) => ({
+      agentName: c.agentName,
+      totalScore: c.totalScore,
+      status: c.status
+    }))
+  )
   Message.success(`评分完成,总分 ${total}${total < 80 ? ',自动转整改' : ''}`)
   scoreVisible.value = false
 }
@@ -350,11 +427,11 @@ function onSubmitRecheck() {
 // 自动抽检 5%
 function autoPick() {
   // 找到最近 7 天未质检的工单
-  const qaTicketIds = new Set(qa.cases.map(c => c.ticketId))
-  const candidates = tickets.filter(t => !qaTicketIds.has(t.id))
+  const qaTicketIds = new Set(qa.cases.map((c) => c.ticketId))
+  const candidates = tickets.filter((t) => !qaTicketIds.has(t.id))
   const pickCount = Math.max(1, Math.floor(candidates.length * 0.05))
   const picked = candidates.slice(0, pickCount)
-  picked.forEach(t => {
+  picked.forEach((t) => {
     qa.create({
       ticketId: t.id,
       customerId: (t as any).customerId || 'C003',
@@ -404,24 +481,28 @@ function severityColor(s: QaSeverity) {
   return { low: 'gray', mid: 'blue', high: 'orange', severe: 'red' }[s] || 'gray'
 }
 function statusLabel(s: QaCase['status']) {
-  return {
-    pending: '待评分',
-    scoring: '评分中',
-    scored: '已评分',
-    rectify: '整改中',
-    rechecked: '已复检',
-    closed: '已闭环'
-  }[s] || s
+  return (
+    {
+      pending: '待评分',
+      scoring: '评分中',
+      scored: '已评分',
+      rectify: '整改中',
+      rechecked: '已复检',
+      closed: '已闭环'
+    }[s] || s
+  )
 }
 function statusColor(s: QaCase['status']) {
-  return {
-    pending: 'gray',
-    scoring: 'blue',
-    scored: 'green',
-    rectify: 'orange',
-    rechecked: 'cyan',
-    closed: 'gray'
-  }[s] || 'gray'
+  return (
+    {
+      pending: 'gray',
+      scoring: 'blue',
+      scored: 'green',
+      rectify: 'orange',
+      rechecked: 'cyan',
+      closed: 'gray'
+    }[s] || 'gray'
+  )
 }
 </script>
 
@@ -438,6 +519,14 @@ function statusColor(s: QaCase['status']) {
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
 }
-.cp-kpi-label { font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 4px; }
-.cp-kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+.cp-kpi-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 4px;
+}
+.cp-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
 </style>

@@ -5,7 +5,8 @@ import { defineStore } from 'pinia'
 
 // ============ 类型 ============
 
-export type ExitReason = 'high_risk' | 'regulator_blacklist' | 'overdue_extreme' | 'refinance_failed' | 'payment_dispute'
+export type ExitReason =
+  'high_risk' | 'regulator_blacklist' | 'overdue_extreme' | 'refinance_failed' | 'payment_dispute'
 export type ExitStatus = 'pending_review' | 'approved' | 'rejected' | 'notified' | 'settled' | 'closed'
 export type ExitTier = 'normal' | 'extra_review' | 'management_extra'
 export type AssetAction = 'settle_all' | 'settle_remain' | 'refinance' | 'litigation' | 'writeoff'
@@ -21,7 +22,7 @@ export interface ExitApprovalStep {
 }
 
 export interface ExitCase {
-  id: string                         // EC-20260715-0001
+  id: string // EC-20260715-0001
   customerId: string
   customerName: string
   loanId: string
@@ -66,14 +67,18 @@ function loadPersisted(): ExitCase[] {
       const arr = JSON.parse(raw)
       if (Array.isArray(arr)) return arr
     }
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
   return buildSeed()
 }
 
 function savePersisted(cases: ExitCase[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cases))
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
 }
 
 function buildSeed(): ExitCase[] {
@@ -90,9 +95,30 @@ function buildSeed(): ExitCase[] {
       description: '客户已被法院列入失信名单 + 6 个月内 6 次投诉(其中 2 次监管转办)',
       status: 'notified',
       approvals: [
-        { step: 1, role: 'business', approver: '李伟', approvedAt: '2026-07-15 10:30', approved: true, comment: '同意进入清退流程' },
-        { step: 2, role: 'review', approver: '王芳', approvedAt: '2026-07-15 14:20', approved: true, comment: '风险评估通过' },
-        { step: 3, role: 'manage', approver: '陈强', approvedAt: '2026-07-15 16:40', approved: true, comment: '管理层批复,启动清退' }
+        {
+          step: 1,
+          role: 'business',
+          approver: '李伟',
+          approvedAt: '2026-07-15 10:30',
+          approved: true,
+          comment: '同意进入清退流程'
+        },
+        {
+          step: 2,
+          role: 'review',
+          approver: '王芳',
+          approvedAt: '2026-07-15 14:20',
+          approved: true,
+          comment: '风险评估通过'
+        },
+        {
+          step: 3,
+          role: 'manage',
+          approver: '陈强',
+          approvedAt: '2026-07-15 16:40',
+          approved: true,
+          comment: '管理层批复,启动清退'
+        }
       ],
       notifies: [
         { at: '2026-07-15 17:00', channel: '短信', result: '成功', note: '发送清退通知短信' },
@@ -116,7 +142,14 @@ function buildSeed(): ExitCase[] {
       description: '逾期 92 天 + 反复承诺不兑现 + 多次投诉催收频次',
       status: 'pending_review',
       approvals: [
-        { step: 1, role: 'business', approver: '李伟', approvedAt: '2026-07-14 15:00', approved: true, comment: '同意进入清退审查' },
+        {
+          step: 1,
+          role: 'business',
+          approver: '李伟',
+          approvedAt: '2026-07-14 15:00',
+          approved: true,
+          comment: '同意进入清退审查'
+        },
         { step: 2, role: 'review', pending: true }
       ],
       notifies: [],
@@ -137,8 +170,22 @@ function buildSeed(): ExitCase[] {
       description: '客户对息费计算有异议 + 多次投诉 → 经审查,事实清楚无法和解',
       status: 'approved',
       approvals: [
-        { step: 1, role: 'business', approver: '李伟', approvedAt: '2026-07-12 11:00', approved: true, comment: '同意走清退' },
-        { step: 2, role: 'review', approver: '王芳', approvedAt: '2026-07-12 14:30', approved: true, comment: '审查通过' }
+        {
+          step: 1,
+          role: 'business',
+          approver: '李伟',
+          approvedAt: '2026-07-12 11:00',
+          approved: true,
+          comment: '同意走清退'
+        },
+        {
+          step: 2,
+          role: 'review',
+          approver: '王芳',
+          approvedAt: '2026-07-12 14:30',
+          approved: true,
+          comment: '审查通过'
+        }
       ],
       notifies: [],
       assetAction: 'refinance',
@@ -156,10 +203,10 @@ export const useExitStore = defineStore('exit', {
     cases: loadPersisted() as ExitCase[]
   }),
   getters: {
-    pendingCount: (s) => s.cases.filter(c => c.status === 'pending_review').length,
-    approvedCount: (s) => s.cases.filter(c => c.status === 'approved').length,
-    notifiedCount: (s) => s.cases.filter(c => c.status === 'notified').length,
-    settledCount: (s) => s.cases.filter(c => c.status === 'settled' || c.status === 'closed').length,
+    pendingCount: (s) => s.cases.filter((c) => c.status === 'pending_review').length,
+    approvedCount: (s) => s.cases.filter((c) => c.status === 'approved').length,
+    notifiedCount: (s) => s.cases.filter((c) => c.status === 'notified').length,
+    settledCount: (s) => s.cases.filter((c) => c.status === 'settled' || c.status === 'closed').length,
     totalExitAmount(s): number {
       return s.cases.reduce((a, c) => a + c.loanBalance, 0)
     }
@@ -170,7 +217,11 @@ export const useExitStore = defineStore('exit', {
     },
 
     /** 启动新清退 */
-    create(input: Omit<ExitCase, 'id' | 'status' | 'approvals' | 'notifies' | 'createdAt' | 'updatedAt' | 'tier'> & { tier?: ExitTier }): ExitCase {
+    create(
+      input: Omit<ExitCase, 'id' | 'status' | 'approvals' | 'notifies' | 'createdAt' | 'updatedAt' | 'tier'> & {
+        tier?: ExitTier
+      }
+    ): ExitCase {
       const id = `EC-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(Math.floor(Math.random() * 9000) + 1000)}`
       // 根据原因自动分层
       let tier: ExitTier = input.tier || 'normal'
@@ -178,20 +229,19 @@ export const useExitStore = defineStore('exit', {
       else if (input.reason === 'overdue_extreme') tier = 'extra_review'
 
       // 多轮审批深度
-      const approvals: ExitApprovalStep[] = tier === 'management_extra'
-        ? [
-          { step: 1, role: 'business', pending: true },
-          { step: 2, role: 'review', pending: true },
-          { step: 3, role: 'manage', pending: true }
-        ]
-        : tier === 'extra_review'
-        ? [
-          { step: 1, role: 'business', pending: true },
-          { step: 2, role: 'review', pending: true }
-        ]
-        : [
-          { step: 1, role: 'business', pending: true }
-        ]
+      const approvals: ExitApprovalStep[] =
+        tier === 'management_extra'
+          ? [
+              { step: 1, role: 'business', pending: true },
+              { step: 2, role: 'review', pending: true },
+              { step: 3, role: 'manage', pending: true }
+            ]
+          : tier === 'extra_review'
+            ? [
+                { step: 1, role: 'business', pending: true },
+                { step: 2, role: 'review', pending: true }
+              ]
+            : [{ step: 1, role: 'business', pending: true }]
       const now = nowStr()
       const c: ExitCase = {
         ...input,
@@ -212,9 +262,9 @@ export const useExitStore = defineStore('exit', {
 
     /** 审批通过(任何步骤) */
     approve(id: string, role: 'business' | 'review' | 'manage', approver: string, comment: string, approved: boolean) {
-      const c = this.cases.find(x => x.id === id)
+      const c = this.cases.find((x) => x.id === id)
       if (!c) return false
-      const step = c.approvals.find(a => a.role === role && a.pending)
+      const step = c.approvals.find((a) => a.role === role && a.pending)
       if (!step) return false
       step.approver = approver
       step.approvedAt = nowStr()
@@ -223,7 +273,7 @@ export const useExitStore = defineStore('exit', {
       step.pending = false
 
       // 全部签批通过 → 转 approved 状态
-      if (approved && c.approvals.every(a => a.approved === true)) {
+      if (approved && c.approvals.every((a) => a.approved === true)) {
         c.status = 'approved'
       } else if (!approved) {
         c.status = 'rejected'
@@ -235,7 +285,7 @@ export const useExitStore = defineStore('exit', {
 
     /** 客户告知 */
     notify(id: string, channel: '短信' | '邮件' | '电话', result: '成功' | '失败', note?: string) {
-      const c = this.cases.find(x => x.id === id)
+      const c = this.cases.find((x) => x.id === id)
       if (!c) return false
       // 必须 approved 才能通知
       if (c.status !== 'approved' && c.status !== 'notified') return false
@@ -248,7 +298,7 @@ export const useExitStore = defineStore('exit', {
 
     /** 更新处置方案与进度 */
     updateAsset(id: string, action: AssetAction, progress: string, settledAmount?: number) {
-      const c = this.cases.find(x => x.id === id)
+      const c = this.cases.find((x) => x.id === id)
       if (!c) return false
       c.assetAction = action
       c.assetProgress = progress
@@ -260,7 +310,7 @@ export const useExitStore = defineStore('exit', {
 
     /** 关闭/结清 */
     close(id: string, settledAmount?: number) {
-      const c = this.cases.find(x => x.id === id)
+      const c = this.cases.find((x) => x.id === id)
       if (!c) return false
       if (settledAmount !== undefined) c.settledAmount = settledAmount
       c.status = 'closed'

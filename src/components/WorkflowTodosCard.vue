@@ -29,12 +29,13 @@
         <div style="flex: 1; min-width: 0">
           <div style="font-size: 13px; font-weight: 500">
             客户:{{ inst.customerName || '-' }}
-            <span v-if="inst.ticketId" style="color: var(--cp-text-tertiary); font-weight: 400"> · 工单 {{ inst.ticketId }}</span>
+            <span v-if="inst.ticketId" style="color: var(--cp-text-tertiary); font-weight: 400">
+              · 工单 {{ inst.ticketId }}</span
+            >
           </div>
           <div style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 2px">
-            节点:<b style="color: var(--cp-text)">{{ currentNodeName(inst) }}</b>
-            · 发起人 {{ inst.initiator }}
-            · {{ inst.createdAt }}
+            节点:<b style="color: var(--cp-text)">{{ currentNodeName(inst) }}</b> · 发起人 {{ inst.initiator }} ·
+            {{ inst.createdAt }}
           </div>
         </div>
         <div class="cp-wf-row-actions">
@@ -45,15 +46,13 @@
               status="success"
               :disabled="!canApproveInDrawer(inst)"
               @click.stop="quickApprove(inst)"
-            >通过</a-button>
-            <a-button
-              size="small"
-              status="danger"
-              :disabled="!canApproveInDrawer(inst)"
-              @click.stop="quickReject(inst)"
-            >驳回</a-button>
+              >通过</a-button
+            >
+            <a-button size="small" status="danger" :disabled="!canApproveInDrawer(inst)" @click.stop="quickReject(inst)"
+              >驳回</a-button
+            >
             <a-tag v-if="!canApproveInDrawer(inst)" size="small" color="gray">
-              需 {{ wf.templateByKind(inst.kind)?.nodes.find(n => n.code === inst.currentNode)?.handlerRole }} 角色
+              需 {{ wf.templateByKind(inst.kind)?.nodes.find((n) => n.code === inst.currentNode)?.handlerRole }} 角色
             </a-tag>
           </template>
           <a-button v-else size="small" disabled>系统节点</a-button>
@@ -71,19 +70,33 @@
         <a-descriptions :column="1" bordered size="small" style="margin-bottom: 16px">
           <a-descriptions-item label="客户">{{ detailInst.customerName || '-' }}</a-descriptions-item>
           <a-descriptions-item label="关联工单">{{ detailInst.ticketId || '-' }}</a-descriptions-item>
-          <a-descriptions-item label="发起人">{{ detailInst.initiator }} ({{ roleLabelByKey(detailInst.initiatorRole) }})</a-descriptions-item>
+          <a-descriptions-item label="发起人"
+            >{{ detailInst.initiator }} ({{ roleLabelByKey(detailInst.initiatorRole) }})</a-descriptions-item
+          >
           <a-descriptions-item label="发起时间">{{ detailInst.createdAt }}</a-descriptions-item>
           <a-descriptions-item label="当前状态">
             <a-tag :color="statusColor(detailInst.status)">{{ statusLabel(detailInst.status) }}</a-tag>
           </a-descriptions-item>
-          <a-descriptions-item v-if="detailInst.relatedTicketStatus" label="副作用回写">{{ detailInst.relatedTicketStatus }}</a-descriptions-item>
+          <a-descriptions-item v-if="detailInst.relatedTicketStatus" label="副作用回写">{{
+            detailInst.relatedTicketStatus
+          }}</a-descriptions-item>
         </a-descriptions>
 
         <a-divider style="margin: 12px 0">节点流转</a-divider>
 
         <a-timeline>
-          <a-timeline-item v-for="(n, i) in templateNodes(detailInst.kind)" :key="n.code"
-            :color="i === currentIndex(detailInst) ? 'var(--cp-brand)' : (execStatus(detailInst, n.code) === 'approved' ? 'var(--cp-success)' : (execStatus(detailInst, n.code) === 'rejected' ? 'var(--cp-danger)' : 'gray'))"
+          <a-timeline-item
+            v-for="(n, i) in templateNodes(detailInst.kind)"
+            :key="n.code"
+            :color="
+              i === currentIndex(detailInst)
+                ? 'var(--cp-brand)'
+                : execStatus(detailInst, n.code) === 'approved'
+                  ? 'var(--cp-success)'
+                  : execStatus(detailInst, n.code) === 'rejected'
+                    ? 'var(--cp-danger)'
+                    : 'gray'
+            "
           >
             <div style="display: flex; justify-content: space-between">
               <span style="font-weight: 500">{{ n.name }}</span>
@@ -92,13 +105,26 @@
             <div style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 2px">
               处置:{{ roleLabelByKey(n.handlerRole) }} · SLA {{ n.slaHours }}h
             </div>
-            <div v-if="execPayload(detailInst, n.code)" style="font-size: 12px; margin-top: 4px; background: var(--cp-bg-soft); padding: 6px 8px; border-radius: 4px">
+            <div
+              v-if="execPayload(detailInst, n.code)"
+              style="
+                font-size: 12px;
+                margin-top: 4px;
+                background: var(--cp-bg-soft);
+                padding: 6px 8px;
+                border-radius: 4px;
+              "
+            >
               <span v-for="(v, k) in execPayload(detailInst, n.code)" :key="k" style="margin-right: 12px">
                 <span style="color: var(--cp-text-tertiary)">{{ k }}:</span> <b>{{ v }}</b>
               </span>
             </div>
-            <div v-if="execComment(detailInst, n.code)" style="font-size: 11px; margin-top: 4px; color: var(--cp-text-secondary)">
-              {{ execOperator(detailInst, n.code) }} · {{ execAt(detailInst, n.code) }} · {{ execComment(detailInst, n.code) }}
+            <div
+              v-if="execComment(detailInst, n.code)"
+              style="font-size: 11px; margin-top: 4px; color: var(--cp-text-secondary)"
+            >
+              {{ execOperator(detailInst, n.code) }} · {{ execAt(detailInst, n.code) }} ·
+              {{ execComment(detailInst, n.code) }}
             </div>
           </a-timeline-item>
         </a-timeline>
@@ -110,7 +136,11 @@
         </div>
         <template v-else>
           <!-- 节点为 auto/notify/archive 时,无需用户操作 -->
-          <a-alert v-if="currentNodeKindStr === 'auto' || currentNodeKindStr === 'notify' || currentNodeKindStr === 'archive'" type="info" show-icon>
+          <a-alert
+            v-if="currentNodeKindStr === 'auto' || currentNodeKindStr === 'notify' || currentNodeKindStr === 'archive'"
+            type="info"
+            show-icon
+          >
             <template #title>系统节点 · 自动推进</template>
             <template #content>该节点为系统自动处理节点,无需用户填写意见。</template>
           </a-alert>
@@ -124,14 +154,23 @@
                 status="success"
                 :disabled="detailInst ? !canApproveInDrawer(detailInst) : true"
                 @click="doApprove"
-              >通过 / 完成</a-button>
+                >通过 / 完成</a-button
+              >
               <a-button
                 status="danger"
                 :disabled="detailInst ? !canApproveInDrawer(detailInst) : true"
                 @click="doReject"
-              >驳回</a-button>
-              <span v-if="detailInst && !canApproveInDrawer(detailInst)" style="font-size: 12px; color: var(--cp-text-tertiary)">
-                (当前角色 {{ userStore.currentRole }} 无权审批,需 {{ wf.templateByKind(detailInst.kind)?.nodes.find(n => n.code === detailInst!.currentNode)?.handlerRole }})
+                >驳回</a-button
+              >
+              <span
+                v-if="detailInst && !canApproveInDrawer(detailInst)"
+                style="font-size: 12px; color: var(--cp-text-tertiary)"
+              >
+                (当前角色 {{ userStore.currentRole }} 无权审批,需
+                {{
+                  wf.templateByKind(detailInst.kind)?.nodes.find((n) => n.code === detailInst!.currentNode)
+                    ?.handlerRole
+                }})
               </span>
               <a-button @click="detailVisible = false">关闭</a-button>
             </a-space>
@@ -169,11 +208,15 @@ function refresh() {
 const todos = computed(() => {
   void refreshKey.value
   switch (props.role) {
-    case 'agent': return wf.agentTodos
-    case 'business': return wf.businessTodos
+    case 'agent':
+      return wf.agentTodos
+    case 'business':
+      return wf.businessTodos
     case 'manage':
-    case 'review': return wf.manageTodos
-    default: return []
+    case 'review':
+      return wf.manageTodos
+    default:
+      return []
   }
 })
 
@@ -186,54 +229,58 @@ function templateNodes(kind: WorkflowInstance['kind']) {
 }
 
 function currentNodeName(inst: WorkflowInstance) {
-  return templateNodes(inst.kind).find(n => n.code === inst.currentNode)?.name || inst.currentNode
+  return templateNodes(inst.kind).find((n) => n.code === inst.currentNode)?.name || inst.currentNode
 }
 
 const currentNodeKindStr = computed(() => {
   if (!detailInst.value) return 'auto'
-  return templateNodes(detailInst.value.kind).find(n => n.code === detailInst.value!.currentNode)?.kind || 'auto'
+  return templateNodes(detailInst.value.kind).find((n) => n.code === detailInst.value!.currentNode)?.kind || 'auto'
 })
 
 function currentIndex(inst: WorkflowInstance) {
-  return templateNodes(inst.kind).findIndex(n => n.code === inst.currentNode)
+  return templateNodes(inst.kind).findIndex((n) => n.code === inst.currentNode)
 }
 
 function execStatus(inst: WorkflowInstance, code: string) {
-  return inst.executions.find(e => e.nodeCode === code)?.status || 'pending'
+  return inst.executions.find((e) => e.nodeCode === code)?.status || 'pending'
 }
 function execPayload(inst: WorkflowInstance, code: string) {
-  return inst.executions.find(e => e.nodeCode === code)?.payload
+  return inst.executions.find((e) => e.nodeCode === code)?.payload
 }
 function execComment(inst: WorkflowInstance, code: string) {
-  return inst.executions.find(e => e.nodeCode === code)?.comment
+  return inst.executions.find((e) => e.nodeCode === code)?.comment
 }
 function execOperator(inst: WorkflowInstance, code: string) {
-  return inst.executions.find(e => e.nodeCode === code)?.operator || '-'
+  return inst.executions.find((e) => e.nodeCode === code)?.operator || '-'
 }
 function execAt(inst: WorkflowInstance, code: string) {
-  return inst.executions.find(e => e.nodeCode === code)?.operatedAt || '-'
+  return inst.executions.find((e) => e.nodeCode === code)?.operatedAt || '-'
 }
 
 function kindColor(kind: WorkflowInstance['kind']) {
-  return {
-    stop_collection: 'orange',
-    negotiate: 'green',
-    transfer_mediate: 'arcoblue',
-    credit_objection: 'red',
-    review_archive: 'purple',
-    alert_directive: 'magenta'
-  }[kind] || 'gray'
+  return (
+    {
+      stop_collection: 'orange',
+      negotiate: 'green',
+      transfer_mediate: 'arcoblue',
+      credit_objection: 'red',
+      review_archive: 'purple',
+      alert_directive: 'magenta'
+    }[kind] || 'gray'
+  )
 }
 
 function nodeKindColor(k: string) {
-  return {
-    apply: 'arcoblue',
-    approve: 'orange',
-    execute: 'green',
-    notify: 'gray',
-    auto: 'gray',
-    archive: 'gray'
-  }[k] || 'gray'
+  return (
+    {
+      apply: 'arcoblue',
+      approve: 'orange',
+      execute: 'green',
+      notify: 'gray',
+      auto: 'gray',
+      archive: 'gray'
+    }[k] || 'gray'
+  )
 }
 
 function kindShort(k: string) {
@@ -259,7 +306,7 @@ const slaInfo = computed(() => {
   if (!detailInst.value || detailInst.value.status !== 'running') return null
   const tpl = wf.templateByKind(detailInst.value.kind)
   if (!tpl) return null
-  const node = tpl.nodes.find(n => n.code === detailInst.value!.currentNode)
+  const node = tpl.nodes.find((n) => n.code === detailInst.value!.currentNode)
   if (!node || !node.slaHours) return null
   const start = new Date(detailInst.value.currentNodeStartedAt.replace(' ', 'T')).getTime()
   const now = Date.now()
@@ -286,7 +333,10 @@ function openDetail(inst: WorkflowInstance) {
 }
 
 function getOperator() {
-  return props.operatorName || (userStore.currentRole ? (getRoleInfo(userStore.currentRole)?.username || userStore.currentRole) : '操作员')
+  return (
+    props.operatorName ||
+    (userStore.currentRole ? getRoleInfo(userStore.currentRole)?.username || userStore.currentRole : '操作员')
+  )
 }
 
 /** 当前登录角色(没登录则返回 'guest',admin/escalation 强制放行) */
@@ -314,7 +364,9 @@ function canQuickAct(inst: WorkflowInstance) {
 function quickApprove(inst: WorkflowInstance) {
   // OPT-FIX-2 / P3-8: 传 role 给 workflow 守卫
   if (!canApproveInDrawer(inst)) {
-    Message.warning(`当前角色无权审批 ${inst.id} (节点要求 ${wf.templateByKind(inst.kind)?.nodes.find(n => n.code === inst.currentNode)?.handlerRole})`)
+    Message.warning(
+      `当前角色无权审批 ${inst.id} (节点要求 ${wf.templateByKind(inst.kind)?.nodes.find((n) => n.code === inst.currentNode)?.handlerRole})`
+    )
     return
   }
   wf.approve(inst.id, getOperator(), '快速通过', getOperatorRole())
@@ -333,7 +385,9 @@ function doApprove() {
   if (!detailInst.value) return
   // OPT-FIX-2 / P3-8 角色守卫
   if (!canApproveInDrawer(detailInst.value)) {
-    Message.warning(`当前角色无权审批 (节点要求 ${wf.templateByKind(detailInst.value.kind)?.nodes.find(n => n.code === detailInst.value!.currentNode)?.handlerRole})`)
+    Message.warning(
+      `当前角色无权审批 (节点要求 ${wf.templateByKind(detailInst.value.kind)?.nodes.find((n) => n.code === detailInst.value!.currentNode)?.handlerRole})`
+    )
     return
   }
   wf.approve(detailInst.value.id, getOperator(), opForm.value.comment || '通过', getOperatorRole())
@@ -358,12 +412,20 @@ function doReject() {
 
 <style scoped>
 .cp-wf-todos-head {
-  display: flex; justify-content: space-between; align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 12px;
 }
-.cp-wf-list { display: flex; flex-direction: column; gap: 8px; }
+.cp-wf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .cp-wf-row {
-  display: flex; align-items: center; gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px 12px;
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
@@ -371,8 +433,22 @@ function doReject() {
   transition: all 0.15s;
   background: #fff;
 }
-.cp-wf-row:hover { border-color: var(--cp-brand); background: var(--cp-brand-soft); }
-.cp-wf-row-left { display: flex; flex-direction: column; gap: 4px; min-width: 90px }
-.cp-wf-row-actions { display: flex; gap: 4px; flex-shrink: 0 }
-.cp-wf-detail { padding: 0 4px }
+.cp-wf-row:hover {
+  border-color: var(--cp-brand);
+  background: var(--cp-brand-soft);
+}
+.cp-wf-row-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 90px;
+}
+.cp-wf-row-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.cp-wf-detail {
+  padding: 0 4px;
+}
 </style>

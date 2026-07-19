@@ -15,11 +15,13 @@
     <a-alert v-if="dupAlert" type="warning" style="margin-bottom: 16px" show-icon>
       <template #title>
         重复工单检测命中(来源:
-        <a-tag size="small" :color="dupSourceColor">{{ dupSourceLabel }}</a-tag>)
+        <a-tag size="small" :color="dupSourceColor">{{ dupSourceLabel }}</a-tag
+        >)
       </template>
       <template #content>
         <div style="margin-top: 6px">
-          客户 <b>{{ dupAlert.customerName }}</b>({{ dupAlert.type }}) 已有同类工单 <a-link>{{ dupAlert.id }}</a-link> 正在处理中({{ dupAlert.node }})
+          客户 <b>{{ dupAlert.customerName }}</b
+          >({{ dupAlert.type }}) 已有同类工单 <a-link>{{ dupAlert.id }}</a-link> 正在处理中({{ dupAlert.node }})
           <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px">
             检测来源:
             <span v-if="dupAlert.source === 'tickets'">工单池</span>
@@ -27,7 +29,9 @@
             <span v-else>客户画像 ongoingTickets</span>
           </div>
           <div style="margin-top: 8px; display: flex; gap: 8px">
-            <a-button size="small" type="primary" status="warning" @click="$router.push(`/agent/ticket/${dupAlert.id}`)">关联已有工单</a-button>
+            <a-button size="small" type="primary" status="warning" @click="$router.push(`/agent/ticket/${dupAlert.id}`)"
+              >关联已有工单</a-button
+            >
             <a-button size="small" @click="dupAlert = null">继续新建</a-button>
           </div>
         </div>
@@ -77,9 +81,15 @@
               <template #title>客户 {{ customer.name }} ({{ customer.idCardMask }})</template>
               <template #content>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px">
-                  <span>授信状态: <b>{{ statusMap[customer.creditStatus] }}</b></span>
-                  <span>在贷余额: <b class="mono">{{ customer.loanBalance }} 元</b></span>
-                  <span>历史投诉: <b>{{ customer.complaintCount6m }} 次</b></span>
+                  <span
+                    >授信状态: <b>{{ statusMap[customer.creditStatus] }}</b></span
+                  >
+                  <span
+                    >在贷余额: <b class="mono">{{ customer.loanBalance }} 元</b></span
+                  >
+                  <span
+                    >历史投诉: <b>{{ customer.complaintCount6m }} 次</b></span
+                  >
                   <risk-tag v-for="tag in customer.riskTags" :key="tag" :type="tag" />
                 </div>
               </template>
@@ -141,7 +151,13 @@
       <div v-show="step === 2">
         <a-form :model="form">
           <a-form-item label="诉求描述" required>
-            <a-textarea v-model="form.description" :rows="6" placeholder="请详细记录客户诉求..." :max-length="500" show-word-limit />
+            <a-textarea
+              v-model="form.description"
+              :rows="6"
+              placeholder="请详细记录客户诉求..."
+              :max-length="500"
+              show-word-limit
+            />
           </a-form-item>
           <a-form-item label="上传材料">
             <a-upload :auto-upload="false" list-type="picture-card" />
@@ -211,11 +227,12 @@ const dispatchResult = computed(() => {
   const u = urgencyMap[form.urgency]
   const typeMap: Record<string, string> = { consult: '咨询', complaint: '投诉', external: '外部转办', mediate: '调解' }
   const t = typeMap[form.type] || form.type
-  const sorted = [...dispatchRules].filter(r => r.enabled).sort((a, b) => a.priority - b.priority)
-  const hit = sorted.find(r =>
-    (r.channel === form.channel || r.channel === '全部') &&
-    (r.type === t || r.type === '全部') &&
-    (r.urgency === u || r.urgency === '全部')
+  const sorted = [...dispatchRules].filter((r) => r.enabled).sort((a, b) => a.priority - b.priority)
+  const hit = sorted.find(
+    (r) =>
+      (r.channel === form.channel || r.channel === '全部') &&
+      (r.type === t || r.type === '全部') &&
+      (r.urgency === u || r.urgency === '全部')
   )
   if (!hit) return null
   return {
@@ -236,7 +253,10 @@ const statusMap: Record<string, string> = { normal: '正常', overdue: '逾期',
  * 命中任一源 → 显示 alert;按钮可关联/继续新建
  */
 function lookupCustomer() {
-  customer.value = customers.find(c => c.idCardMask.includes(form.customerId.slice(-4)) || c.phone.includes(form.customerId.slice(-4))) || null
+  customer.value =
+    customers.find(
+      (c) => c.idCardMask.includes(form.customerId.slice(-4)) || c.phone.includes(form.customerId.slice(-4))
+    ) || null
   if (!customer.value) {
     dupAlert.value = null
     return
@@ -249,18 +269,16 @@ function lookupCustomer() {
   const fromCustomerTickets = c.ongoingTickets?.find((t: any) => t.type === form.type)
 
   // 源 2:workflow.instances 中同 customerId,排除 finished/expired
-  const fromWf = wf.instances.find(w =>
-    w.customerId === customerId
-    && w.status === 'running'
-    && wf.templateByKind(w.kind)?.nodes[0]?.fields?.some(f => f.options?.includes(form.type))
+  const fromWf = wf.instances.find(
+    (w) =>
+      w.customerId === customerId &&
+      w.status === 'running' &&
+      wf.templateByKind(w.kind)?.nodes[0]?.fields?.some((f) => f.options?.includes(form.type))
   )
 
   // 源 3:mock tickets 中同客户 + 同 type + 不在 closed 终态
-  const fromMock = (mockTickets as any[])?.find(t =>
-    t.customerId === customerId
-    && t.type === form.type
-    && t.status !== 'closed'
-    && t.status !== 'finished'
+  const fromMock = (mockTickets as any[])?.find(
+    (t) => t.customerId === customerId && t.type === form.type && t.status !== 'closed' && t.status !== 'finished'
   )
 
   // 选取优先级最高的一处作为 alert
@@ -290,11 +308,18 @@ const canSubmit = computed(() => form.customerId && form.type && form.category &
 /** 重复工单检测来源标签颜色 + 名称(OPT-FIX-4) */
 const dupSourceColor = computed(() => {
   if (!dupAlert.value) return 'gray'
-  return ({ tickets: 'red', workflow: 'orange', customer: 'gray' } as Record<string, string>)[dupAlert.value.source] || 'gray'
+  return (
+    ({ tickets: 'red', workflow: 'orange', customer: 'gray' } as Record<string, string>)[dupAlert.value.source] ||
+    'gray'
+  )
 })
 const dupSourceLabel = computed(() => {
   if (!dupAlert.value) return ''
-  return ({ tickets: '工单池', workflow: '工作流', customer: '客户档案' } as Record<string, string>)[dupAlert.value.source] || '未知'
+  return (
+    ({ tickets: '工单池', workflow: '工作流', customer: '客户档案' } as Record<string, string>)[
+      dupAlert.value.source
+    ] || '未知'
+  )
 })
 
 function submit() {
@@ -319,7 +344,9 @@ function submit() {
           source: 'TicketCreate'
         }
       })
-      Message.warning(`工单已提交,因客户含 ${tags.includes('threat') ? '扬言' : '黑名单'} 标签,已自动生成指令实例 ${inst?.id || ''} 通知管理层`)
+      Message.warning(
+        `工单已提交,因客户含 ${tags.includes('threat') ? '扬言' : '黑名单'} 标签,已自动生成指令实例 ${inst?.id || ''} 通知管理层`
+      )
     } else if (form.isRegulator) {
       // 监管件:生成 review_archive 工作流的简化版,或直接走预警
       const inst = wf.start({

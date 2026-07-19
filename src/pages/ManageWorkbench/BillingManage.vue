@@ -64,9 +64,15 @@
             <a-table-column title="摘要" :width="240">
               <template #cell="{ record }">
                 <span style="font-size: 12px; color: var(--cp-text-secondary)">
-                  <span v-if="record.type === 'contract'">{{ record.fields.loanAmount }} · {{ record.fields.term }}</span>
-                  <span v-else-if="record.type === 'notice'">{{ record.fields.loanBalance }} · 宽限至 {{ record.fields.deadline }}</span>
-                  <span v-else-if="record.type === 'invoice'">{{ record.fields.loanId }} · 金额 {{ record.fields.settledAmount }}</span>
+                  <span v-if="record.type === 'contract'"
+                    >{{ record.fields.loanAmount }} · {{ record.fields.term }}</span
+                  >
+                  <span v-else-if="record.type === 'notice'"
+                    >{{ record.fields.loanBalance }} · 宽限至 {{ record.fields.deadline }}</span
+                  >
+                  <span v-else-if="record.type === 'invoice'"
+                    >{{ record.fields.loanId }} · 金额 {{ record.fields.settledAmount }}</span
+                  >
                 </span>
               </template>
             </a-table-column>
@@ -88,9 +94,29 @@
               <template #cell="{ record }">
                 <a-space :size="4">
                   <a-button size="small" type="text" @click="openPreview(record)">预览</a-button>
-                  <a-button v-if="record.status === 'issued'" size="small" type="text" status="warning" @click="openSend(record)">发送</a-button>
-                  <a-button v-if="record.status === 'sent'" size="small" type="text" status="success" @click="signDoc(record)">登记签字</a-button>
-                  <a-button v-if="record.status === 'signed' || record.status === 'sent'" size="small" type="text" @click="archiveDoc(record)">归档</a-button>
+                  <a-button
+                    v-if="record.status === 'issued'"
+                    size="small"
+                    type="text"
+                    status="warning"
+                    @click="openSend(record)"
+                    >发送</a-button
+                  >
+                  <a-button
+                    v-if="record.status === 'sent'"
+                    size="small"
+                    type="text"
+                    status="success"
+                    @click="signDoc(record)"
+                    >登记签字</a-button
+                  >
+                  <a-button
+                    v-if="record.status === 'signed' || record.status === 'sent'"
+                    size="small"
+                    type="text"
+                    @click="archiveDoc(record)"
+                    >归档</a-button
+                  >
                 </a-space>
               </template>
             </a-table-column>
@@ -134,7 +160,9 @@
           <a-col :span="12">
             <a-form-item label="文档类型" required>
               <a-select v-model="createForm.templateId" @change="onTemplateChange">
-                <a-option v-for="t in bill.templates" :key="t.id" :value="t.id">{{ typeLabel(t.type) }} · {{ t.name }}</a-option>
+                <a-option v-for="t in bill.templates" :key="t.id" :value="t.id"
+                  >{{ typeLabel(t.type) }} · {{ t.name }}</a-option
+                >
               </a-select>
             </a-form-item>
           </a-col>
@@ -193,7 +221,19 @@
             </span>
           </a-descriptions-item>
         </a-descriptions>
-        <pre style="white-space: pre-wrap; font-family: monospace; background: var(--cp-bg-soft); padding: 12px; border-radius: 4px; max-height: 400px; overflow: auto; font-size: 12px; line-height: 1.6">{{ previewDoc.renderedBody }}</pre>
+        <pre
+          style="
+            white-space: pre-wrap;
+            font-family: monospace;
+            background: var(--cp-bg-soft);
+            padding: 12px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow: auto;
+            font-size: 12px;
+            line-height: 1.6;
+          "
+          >{{ previewDoc.renderedBody }}</pre>
       </div>
     </a-modal>
 
@@ -201,7 +241,9 @@
     <a-modal v-model:visible="tplPreviewVisible" title="模板预览" :width="720" :footer="false">
       <div v-if="previewTpl">
         <div style="margin-bottom: 12px">
-          <a-tag :color="typeColor(previewTpl.type)" size="large">{{ typeLabel(previewTpl.type) }} · {{ previewTpl.name }}</a-tag>
+          <a-tag :color="typeColor(previewTpl.type)" size="large"
+            >{{ typeLabel(previewTpl.type) }} · {{ previewTpl.name }}</a-tag
+          >
         </div>
         <h4 style="margin: 0 0 6px">字段定义</h4>
         <a-table :data="previewTpl.fields" :pagination="false" size="small" style="margin-bottom: 12px">
@@ -210,15 +252,30 @@
           <a-table-column title="示例" data-index="example" />
         </a-table>
         <h4 style="margin: 0 0 6px">模板正文</h4>
-        <pre style="white-space: pre-wrap; font-family: monospace; background: var(--cp-bg-soft); padding: 12px; border-radius: 4px; max-height: 400px; overflow: auto; font-size: 12px; line-height: 1.6">{{ previewTpl.body }}</pre>
+        <pre
+          style="
+            white-space: pre-wrap;
+            font-family: monospace;
+            background: var(--cp-bg-soft);
+            padding: 12px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow: auto;
+            font-size: 12px;
+            line-height: 1.6;
+          "
+          >{{ previewTpl.body }}</pre>
       </div>
     </a-modal>
 
     <!-- 发送弹窗 -->
     <a-modal v-model:visible="sendVisible" title="发送文档" :width="480" :ok-text="'提交'" @ok="onSubmitSend">
       <div v-if="sendTarget">
-        <p>文档:<b>{{ sendTarget.id }}</b></p>
-        <p>渠道:
+        <p>
+          文档:<b>{{ sendTarget.id }}</b>
+        </p>
+        <p>
+          渠道:
           <a-radio-group v-model="sendForm.channel">
             <a-radio value="email">邮件</a-radio>
             <a-radio value="wechat">微信</a-radio>
@@ -268,7 +325,7 @@ const activeTab = ref('docs')
 const typeFilter = ref<string>('')
 const filteredDocs = computed(() => {
   if (!typeFilter.value) return bill.docs
-  return bill.docs.filter(d => d.type === typeFilter.value)
+  return bill.docs.filter((d) => d.type === typeFilter.value)
 })
 
 // 创建文档
@@ -282,13 +339,13 @@ const createForm = reactive({
 })
 
 const currentTplFields = computed(() => {
-  const tpl = bill.templates.find(t => t.id === createForm.templateId)
+  const tpl = bill.templates.find((t) => t.id === createForm.templateId)
   return tpl?.fields || []
 })
 
 function onTemplateChange() {
   // 重置字段默认值
-  currentTplFields.value.forEach(f => {
+  currentTplFields.value.forEach((f) => {
     if (!(f.key in createForm.fields)) {
       createForm.fields[f.key] = ''
     }
@@ -296,11 +353,12 @@ function onTemplateChange() {
 }
 
 function onCustomerChange() {
-  const c = customers.find(c => c.id === createForm.customerId)
+  const c = customers.find((c) => c.id === createForm.customerId)
   if (c) {
     if ('customerName' in createForm.fields) createForm.fields['customerName'] = c.name
     if ('idCardMask' in createForm.fields) createForm.fields['idCardMask'] = (c as any).idCardMask || ''
-    if ('loanAmount' in createForm.fields) createForm.fields['loanAmount'] = `¥${((c as any).loanBalance || 0).toLocaleString()}`
+    if ('loanAmount' in createForm.fields)
+      createForm.fields['loanAmount'] = `¥${((c as any).loanBalance || 0).toLocaleString()}`
   }
 }
 
@@ -310,7 +368,10 @@ function openCreate() {
     return
   }
   Object.assign(createForm, {
-    templateId: '', refType: 'loan', refId: '', customerId: '',
+    templateId: '',
+    refType: 'loan',
+    refId: '',
+    customerId: '',
     fields: {}
   })
   showCreate.value = true
@@ -322,12 +383,12 @@ function onCreate() {
     return
   }
   // 校验必填字段
-  const missing = currentTplFields.value.filter(f => !createForm.fields[f.key])
+  const missing = currentTplFields.value.filter((f) => !createForm.fields[f.key])
   if (missing.length) {
-    Message.warning(`必填字段缺失:${missing.map(f => f.label).join(', ')}`)
+    Message.warning(`必填字段缺失:${missing.map((f) => f.label).join(', ')}`)
     return
   }
-  const customer = customers.find(c => c.id === createForm.customerId)
+  const customer = customers.find((c) => c.id === createForm.customerId)
   const doc = bill.create({
     templateId: createForm.templateId,
     customerId: createForm.customerId,
@@ -369,7 +430,7 @@ const sendForm = reactive({ channel: 'email' as DeliveryChannel, target: '' })
 
 function openSend(d: BillingDoc) {
   sendTarget.value = d
-  const c = customers.find(c => c.id === d.customerId)
+  const c = customers.find((c) => c.id === d.customerId)
   sendForm.target = c?.id ? `customer${c.id}@mail.com` : ''
   sendVisible.value = true
 }
@@ -408,8 +469,11 @@ function onCreateTpl() {
     Message.warning('请填写完整')
     return
   }
-  const keys = tplForm.fieldsRaw.split(/[,，]/).map(s => s.trim()).filter(Boolean)
-  const fields = keys.map(k => ({ key: k, label: k, example: '' }))
+  const keys = tplForm.fieldsRaw
+    .split(/[,，]/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+  const fields = keys.map((k) => ({ key: k, label: k, example: '' }))
   bill.addTemplate({
     name: tplForm.name,
     type: tplForm.type,
@@ -423,22 +487,24 @@ function onCreateTpl() {
 
 // tools
 function typeColor(t: DocType) {
-  return ({ contract: 'blue', notice: 'orange', invoice: 'green', receipt: 'arcoblue', settlement: 'purple' })[t] || 'gray'
+  return (
+    { contract: 'blue', notice: 'orange', invoice: 'green', receipt: 'arcoblue', settlement: 'purple' }[t] || 'gray'
+  )
 }
 function typeLabel(t: DocType) {
-  return ({ contract: '合同', notice: '通知', invoice: '结清证明', receipt: '收据', settlement: '结算单' })[t] || t
+  return { contract: '合同', notice: '通知', invoice: '结清证明', receipt: '收据', settlement: '结算单' }[t] || t
 }
 function statusColor(s: DocStatus) {
-  return ({ drafting: 'gray', issued: 'blue', signed: 'arcoblue', sent: 'green', archived: 'gray' })[s] || 'gray'
+  return { drafting: 'gray', issued: 'blue', signed: 'arcoblue', sent: 'green', archived: 'gray' }[s] || 'gray'
 }
 function statusLabel(s: DocStatus) {
-  return ({ drafting: '拟定中', issued: '已开具', signed: '已签字', sent: '已发送', archived: '已归档' })[s] || s
+  return { drafting: '拟定中', issued: '已开具', signed: '已签字', sent: '已发送', archived: '已归档' }[s] || s
 }
 function refTypeLabel(r: BillingDoc['refType']) {
-  return ({ loan: '借据', ticket: '工单', exit_case: '清退单', review: '审查' })[r] || r
+  return { loan: '借据', ticket: '工单', exit_case: '清退单', review: '审查' }[r] || r
 }
 function channelLabel(c: DeliveryChannel) {
-  return ({ email: '邮件', wechat: '微信', hand: '面交', registered_mail: '挂号信' })[c] || c
+  return { email: '邮件', wechat: '微信', hand: '面交', registered_mail: '挂号信' }[c] || c
 }
 </script>
 
@@ -455,6 +521,14 @@ function channelLabel(c: DeliveryChannel) {
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
 }
-.cp-kpi-label { font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 4px; }
-.cp-kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+.cp-kpi-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 4px;
+}
+.cp-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
 </style>

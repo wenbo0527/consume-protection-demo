@@ -59,7 +59,9 @@
           <a-table-column title="操作">
             <template #cell="{ record }">
               <a-space :size="4">
-                <a-button v-if="record.status === 'alert_open'" size="small" type="primary" @click="openHandle(record)">处置</a-button>
+                <a-button v-if="record.status === 'alert_open'" size="small" type="primary" @click="openHandle(record)"
+                  >处置</a-button
+                >
                 <a-button size="small">详情</a-button>
                 <a-button v-if="record.relatedTicket" size="small">查看工单</a-button>
               </a-space>
@@ -122,9 +124,7 @@
           <a-form-item label="截止时间(可选)">
             <a-input v-model="instructionForm.deadline" placeholder="例:2026-07-15 18:00" />
           </a-form-item>
-          <a-button type="primary" size="small" long status="warning" @click="sendInstruction">
-            下达指令
-          </a-button>
+          <a-button type="primary" size="small" long status="warning" @click="sendInstruction"> 下达指令 </a-button>
         </a-form>
 
         <div class="cp-form" style="margin-top: 16px">
@@ -147,7 +147,16 @@
           </a-form-item>
         </div>
 
-        <div style="margin-top: 16px; padding: 12px; background: var(--cp-bg-soft); border-radius: 6px; font-size: 12px; color: var(--cp-text-secondary)">
+        <div
+          style="
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--cp-bg-soft);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--cp-text-secondary);
+          "
+        >
           <icon-info-circle /> 关联工单关单后,本预警将自动标记为"已验证"。
         </div>
 
@@ -240,7 +249,10 @@ function openHandle(record: any) {
 }
 
 function confirm() {
-  if (!opinion.value) { Message.warning('请填写处置意见'); return }
+  if (!opinion.value) {
+    Message.warning('请填写处置意见')
+    return
+  }
   // 走 alert_directive 工作流
   // 节点1:管理层确认预警(含指令内容/指派坐席) → 自动推进
   // 节点2:坐席执行指令

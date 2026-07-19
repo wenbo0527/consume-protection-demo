@@ -10,9 +10,7 @@
     <div class="cp-action-body">
       <a-alert type="warning" show-icon style="margin-bottom: 16px">
         <template #title>OA 审批结果已回写</template>
-        <template #content>
-          您的停催申请 ST-20260708-0009 被驳回,驳回原因已同步到工单,可直接修改后重新提交。
-        </template>
+        <template #content> 您的停催申请 ST-20260708-0009 被驳回,驳回原因已同步到工单,可直接修改后重新提交。 </template>
       </a-alert>
 
       <a-descriptions :column="1" bordered size="small">
@@ -49,9 +47,36 @@ function confirm() {
 </script>
 
 <style scoped>
-.cp-action { display: flex; flex-direction: column; height: 100%; }
-.cp-action-head { padding: 16px 20px; border-bottom: 1px solid var(--cp-border-light); display: flex; justify-content: space-between; align-items: center; }
-.cp-action-title { font-size: 16px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px; }
-.cp-action-body { flex: 1; padding: 16px 20px; overflow-y: auto; }
-.cp-action-foot { padding: 12px 20px; border-top: 1px solid var(--cp-border-light); display: flex; justify-content: flex-end; gap: 8px; }
+.cp-action {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.cp-action-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cp-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cp-action-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cp-action-body {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+.cp-action-foot {
+  padding: 12px 20px;
+  border-top: 1px solid var(--cp-border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
 </style>

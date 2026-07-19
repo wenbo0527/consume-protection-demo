@@ -11,29 +11,29 @@ export type RectifyStatus = 'pending' | 'in_progress' | 'done' | 'verified' | 'r
 
 export interface TraceReport {
   id: string
-  scene: string                // 高发场景(如:催收频次投诉)
-  rootCause: string            // 根因分类:产品设计 / 流程 / 话术 / 系统
-  description: string          // 报告描述
+  scene: string // 高发场景(如:催收频次投诉)
+  rootCause: string // 根因分类:产品设计 / 流程 / 话术 / 系统
+  description: string // 报告描述
   data: {
-    complaintCount: number     // 期间投诉量
-    dropRate?: number          // 期望下降率
-    customerAffected: number   // 涉及客户数
-    period: string             // 统计周期
+    complaintCount: number // 期间投诉量
+    dropRate?: number // 期望下降率
+    customerAffected: number // 涉及客户数
+    period: string // 统计周期
   }
-  conclusion: string           // 结论(给业务部门的方向)
+  conclusion: string // 结论(给业务部门的方向)
   createdAt: string
   author: string
 }
 
 export interface RectifyTask {
   id: string
-  reportId: string             // 关联溯源报告
-  title?: string               // 整改标题(审计追溯用)
+  reportId: string // 关联溯源报告
+  title?: string // 整改标题(审计追溯用)
   scene: string
-  dept: string                 // 负责部门
-  owner: string                // 责任人
-  requirement: string          // 整改要求
-  deadline: string             // 截止日期
+  dept: string // 负责部门
+  owner: string // 责任人
+  requirement: string // 整改要求
+  deadline: string // 截止日期
   status: RectifyStatus
   /** 进度备注(管理层/责任人填写) */
   progress: { time: string; operator: string; note: string }[]
@@ -116,9 +116,7 @@ function buildMock(): { reports: TraceReport[]; tasks: RectifyTask[] } {
         requirement: '1) 贷后首次沟通话术增加 IRR 说明;2) 提供纸质费率说明模板;3) 8 月底前完成培训',
         deadline: '2026-08-31',
         status: 'pending',
-        progress: [
-          { time: '2026-07-10 15:00', operator: '陈强', note: '下发整改任务' }
-        ],
+        progress: [{ time: '2026-07-10 15:00', operator: '陈强', note: '下发整改任务' }],
         createdAt: '2026-07-10 15:00'
       }
     ]
@@ -155,12 +153,12 @@ export const useRectifyStore = defineStore('rectify', {
     }
   },
   getters: {
-    pendingTasks: (s) => s.tasks.filter(t => t.status === 'pending'),
-    inProgressTasks: (s) => s.tasks.filter(t => t.status === 'in_progress'),
-    doneTasks: (s) => s.tasks.filter(t => t.status === 'done'),
-    verifiedTasks: (s) => s.tasks.filter(t => t.status === 'verified'),
-    reportById: (s) => (id: string) => s.reports.find(r => r.id === id),
-    taskById: (s) => (id: string) => s.tasks.find(t => t.id === id)
+    pendingTasks: (s) => s.tasks.filter((t) => t.status === 'pending'),
+    inProgressTasks: (s) => s.tasks.filter((t) => t.status === 'in_progress'),
+    doneTasks: (s) => s.tasks.filter((t) => t.status === 'done'),
+    verifiedTasks: (s) => s.tasks.filter((t) => t.status === 'verified'),
+    reportById: (s) => (id: string) => s.reports.find((r) => r.id === id),
+    taskById: (s) => (id: string) => s.tasks.find((t) => t.id === id)
   },
   actions: {
     persist() {
@@ -186,7 +184,7 @@ export const useRectifyStore = defineStore('rectify', {
       requirement: string
       deadline: string
     }): RectifyTask | null {
-      const report = this.reports.find(r => r.id === input.reportId)
+      const report = this.reports.find((r) => r.id === input.reportId)
       if (!report) {
         log('warn', 'task.create', `report ${input.reportId} not found`)
         return null
@@ -214,7 +212,7 @@ export const useRectifyStore = defineStore('rectify', {
 
     /** 责任人填写进度 */
     addProgress(taskId: string, operator: string, note: string) {
-      const t = this.tasks.find(x => x.id === taskId)
+      const t = this.tasks.find((x) => x.id === taskId)
       if (!t) return
       t.progress.push({ time: nowStr(), operator, note })
       if (t.status === 'pending') t.status = 'in_progress'
@@ -224,7 +222,7 @@ export const useRectifyStore = defineStore('rectify', {
 
     /** 责任人提交完成,等待管理层验证 */
     submitDone(taskId: string, operator: string, note: string) {
-      const t = this.tasks.find(x => x.id === taskId)
+      const t = this.tasks.find((x) => x.id === taskId)
       if (!t) return
       t.status = 'done'
       t.progress.push({ time: nowStr(), operator, note: `[完成] ${note}` })
@@ -235,7 +233,7 @@ export const useRectifyStore = defineStore('rectify', {
 
     /** 管理层验证整改效果 */
     verify(taskId: string, operator: string, result: 'pass' | 'fail', note: string, metricDrop?: number) {
-      const t = this.tasks.find(x => x.id === taskId)
+      const t = this.tasks.find((x) => x.id === taskId)
       if (!t) return
       t.status = result === 'pass' ? 'verified' : 'rejected'
       t.verification = { time: nowStr(), operator, result, note, metricDrop }
@@ -243,13 +241,17 @@ export const useRectifyStore = defineStore('rectify', {
       this.persist()
       // 验证通过后,可一键生成审查标准 + 知识库条目(由 UI 调用)
       if (result === 'pass') {
-        window.dispatchEvent(new CustomEvent(EVT.RECTIFY_VERIFIED, { detail: { taskId, scene: t.scene, requirement: t.requirement, owner: t.owner } }))
+        window.dispatchEvent(
+          new CustomEvent(EVT.RECTIFY_VERIFIED, {
+            detail: { taskId, scene: t.scene, requirement: t.requirement, owner: t.owner }
+          })
+        )
       }
     },
 
     /** 整改验证后,记录关联产出的标准/知识条目 */
     attachGenerated(taskId: string, standardIds?: string[], kbIds?: string[]) {
-      const t = this.tasks.find(x => x.id === taskId)
+      const t = this.tasks.find((x) => x.id === taskId)
       if (!t) return
       t.generatedStandardIds = standardIds || t.generatedStandardIds
       t.generatedKbIds = kbIds || t.generatedKbIds
@@ -272,18 +274,20 @@ if (typeof window !== 'undefined') {
     useRectifyStore().attachGenerated(taskId, [stdId], [kbId])
 
     // 知识库写入
-    import('./knowledge').then(({ useKnowledgeStore }) => {
-      const kbStore = useKnowledgeStore()
-      kbStore.add({
-        title: `${scene} · 整改复盘`,
-        category: '溯源整改',
-        tags: [scene, '整改复盘'],
-        source: 'rectify',
-        summary: `整改任务 ${taskId} 验证通过,沉淀为知识条目`,
-        content: `整改要求:${requirement}\n\n复盘结论:已验证整改措施有效,纳入知识库供后续参考。`,
-        author: '陈强(管理)',
-        status: 'active'
+    import('./knowledge')
+      .then(({ useKnowledgeStore }) => {
+        const kbStore = useKnowledgeStore()
+        kbStore.add({
+          title: `${scene} · 整改复盘`,
+          category: '溯源整改',
+          tags: [scene, '整改复盘'],
+          source: 'rectify',
+          summary: `整改任务 ${taskId} 验证通过,沉淀为知识条目`,
+          content: `整改要求:${requirement}\n\n复盘结论:已验证整改措施有效,纳入知识库供后续参考。`,
+          author: '陈强(管理)',
+          status: 'active'
+        })
       })
-    }).catch(err => log('warn', 'listener', 'failed to write KB', err))
+      .catch((err) => log('warn', 'listener', 'failed to write KB', err))
   })
 }

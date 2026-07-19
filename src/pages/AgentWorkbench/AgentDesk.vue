@@ -18,9 +18,7 @@
           <icon-phone v-if="!ready" /> <icon-pause v-else />
           {{ ready ? '已开启接线 - 停止' : '开启接线' }}
         </a-button>
-        <a-button size="small" @click="simulateIncoming">
-          <icon-plus /> 模拟来电
-        </a-button>
+        <a-button size="small" @click="simulateIncoming"> <icon-plus /> 模拟来电 </a-button>
         <!-- OPT-5:坐席发起业务申请入口 -->
         <a-button size="small" type="primary" status="warning" @click="showAppForm = true">
           <icon-plus /> 发起业务申请
@@ -30,9 +28,7 @@
 
     <!-- OPT-5 发起申请弹窗 -->
     <a-modal v-model:visible="showAppForm" title="发起业务申请" :width="600" :ok-text="'提交申请'" @ok="onCreateApp">
-      <a-alert v-if="!selectedCustomer" type="warning" style="margin-bottom: 12px">
-        请先在右侧选择一个客户
-      </a-alert>
+      <a-alert v-if="!selectedCustomer" type="warning" style="margin-bottom: 12px"> 请先在右侧选择一个客户 </a-alert>
       <a-form :model="appForm" layout="vertical">
         <a-row :gutter="12">
           <a-col :span="12">
@@ -135,7 +131,9 @@
               <div class="cp-row-meta">
                 <span class="mono">{{ c.phone }}</span>
                 <span>·</span>
-                <span>在贷 <b class="mono">¥{{ c.loanBalance.toLocaleString() }}</b></span>
+                <span
+                  >在贷 <b class="mono">¥{{ c.loanBalance.toLocaleString() }}</b></span
+                >
                 <span>·</span>
                 <span>逾期 {{ c.maxOverdueDays }} 天</span>
                 <span>·</span>
@@ -158,17 +156,10 @@
             <!-- 操作 -->
             <div class="cp-row-actions">
               <a-space direction="vertical" :size="4">
-                <a-button
-                  size="small"
-                  type="primary"
-                  :disabled="wb.agentStatus === 'oncall'"
-                  @click="manualCall(c)"
-                >
+                <a-button size="small" type="primary" :disabled="wb.agentStatus === 'oncall'" @click="manualCall(c)">
                   <icon-phone /> 拨号
                 </a-button>
-                <a-button size="small" @click="openStartWorkflow(c)">
-                  <icon-send /> 发起业务
-                </a-button>
+                <a-button size="small" @click="openStartWorkflow(c)"> <icon-send /> 发起业务 </a-button>
               </a-space>
             </div>
           </div>
@@ -197,7 +188,16 @@
           <risk-tag v-for="t in incomingCustomer.riskTags" :key="t" :type="t" />
         </div>
         <!-- OPT-3:命中标签规则时的预览 -->
-        <div v-if="incomingAlert" style="margin-top: 14px; padding: 10px 12px; border-radius: 6px; background: rgba(245, 34, 45, 0.08); border: 1px solid rgba(245, 34, 45, 0.2)">
+        <div
+          v-if="incomingAlert"
+          style="
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            background: rgba(245, 34, 45, 0.08);
+            border: 1px solid rgba(245, 34, 45, 0.2);
+          "
+        >
           <div style="font-weight: 600; color: #f5222d; font-size: 13px">
             <icon-warning /> {{ incomingAlert.title }}
           </div>
@@ -208,26 +208,24 @@
           </div>
           <div v-if="incomingHitRules.length" style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 4px">
             命中 {{ incomingHitRules.length }} 条规则:
-            <span style="margin-left: 4px">{{ incomingHitRules.map(r => r.ruleName).join(' · ') }}</span>
+            <span style="margin-left: 4px">{{ incomingHitRules.map((r) => r.ruleName).join(' · ') }}</span>
           </div>
         </div>
         <div class="cp-incoming-actions">
           <a-button size="large" @click="declineCall">拒接</a-button>
-          <a-button size="large" type="primary" status="success" @click="answerCall">
-            <icon-phone /> 接通
-          </a-button>
+          <a-button size="large" type="primary" status="success" @click="answerCall"> <icon-phone /> 接通 </a-button>
         </div>
       </div>
     </a-modal>
 
     <!-- 工单详情 Modal(接通后跳转前的兜底,保留但不再自动弹出) -->
-    <a-modal
-      v-model:visible="ticketModalVisible"
-      :footer="false"
-      width="880px"
-      wrap-class-name="cp-ticket-modal"
-    >
-      <TicketDetail v-if="ticketModalVisible" :ticket-id="activeTicketId" :embedded="true" @close="ticketModalVisible = false" />
+    <a-modal v-model:visible="ticketModalVisible" :footer="false" width="880px" wrap-class-name="cp-ticket-modal">
+      <TicketDetail
+        v-if="ticketModalVisible"
+        :ticket-id="activeTicketId"
+        :embedded="true"
+        @close="ticketModalVisible = false"
+      />
     </a-modal>
   </div>
 </template>
@@ -261,7 +259,10 @@ onMounted(() => {
   isMounted = true
   timer = setInterval(() => {
     if (!isMounted) {
-      if (timer) { clearInterval(timer); timer = null }
+      if (timer) {
+        clearInterval(timer)
+        timer = null
+      }
       return
     }
     if (wb.call) wb.call.duration = Math.floor((Date.now() - wb.call.startAt) / 1000)
@@ -293,19 +294,24 @@ function goWorkflowMonitor() {
 }
 
 const todoCustomers = computed(() =>
-  customers.filter(c => c.ongoingTickets.length > 0 && c.ongoingTickets.some(t => t.handler === ME || t.handler === '待分派'))
+  customers.filter(
+    (c) => c.ongoingTickets.length > 0 && c.ongoingTickets.some((t) => t.handler === ME || t.handler === '待分派')
+  )
 )
 
 const totalTickets = computed(() => todoCustomers.value.reduce((sum, c) => sum + c.ongoingTickets.length, 0))
-const regCount = computed(() => tickets.filter(t => t.isRegulator && t.handler === ME && t.status !== 'closed').length)
-const dangerCount = computed(() => todoCustomers.value.filter(c => c.riskTags.includes('threat') || c.riskTags.includes('blacklist')).length)
+const regCount = computed(
+  () => tickets.filter((t) => t.isRegulator && t.handler === ME && t.status !== 'closed').length
+)
+const dangerCount = computed(
+  () => todoCustomers.value.filter((c) => c.riskTags.includes('threat') || c.riskTags.includes('blacklist')).length
+)
 
 const filteredCustomers = computed(() => {
   if (!searchKey.value) return todoCustomers.value
   const k = searchKey.value.toLowerCase()
-  return todoCustomers.value.filter(c =>
-    c.name.includes(k) || c.phone.includes(k) ||
-    c.ongoingTickets.some(t => t.id.toLowerCase().includes(k))
+  return todoCustomers.value.filter(
+    (c) => c.name.includes(k) || c.phone.includes(k) || c.ongoingTickets.some((t) => t.id.toLowerCase().includes(k))
   )
 })
 
@@ -345,7 +351,7 @@ function manualCall(c: any) {
 
 const incomingCustomer = computed(() => {
   const cid = wb.incoming?.customerId
-  return cid ? customers.find(c => c.id === cid) : null
+  return cid ? customers.find((c) => c.id === cid) : null
 })
 
 // OPT-3:来电客户命中的标签规则(给坐席接通前预览)
@@ -386,7 +392,7 @@ const titlePlaceholder = computed(() => {
 
 const selectedCustomer = computed(() => {
   if (!appForm.customerId) return null
-  return customers.find(c => c.id === appForm.customerId)
+  return customers.find((c) => c.id === appForm.customerId)
 })
 
 function onCreateApp() {
@@ -394,9 +400,9 @@ function onCreateApp() {
     Message.warning('客户 + 申请说明必填')
     return
   }
-  const customer = customers.find(c => c.id === appForm.customerId)
+  const customer = customers.find((c) => c.id === appForm.customerId)
   if (!customer) return
-  const operator = userStore.currentRole ? (getRoleInfo(userStore.currentRole)?.username || '坐席') : '张敏'
+  const operator = userStore.currentRole ? getRoleInfo(userStore.currentRole)?.username || '坐席' : '张敏'
   const app = businessApp.create({
     type: appForm.type,
     title: appForm.title || titlePlaceholder.value,
@@ -484,24 +490,60 @@ function formatDuration(s: number) {
 </script>
 
 <style scoped>
-.cp-desk { display: flex; flex-direction: column; height: calc(100vh - 56px); }
+.cp-desk {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 56px);
+}
 
 /* 顶部 */
 .cp-desk-header {
-  background: #fff; padding: 10px 24px;
+  background: #fff;
+  padding: 10px 24px;
   border-bottom: 1px solid var(--cp-border-light);
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex-shrink: 0;
 }
-.cp-desk-status { display: flex; align-items: center; gap: 8px; font-size: 13px; }
-.cp-status-dot { width: 8px; height: 8px; border-radius: 50%; }
-.cp-status-idle { background: #c9cdd4; }
-.cp-status-ringing { background: var(--cp-warning); animation: cp-pulse 1s infinite; }
-.cp-status-oncall { background: var(--cp-success); box-shadow: 0 0 0 4px rgba(0, 180, 42, 0.15); }
-.cp-status-wrapup { background: var(--cp-brand); }
-.cp-status-label { font-weight: 500; }
-.cp-call-time { font-size: 13px; color: var(--cp-success); font-weight: 600; font-family: 'DIN Alternate', monospace; }
-.cp-call-name { font-size: 12px; color: var(--cp-text-secondary); }
+.cp-desk-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.cp-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.cp-status-idle {
+  background: #c9cdd4;
+}
+.cp-status-ringing {
+  background: var(--cp-warning);
+  animation: cp-pulse 1s infinite;
+}
+.cp-status-oncall {
+  background: var(--cp-success);
+  box-shadow: 0 0 0 4px rgba(0, 180, 42, 0.15);
+}
+.cp-status-wrapup {
+  background: var(--cp-brand);
+}
+.cp-status-label {
+  font-weight: 500;
+}
+.cp-call-time {
+  font-size: 13px;
+  color: var(--cp-success);
+  font-weight: 600;
+  font-family: 'DIN Alternate', monospace;
+}
+.cp-call-name {
+  font-size: 12px;
+  color: var(--cp-text-secondary);
+}
 
 /* 主体:仅客户列表 */
 .cp-desk-body {
@@ -527,11 +569,18 @@ function formatDuration(s: number) {
   align-items: center;
 }
 .cp-main-title {
-  font-size: 15px; font-weight: 600; margin: 0;
-  display: flex; align-items: center; gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.cp-customer-list { flex: 1; overflow-y: auto; }
+.cp-customer-list {
+  flex: 1;
+  overflow-y: auto;
+}
 
 /* 列表行:头像 + 客户名(可跳画像) + 信息 + 操作 */
 .cp-customer-row {
@@ -543,58 +592,128 @@ function formatDuration(s: number) {
   border-bottom: 1px solid var(--cp-border-light);
   transition: background 0.15s;
 }
-.cp-customer-row:hover { background: var(--cp-bg-hover); }
-.cp-customer-row.is-danger { background: #fff8f5; border-left: 3px solid var(--cp-danger); }
-.cp-customer-row.is-danger:hover { background: #ffefe8; }
+.cp-customer-row:hover {
+  background: var(--cp-bg-hover);
+}
+.cp-customer-row.is-danger {
+  background: #fff8f5;
+  border-left: 3px solid var(--cp-danger);
+}
+.cp-customer-row.is-danger:hover {
+  background: #ffefe8;
+}
 
 .cp-row-avatar {
-  width: 40px; height: 40px; border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   background: var(--cp-brand-soft);
   color: var(--cp-brand);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 600; font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
   flex-shrink: 0;
 }
-.cp-row-avatar.is-danger { background: var(--cp-danger-soft); color: var(--cp-danger); }
+.cp-row-avatar.is-danger {
+  background: var(--cp-danger-soft);
+  color: var(--cp-danger);
+}
 
 .cp-row-name-block {
-  display: flex; flex-direction: column; gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-.cp-row-name { font-size: 14px; font-weight: 600; color: var(--cp-text); }
+.cp-row-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cp-text);
+}
 
-.cp-row-info { min-width: 0; }
-.cp-row-meta { font-size: 12px; color: var(--cp-text-tertiary); display: flex; gap: 6px; flex-wrap: wrap; }
-.cp-row-tickets { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
-.cp-ticket-pill { cursor: pointer; }
-.cp-ticket-pill:hover { opacity: 0.8; }
+.cp-row-info {
+  min-width: 0;
+}
+.cp-row-meta {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.cp-row-tickets {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cp-ticket-pill {
+  cursor: pointer;
+}
+.cp-ticket-pill:hover {
+  opacity: 0.8;
+}
 
-.cp-row-actions { flex-shrink: 0; padding-top: 6px; text-align: right; }
+.cp-row-actions {
+  flex-shrink: 0;
+  padding-top: 6px;
+  text-align: right;
+}
 
 /* 来电弹屏 */
-:global(.cp-incoming-modal .arco-modal-content) { padding: 32px 24px; text-align: center; }
+:global(.cp-incoming-modal .arco-modal-content) {
+  padding: 32px 24px;
+  text-align: center;
+}
 .cp-incoming-pulse {
-  width: 72px; height: 72px; border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
   background: linear-gradient(135deg, var(--cp-brand), var(--cp-brand-hover));
   color: #fff;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto 14px;
   animation: cp-pulse 1.5s ease-in-out infinite;
   box-shadow: 0 0 0 8px var(--cp-brand-soft);
 }
-.cp-incoming-title { font-size: 18px; font-weight: 600; color: var(--cp-text); }
-.cp-incoming-desc { font-size: 13px; color: var(--cp-text-tertiary); margin-top: 4px; }
+.cp-incoming-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--cp-text);
+}
+.cp-incoming-desc {
+  font-size: 13px;
+  color: var(--cp-text-tertiary);
+  margin-top: 4px;
+}
 .cp-incoming-actions {
-  display: flex; gap: 12px; justify-content: center;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
   margin-top: 24px;
 }
-.cp-incoming-actions .arco-btn { min-width: 100px; }
+.cp-incoming-actions .arco-btn {
+  min-width: 100px;
+}
 
 @keyframes cp-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* 工单 Modal */
-:global(.cp-ticket-modal .arco-modal-content) { padding: 0; }
-:global(.cp-ticket-modal .arco-modal-header) { display: none; }
+:global(.cp-ticket-modal .arco-modal-content) {
+  padding: 0;
+}
+:global(.cp-ticket-modal .arco-modal-header) {
+  display: none;
+}
 </style>

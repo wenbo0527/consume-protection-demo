@@ -19,7 +19,7 @@ export const EVT = {
   RECTIFY_TASK_DONE: 'cp-rectify-task-done'
 } as const
 
-export type EventName = typeof EVT[keyof typeof EVT]
+export type EventName = (typeof EVT)[keyof typeof EVT]
 
 /** 自定义事件 detail 的类型契约(派发 + 监听都用) */
 export interface EventDetailMap {

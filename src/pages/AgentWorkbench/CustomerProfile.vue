@@ -9,29 +9,22 @@
         <span class="cp-call-target">· {{ customer.name }} · {{ customer.phone }}</span>
       </div>
       <div class="cp-call-banner-right">
-        <a-button size="small" type="primary" @click="quickCreateTicket">
-          <icon-plus /> 快速建工单
-        </a-button>
-        <a-button size="small" @click="openStartWorkflow">
-          <icon-send /> 发起业务工作流
-        </a-button>
-        <a-button size="small" type="primary" status="danger" @click="hangup">
-          <icon-close /> 挂断通话
-        </a-button>
-        <a-button size="small" @click="$router.push('/agent/desk')">
-          <icon-left /> 返回工作台
-        </a-button>
+        <a-button size="small" type="primary" @click="quickCreateTicket"> <icon-plus /> 快速建工单 </a-button>
+        <a-button size="small" @click="openStartWorkflow"> <icon-send /> 发起业务工作流 </a-button>
+        <a-button size="small" type="primary" status="danger" @click="hangup"> <icon-close /> 挂断通话 </a-button>
+        <a-button size="small" @click="$router.push('/agent/desk')"> <icon-left /> 返回工作台 </a-button>
       </div>
     </div>
 
-    <a-page-header :title="customer.name + ' - 客户画像'" :subtitle="`客户编号 ${customer.id} · ${customer.idCardMask}`">
+    <a-page-header
+      :title="customer.name + ' - 客户画像'"
+      :subtitle="`客户编号 ${customer.id} · ${customer.idCardMask}`"
+    >
       <template #back-icon><icon-left /></template>
       <template #extra>
         <a-space>
           <a-button @click="$router.back()">返回</a-button>
-          <a-button @click="openStartWorkflow">
-            <icon-send /> 发起业务工作流
-          </a-button>
+          <a-button @click="openStartWorkflow"> <icon-send /> 发起业务工作流 </a-button>
           <a-button type="primary" :disabled="!customer.ongoingTickets.length">
             <icon-phone /> 拨号 ({{ customer.ongoingTickets.length }})
           </a-button>
@@ -45,7 +38,13 @@
       <template #content>
         <div style="margin-top: 4px">
           建议处置:
-          <a-tag v-for="a in alertLevel.actions" :key="a" :color="alertLevel.type === 'error' ? 'red' : 'orange'" style="margin-left: 4px">{{ a }}</a-tag>
+          <a-tag
+            v-for="a in alertLevel.actions"
+            :key="a"
+            :color="alertLevel.type === 'error' ? 'red' : 'orange'"
+            style="margin-left: 4px"
+            >{{ a }}</a-tag
+          >
         </div>
         <!-- OPT-3:列出命中的具体规则与描述 -->
         <div v-if="hitRules.length" style="margin-top: 8px; font-size: 12px">
@@ -69,9 +68,7 @@
       <template #content>
         <div v-for="(n, i) in upgradeNotes" :key="i" style="margin-top: 2px">{{ n }}</div>
         <div style="margin-top: 8px">
-          <a-button size="small" status="danger" @click="triggerAutoUpgrade">
-            <icon-send /> 一键升级到管理层
-          </a-button>
+          <a-button size="small" status="danger" @click="triggerAutoUpgrade"> <icon-send /> 一键升级到管理层 </a-button>
         </div>
       </template>
     </a-alert>
@@ -81,7 +78,9 @@
       <div class="cp-stat-card">
         <div class="cp-stat-label">授信状态</div>
         <div class="cp-stat-value" style="font-size: 14px">
-          <a-tag :color="statusColor(customer.creditStatus)" size="medium">{{ statusMap[customer.creditStatus] }}</a-tag>
+          <a-tag :color="statusColor(customer.creditStatus)" size="medium">{{
+            statusMap[customer.creditStatus]
+          }}</a-tag>
         </div>
       </div>
       <div class="cp-stat-card">
@@ -90,11 +89,15 @@
       </div>
       <div class="cp-stat-card">
         <div class="cp-stat-label">逾期借据</div>
-        <div class="cp-stat-value mono" :style="{ color: customer.overdueCount ? 'var(--cp-danger)' : '' }">{{ customer.overdueCount }} 笔</div>
+        <div class="cp-stat-value mono" :style="{ color: customer.overdueCount ? 'var(--cp-danger)' : '' }">
+          {{ customer.overdueCount }} 笔
+        </div>
       </div>
       <div class="cp-stat-card">
         <div class="cp-stat-label">最长逾期</div>
-        <div class="cp-stat-value mono" :style="{ color: customer.maxOverdueDays > 30 ? 'var(--cp-danger)' : '' }">{{ customer.maxOverdueDays }} 天</div>
+        <div class="cp-stat-value mono" :style="{ color: customer.maxOverdueDays > 30 ? 'var(--cp-danger)' : '' }">
+          {{ customer.maxOverdueDays }} 天
+        </div>
       </div>
       <div class="cp-stat-card">
         <div class="cp-stat-label">风险标签</div>
@@ -114,7 +117,17 @@
           <!-- 1.1 征信 -->
           <a-tab-pane key="credit" title="征信">
             <!-- Mock 状态切换(开发态) -->
-            <div style="margin-bottom: 12px; padding: 8px 12px; background: var(--cp-bg-soft); border-radius: 4px; display: flex; align-items: center; gap: 8px">
+            <div
+              style="
+                margin-bottom: 12px;
+                padding: 8px 12px;
+                background: var(--cp-bg-soft);
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
               <span style="font-size: 12px; color: var(--cp-text-tertiary)">DEV Mock 状态切换:</span>
               <a-radio-group v-model="creditStatus" type="button" size="small">
                 <a-radio-button value="none">无报告</a-radio-button>
@@ -127,20 +140,24 @@
             <div v-if="creditStatus === 'none'" class="cp-card" style="padding: 60px 20px; text-align: center">
               <icon-file style="font-size: 48px; color: var(--cp-text-quaternary)" />
               <div style="margin-top: 12px; font-size: 14px; color: var(--cp-text-secondary)">暂无征信报告</div>
-              <div style="margin-top: 4px; font-size: 12px; color: var(--cp-text-tertiary)">客户尚未授权查询征信信息</div>
-              <a-button type="primary" style="margin-top: 16px">
-                <icon-plus /> 申请查询授权
-              </a-button>
+              <div style="margin-top: 4px; font-size: 12px; color: var(--cp-text-tertiary)">
+                客户尚未授权查询征信信息
+              </div>
+              <a-button type="primary" style="margin-top: 16px"> <icon-plus /> 申请查询授权 </a-button>
             </div>
 
             <!-- 无权限 -->
-            <div v-else-if="creditStatus === 'no_permission'" class="cp-card" style="padding: 60px 20px; text-align: center">
+            <div
+              v-else-if="creditStatus === 'no_permission'"
+              class="cp-card"
+              style="padding: 60px 20px; text-align: center"
+            >
               <icon-lock style="font-size: 48px; color: var(--cp-warning)" />
               <div style="margin-top: 12px; font-size: 14px; color: var(--cp-text-secondary)">无权限查看征信报告</div>
-              <div style="margin-top: 4px; font-size: 12px; color: var(--cp-text-tertiary)">当前角色未授予征信查询权限,请联系管理员</div>
-              <a-button type="primary" style="margin-top: 16px">
-                <icon-user /> 申请权限
-              </a-button>
+              <div style="margin-top: 4px; font-size: 12px; color: var(--cp-text-tertiary)">
+                当前角色未授予征信查询权限,请联系管理员
+              </div>
+              <a-button type="primary" style="margin-top: 16px"> <icon-user /> 申请权限 </a-button>
             </div>
 
             <!-- 查得报告 -->
@@ -156,7 +173,9 @@
                   <a-descriptions-item label="查询机构">{{ creditReport.queryOrg }}</a-descriptions-item>
                   <a-descriptions-item label="有效期至">{{ creditReport.validUntil }}</a-descriptions-item>
                   <a-descriptions-item label="信用评分">
-                    <span class="mono" style="font-weight: 600; color: var(--cp-success)">{{ creditReport.creditScore }}</span>
+                    <span class="mono" style="font-weight: 600; color: var(--cp-success)">{{
+                      creditReport.creditScore
+                    }}</span>
                     <a-tag color="green" size="small" style="margin-left: 6px">{{ creditReport.creditLevel }}</a-tag>
                   </a-descriptions-item>
                   <a-descriptions-item label="查询原因">{{ creditReport.queryReason }}</a-descriptions-item>
@@ -177,11 +196,21 @@
                 </div>
                 <div class="cp-stat-card">
                   <div class="cp-stat-label">逾期账户</div>
-                  <div class="cp-stat-value mono" :style="{ color: creditReport.overdueAccounts ? 'var(--cp-danger)' : '' }">{{ creditReport.overdueAccounts }}</div>
+                  <div
+                    class="cp-stat-value mono"
+                    :style="{ color: creditReport.overdueAccounts ? 'var(--cp-danger)' : '' }"
+                  >
+                    {{ creditReport.overdueAccounts }}
+                  </div>
                 </div>
                 <div class="cp-stat-card">
                   <div class="cp-stat-label">最长逾期</div>
-                  <div class="cp-stat-value mono" :style="{ color: creditReport.maxOverdueDays > 30 ? 'var(--cp-danger)' : '' }">{{ creditReport.maxOverdueDays }} 天</div>
+                  <div
+                    class="cp-stat-value mono"
+                    :style="{ color: creditReport.maxOverdueDays > 30 ? 'var(--cp-danger)' : '' }"
+                  >
+                    {{ creditReport.maxOverdueDays }} 天
+                  </div>
                 </div>
               </div>
 
@@ -211,7 +240,9 @@
                       <span style="font-weight: 500">{{ d.content }}</span>
                       <a-tag size="small" :color="d.status === '已处理' ? 'green' : 'orange'">{{ d.status }}</a-tag>
                     </div>
-                    <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px">{{ d.date }} · {{ d.result || '处理中' }}</div>
+                    <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px">
+                      {{ d.date }} · {{ d.result || '处理中' }}
+                    </div>
                   </div>
                 </div>
                 <a-empty v-else size="small" description="无异议记录" />
@@ -249,21 +280,36 @@
                     <a-col :span="8">
                       <div style="padding: 12px; background: var(--cp-bg-soft); border-radius: 4px; text-align: center">
                         <div style="font-size: 11px; color: var(--cp-text-tertiary)">综合风险评分</div>
-                        <div class="mono" style="font-size: 22px; font-weight: 600; color: var(--cp-warning); margin-top: 4px">{{ basic.riskScore }}</div>
+                        <div
+                          class="mono"
+                          style="font-size: 22px; font-weight: 600; color: var(--cp-warning); margin-top: 4px"
+                        >
+                          {{ basic.riskScore }}
+                        </div>
                         <a-tag color="orange" size="small">中等</a-tag>
                       </div>
                     </a-col>
                     <a-col :span="8">
                       <div style="padding: 12px; background: var(--cp-bg-soft); border-radius: 4px; text-align: center">
                         <div style="font-size: 11px; color: var(--cp-text-tertiary)">违约概率</div>
-                        <div class="mono" style="font-size: 22px; font-weight: 600; color: var(--cp-danger); margin-top: 4px">{{ basic.defaultProb }}%</div>
+                        <div
+                          class="mono"
+                          style="font-size: 22px; font-weight: 600; color: var(--cp-danger); margin-top: 4px"
+                        >
+                          {{ basic.defaultProb }}%
+                        </div>
                         <a-tag color="red" size="small">高</a-tag>
                       </div>
                     </a-col>
                     <a-col :span="8">
                       <div style="padding: 12px; background: var(--cp-bg-soft); border-radius: 4px; text-align: center">
                         <div style="font-size: 11px; color: var(--cp-text-tertiary)">客户价值等级</div>
-                        <div class="mono" style="font-size: 22px; font-weight: 600; color: var(--cp-brand); margin-top: 4px">{{ basic.valueLevel }}</div>
+                        <div
+                          class="mono"
+                          style="font-size: 22px; font-weight: 600; color: var(--cp-brand); margin-top: 4px"
+                        >
+                          {{ basic.valueLevel }}
+                        </div>
                         <a-tag color="blue" size="small">高价值</a-tag>
                       </div>
                     </a-col>
@@ -326,9 +372,15 @@
                 <div class="cp-card" style="padding: 20px; margin-top: 12px">
                   <h3 class="cp-section-title">近 6 月投诉</h3>
                   <div style="text-align: center; padding: 8px 0">
-                    <div class="mono" style="font-size: 32px; font-weight: 600; color: var(--cp-text)">{{ customer.complaintCount6m }}</div>
-                    <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px">次投诉 · 上次 {{ customer.lastComplaintTime }}</div>
-                    <div style="font-size: 12px; color: var(--cp-text-tertiary)">类型:{{ customer.lastComplaintType || '无' }}</div>
+                    <div class="mono" style="font-size: 32px; font-weight: 600; color: var(--cp-text)">
+                      {{ customer.complaintCount6m }}
+                    </div>
+                    <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px">
+                      次投诉 · 上次 {{ customer.lastComplaintTime }}
+                    </div>
+                    <div style="font-size: 12px; color: var(--cp-text-tertiary)">
+                      类型:{{ customer.lastComplaintType || '无' }}
+                    </div>
                   </div>
                   <a-link @click="activeTab = 'collection'">查看催收记录 →</a-link>
                 </div>
@@ -344,7 +396,9 @@
         <div class="cp-stat-row" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 12px">
           <div class="cp-stat-card">
             <div class="cp-stat-label">历史最大逾期</div>
-            <div class="cp-stat-value mono" :style="{ color: customer.maxOverdueDays > 30 ? 'var(--cp-danger)' : '' }">{{ customer.maxOverdueDays }} 天</div>
+            <div class="cp-stat-value mono" :style="{ color: customer.maxOverdueDays > 30 ? 'var(--cp-danger)' : '' }">
+              {{ customer.maxOverdueDays }} 天
+            </div>
           </div>
           <div class="cp-stat-card">
             <div class="cp-stat-label">当前总在贷</div>
@@ -356,8 +410,14 @@
           </div>
           <div class="cp-stat-card">
             <div class="cp-stat-label">已用额度</div>
-            <div class="cp-stat-value mono">{{ Math.round(customer.loanBalance / basic.totalCreditLimit * 100) }}%</div>
-            <a-progress :percent="Math.round(customer.loanBalance / basic.totalCreditLimit * 100)" :show-text="false" :color="customer.loanBalance / basic.totalCreditLimit > 0.8 ? 'var(--cp-danger)' : 'var(--cp-brand)'" />
+            <div class="cp-stat-value mono">
+              {{ Math.round((customer.loanBalance / basic.totalCreditLimit) * 100) }}%
+            </div>
+            <a-progress
+              :percent="Math.round((customer.loanBalance / basic.totalCreditLimit) * 100)"
+              :show-text="false"
+              :color="customer.loanBalance / basic.totalCreditLimit > 0.8 ? 'var(--cp-danger)' : 'var(--cp-brand)'"
+            />
           </div>
         </div>
 
@@ -378,10 +438,14 @@
               <a-table-column title="借据号" data-index="contractNo" />
               <a-table-column title="产品" data-index="productName" />
               <a-table-column title="放款金额" data-index="amount">
-                <template #cell="{ record }"><span class="mono">¥{{ record.amount.toLocaleString() }}</span></template>
+                <template #cell="{ record }"
+                  ><span class="mono">¥{{ record.amount.toLocaleString() }}</span></template
+                >
               </a-table-column>
               <a-table-column title="剩余本金" data-index="remainingPrincipal">
-                <template #cell="{ record }"><span class="mono">¥{{ record.remainingPrincipal.toLocaleString() }}</span></template>
+                <template #cell="{ record }"
+                  ><span class="mono">¥{{ record.remainingPrincipal.toLocaleString() }}</span></template
+                >
               </a-table-column>
               <a-table-column title="剩余应还">
                 <template #cell="{ record }">
@@ -398,12 +462,19 @@
               </a-table-column>
               <a-table-column title="逾期天数">
                 <template #cell="{ record }">
-                  <span class="mono" :style="{ color: record.overdueDays > 0 ? 'var(--cp-danger)' : '' }">{{ record.overdueDays }}</span>
+                  <span class="mono" :style="{ color: record.overdueDays > 0 ? 'var(--cp-danger)' : '' }">{{
+                    record.overdueDays
+                  }}</span>
                 </template>
               </a-table-column>
               <a-table-column title="状态">
                 <template #cell="{ record }">
-                  <a-tag :color="record.contractStatus === '正常' ? 'green' : record.contractStatus === '逾期' ? 'red' : 'gray'">{{ record.contractStatus }}</a-tag>
+                  <a-tag
+                    :color="
+                      record.contractStatus === '正常' ? 'green' : record.contractStatus === '逾期' ? 'red' : 'gray'
+                    "
+                    >{{ record.contractStatus }}</a-tag
+                  >
                 </template>
               </a-table-column>
               <a-table-column title="操作">
@@ -465,7 +536,9 @@
           </div>
           <div class="cp-stat-card">
             <div class="cp-stat-label">实际回款</div>
-            <div class="cp-stat-value mono" style="color: var(--cp-brand)">¥{{ collectionSummary.totalActualPayment.toLocaleString() }}</div>
+            <div class="cp-stat-value mono" style="color: var(--cp-brand)">
+              ¥{{ collectionSummary.totalActualPayment.toLocaleString() }}
+            </div>
           </div>
         </div>
 
@@ -475,20 +548,43 @@
           <a-row :gutter="16">
             <a-col :span="12">
               <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 6px">难度分布</div>
-              <div v-for="(v, k) in collectionSummary.difficultyDistribution" :key="k" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px">
-                <a-tag :color="k === 'easy' ? 'green' : k === 'medium' ? 'orange' : 'red'" size="small">{{ k === 'easy' ? '容易' : k === 'medium' ? '中等' : '困难' }}</a-tag>
+              <div
+                v-for="(v, k) in collectionSummary.difficultyDistribution"
+                :key="k"
+                style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px"
+              >
+                <a-tag :color="k === 'easy' ? 'green' : k === 'medium' ? 'orange' : 'red'" size="small">{{
+                  k === 'easy' ? '容易' : k === 'medium' ? '中等' : '困难'
+                }}</a-tag>
                 <div style="flex: 1; height: 6px; background: var(--cp-bg-soft); border-radius: 3px; overflow: hidden">
-                  <div :style="{ width: (v / collectionSummary.totalRecords * 100) + '%', height: '100%', background: k === 'easy' ? 'var(--cp-success)' : k === 'medium' ? 'var(--cp-warning)' : 'var(--cp-danger)' }"></div>
+                  <div
+                    :style="{
+                      width: (v / collectionSummary.totalRecords) * 100 + '%',
+                      height: '100%',
+                      background:
+                        k === 'easy' ? 'var(--cp-success)' : k === 'medium' ? 'var(--cp-warning)' : 'var(--cp-danger)'
+                    }"
+                  ></div>
                 </div>
                 <span class="mono" style="min-width: 30px; text-align: right">{{ v }}</span>
               </div>
             </a-col>
             <a-col :span="12">
               <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 6px">阶段分布</div>
-              <div v-for="(v, k) in collectionSummary.stageDistribution" :key="k" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px">
+              <div
+                v-for="(v, k) in collectionSummary.stageDistribution"
+                :key="k"
+                style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px"
+              >
                 <a-tag color="blue" size="small">M{{ k }}</a-tag>
                 <div style="flex: 1; height: 6px; background: var(--cp-bg-soft); border-radius: 3px; overflow: hidden">
-                  <div :style="{ width: (v / collectionSummary.totalRecords * 100) + '%', height: '100%', background: 'var(--cp-brand)' }"></div>
+                  <div
+                    :style="{
+                      width: (v / collectionSummary.totalRecords) * 100 + '%',
+                      height: '100%',
+                      background: 'var(--cp-brand)'
+                    }"
+                  ></div>
                 </div>
                 <span class="mono" style="min-width: 30px; text-align: right">{{ v }}</span>
               </div>
@@ -502,12 +598,16 @@
             <template #columns>
               <a-table-column title="催收日期" data-index="date" />
               <a-table-column title="催收类型">
-                <template #cell="{ record }"><a-tag size="small">{{ record.type }}</a-tag></template>
+                <template #cell="{ record }"
+                  ><a-tag size="small">{{ record.type }}</a-tag></template
+                >
               </a-table-column>
               <a-table-column title="催收员" data-index="collector" />
               <a-table-column title="联系结果">
                 <template #cell="{ record }">
-                  <a-tag :color="record.result === '承诺还款' ? 'green' : 'orange'" size="small">{{ record.result }}</a-tag>
+                  <a-tag :color="record.result === '承诺还款' ? 'green' : 'orange'" size="small">{{
+                    record.result
+                  }}</a-tag>
                 </template>
               </a-table-column>
               <a-table-column title="承诺金额">
@@ -518,7 +618,11 @@
               </a-table-column>
               <a-table-column title="难度">
                 <template #cell="{ record }">
-                  <a-tag :color="record.difficulty === '容易' ? 'green' : record.difficulty === '中等' ? 'orange' : 'red'" size="small">{{ record.difficulty }}</a-tag>
+                  <a-tag
+                    :color="record.difficulty === '容易' ? 'green' : record.difficulty === '中等' ? 'orange' : 'red'"
+                    size="small"
+                    >{{ record.difficulty }}</a-tag
+                  >
                 </template>
               </a-table-column>
               <a-table-column title="标签">
@@ -573,14 +677,37 @@
               <a-table-column title="渠道" data-index="channel" />
               <a-table-column title="状态">
                 <template #cell="{ record }">
-                  <a-tag :color="record.status === '成功' ? 'green' : record.status === '进行中' ? 'orange' : 'red'" size="small">{{ record.status }}</a-tag>
+                  <a-tag
+                    :color="record.status === '成功' ? 'green' : record.status === '进行中' ? 'orange' : 'red'"
+                    size="small"
+                    >{{ record.status }}</a-tag
+                  >
                 </template>
               </a-table-column>
               <a-table-column title="响应率">
                 <template #cell="{ record }">
                   <div style="display: flex; align-items: center; gap: 6px">
-                    <div style="width: 60px; height: 4px; background: var(--cp-bg-soft); border-radius: 2px; overflow: hidden">
-                      <div :style="{ width: record.responseRate + '%', height: '100%', background: record.responseRate >= 70 ? 'var(--cp-success)' : record.responseRate >= 40 ? 'var(--cp-warning)' : 'var(--cp-danger)' }"></div>
+                    <div
+                      style="
+                        width: 60px;
+                        height: 4px;
+                        background: var(--cp-bg-soft);
+                        border-radius: 2px;
+                        overflow: hidden;
+                      "
+                    >
+                      <div
+                        :style="{
+                          width: record.responseRate + '%',
+                          height: '100%',
+                          background:
+                            record.responseRate >= 70
+                              ? 'var(--cp-success)'
+                              : record.responseRate >= 40
+                                ? 'var(--cp-warning)'
+                                : 'var(--cp-danger)'
+                        }"
+                      ></div>
                     </div>
                     <span class="mono">{{ record.responseRate }}%</span>
                   </div>
@@ -622,9 +749,7 @@
               </a-select>
             </a-col>
             <a-col :span="6">
-              <a-button type="primary" long @click="showHistorySample = true">
-                <icon-search /> 查询
-              </a-button>
+              <a-button type="primary" long @click="showHistorySample = true"> <icon-search /> 查询 </a-button>
             </a-col>
           </a-row>
 
@@ -650,7 +775,19 @@
                 <a-table-column title="数据模型" data-index="model" />
                 <a-table-column title="变化">
                   <template #cell="{ record }">
-                    <a-tag :color="record.change === '新增' ? 'green' : record.change === '修改' ? 'orange' : record.change === '删除' ? 'red' : 'gray'" size="small">{{ record.change }}</a-tag>
+                    <a-tag
+                      :color="
+                        record.change === '新增'
+                          ? 'green'
+                          : record.change === '修改'
+                            ? 'orange'
+                            : record.change === '删除'
+                              ? 'red'
+                              : 'gray'
+                      "
+                      size="small"
+                      >{{ record.change }}</a-tag
+                    >
                   </template>
                 </a-table-column>
                 <a-table-column title="字段" data-index="field" />
@@ -691,7 +828,7 @@ import { Message } from '@arco-design/web-vue'
 const route = useRoute()
 const router = useRouter()
 const wb = useWorkbenchStore()
-const customer = computed(() => customers.find(c => c.id === route.params.id))
+const customer = computed(() => customers.find((c) => c.id === route.params.id))
 
 // 通话中快速建工单/发起工作流
 const workflowModalVisible = ref(false)
@@ -723,7 +860,10 @@ onMounted(() => {
     callTimer = setInterval(() => {
       // 卸载后定时器仍在跑,加守卫避免访问响应式 state
       if (!isMounted) {
-        if (callTimer) { clearInterval(callTimer); callTimer = null }
+        if (callTimer) {
+          clearInterval(callTimer)
+          callTimer = null
+        }
         return
       }
       if (wb.call) callDuration.value = Math.floor((Date.now() - wb.call.startAt) / 1000)
@@ -741,7 +881,10 @@ onUnmounted(() => {
 const callDurationText = computed(() => formatDuration(callDuration.value))
 
 function hangup() {
-  if (callTimer) { clearInterval(callTimer); callTimer = null }
+  if (callTimer) {
+    clearInterval(callTimer)
+    callTimer = null
+  }
   wb.hangup()
   wb.activeTask = null
   wb.setIdle()
@@ -752,10 +895,16 @@ function hangup() {
 const activeTab = ref('profile')
 
 const statusMap: Record<string, string> = { normal: '正常', overdue: '逾期', frozen: '冻结' }
-function statusColor(s: string) { return s === 'normal' ? 'green' : s === 'overdue' ? 'red' : 'gray' }
+function statusColor(s: string) {
+  return s === 'normal' ? 'green' : s === 'overdue' ? 'red' : 'gray'
+}
 
 const tagLabel: Record<string, string> = {
-  blacklist: '黑名单', complaint: '投诉倾向', agent: '异常代理', threat: '扬言倾向', normal: '正常'
+  blacklist: '黑名单',
+  complaint: '投诉倾向',
+  agent: '异常代理',
+  threat: '扬言倾向',
+  normal: '正常'
 }
 
 // 接入 useTagRuleStore:命中规则返回弹窗预警;P2-9 改造
@@ -875,7 +1024,9 @@ const productList = computed(() => {
 })
 
 const filteredProducts = computed(() =>
-  productTypeFilter.value ? productList.value.filter(p => p.productType === productTypeFilter.value) : productList.value
+  productTypeFilter.value
+    ? productList.value.filter((p) => p.productType === productTypeFilter.value)
+    : productList.value
 )
 
 // ============ 催收记录 ============
@@ -890,12 +1041,60 @@ const collectionSummary = computed(() => ({
 }))
 
 const collectionRecords = ref([
-  { date: '2026-07-15', type: '电话催收', collector: '李伟', result: '承诺还款', promiseAmount: 5000, difficulty: '容易', tags: ['配合度高', '还款意愿强'] },
-  { date: '2026-07-12', type: '短信催收', collector: '系统', result: '无应答', promiseAmount: 0, difficulty: '困难', tags: ['联系困难', '逃避还款'] },
-  { date: '2026-07-10', type: '电话催收', collector: '李伟', result: '承诺还款', promiseAmount: 3000, difficulty: '中等', tags: ['电话有效'] },
-  { date: '2026-07-08', type: '电话催收', collector: '王芳', result: '投诉催收方式', promiseAmount: 0, difficulty: '困难', tags: ['投诉催收时间', '投诉催收态度'] },
-  { date: '2026-07-05', type: '上门催收', collector: '李伟', result: '承诺还款', promiseAmount: 10000, difficulty: '中等', tags: ['上门有效'] },
-  { date: '2026-07-01', type: '电话催收', collector: '李伟', result: '承诺还款', promiseAmount: 8000, difficulty: '容易', tags: ['配合度高'] }
+  {
+    date: '2026-07-15',
+    type: '电话催收',
+    collector: '李伟',
+    result: '承诺还款',
+    promiseAmount: 5000,
+    difficulty: '容易',
+    tags: ['配合度高', '还款意愿强']
+  },
+  {
+    date: '2026-07-12',
+    type: '短信催收',
+    collector: '系统',
+    result: '无应答',
+    promiseAmount: 0,
+    difficulty: '困难',
+    tags: ['联系困难', '逃避还款']
+  },
+  {
+    date: '2026-07-10',
+    type: '电话催收',
+    collector: '李伟',
+    result: '承诺还款',
+    promiseAmount: 3000,
+    difficulty: '中等',
+    tags: ['电话有效']
+  },
+  {
+    date: '2026-07-08',
+    type: '电话催收',
+    collector: '王芳',
+    result: '投诉催收方式',
+    promiseAmount: 0,
+    difficulty: '困难',
+    tags: ['投诉催收时间', '投诉催收态度']
+  },
+  {
+    date: '2026-07-05',
+    type: '上门催收',
+    collector: '李伟',
+    result: '承诺还款',
+    promiseAmount: 10000,
+    difficulty: '中等',
+    tags: ['上门有效']
+  },
+  {
+    date: '2026-07-01',
+    type: '电话催收',
+    collector: '李伟',
+    result: '承诺还款',
+    promiseAmount: 8000,
+    difficulty: '容易',
+    tags: ['配合度高']
+  }
 ])
 
 // ============ 营销记录 ============
@@ -905,14 +1104,30 @@ const marketingRecords = ref([
   { name: '新户首单立减', type: '新产品', channel: 'APP推送', status: '成功', responseRate: 72, time: '2026-07-05' },
   { name: 'VIP客户关怀', type: '客户关怀', channel: '电话', status: '进行中', responseRate: 45, time: '2026-07-12' },
   { name: '现金贷额度升级', type: '交叉销售', channel: '短信', status: '成功', responseRate: 68, time: '2026-07-01' },
-  { name: '信用卡分期优惠', type: '产品推广', channel: 'APP推送', status: '失败', responseRate: 22, time: '2026-06-28' },
+  {
+    name: '信用卡分期优惠',
+    type: '产品推广',
+    channel: 'APP推送',
+    status: '失败',
+    responseRate: 22,
+    time: '2026-06-28'
+  },
   { name: '免息券发放', type: '客户关怀', channel: '微信', status: '成功', responseRate: 78, time: '2026-06-20' },
-  { name: '会员积分兑换', type: '客户关怀', channel: 'APP推送', status: '进行中', responseRate: 35, time: '2026-06-15' },
+  {
+    name: '会员积分兑换',
+    type: '客户关怀',
+    channel: 'APP推送',
+    status: '进行中',
+    responseRate: 35,
+    time: '2026-06-15'
+  },
   { name: '消费分期活动', type: '产品推广', channel: '短信', status: '成功', responseRate: 64, time: '2026-06-10' }
 ])
 
 const filteredMarketing = computed(() =>
-  marketingFilter.value ? marketingRecords.value.filter(m => m.status === marketingFilter.value) : marketingRecords.value
+  marketingFilter.value
+    ? marketingRecords.value.filter((m) => m.status === marketingFilter.value)
+    : marketingRecords.value
 )
 
 function marketingTypeColor(t: string) {
@@ -926,17 +1141,54 @@ const historyView = ref('table')
 const showHistorySample = ref(false)
 
 const historySample = [
-  { time: '2026-07-10', model: '用信记录', change: '修改', field: '在贷余额', before: '¥92,000', after: '¥86,420', operator: '系统自动' },
-  { time: '2026-06-25', model: '征信记录', change: '修改', field: '逾期账户数', before: '1', after: '2', operator: '系统自动' },
-  { time: '2026-06-12', model: '客户基础', change: '修改', field: '手机号', before: '138****5621', after: '138****5621', operator: '客户变更' },
+  {
+    time: '2026-07-10',
+    model: '用信记录',
+    change: '修改',
+    field: '在贷余额',
+    before: '¥92,000',
+    after: '¥86,420',
+    operator: '系统自动'
+  },
+  {
+    time: '2026-06-25',
+    model: '征信记录',
+    change: '修改',
+    field: '逾期账户数',
+    before: '1',
+    after: '2',
+    operator: '系统自动'
+  },
+  {
+    time: '2026-06-12',
+    model: '客户基础',
+    change: '修改',
+    field: '手机号',
+    before: '138****5621',
+    after: '138****5621',
+    operator: '客户变更'
+  },
   { time: '2026-06-01', model: '用信记录', change: '未变', field: '-', before: '-', after: '-', operator: '-' },
-  { time: '2026-05-15', model: '催收记录', change: '新增', field: '催收员', before: '-', after: '李伟', operator: '系统' },
+  {
+    time: '2026-05-15',
+    model: '催收记录',
+    change: '新增',
+    field: '催收员',
+    before: '-',
+    after: '李伟',
+    operator: '系统'
+  },
   { time: '2026-05-10', model: '营销记录', change: '新增', field: '响应', before: '-', after: '成功', operator: '系统' }
 ]
 </script>
 
 <style scoped>
-.cp-section-title { font-size: 14px; font-weight: 600; margin: 0 0 12px; color: var(--cp-text); }
+.cp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--cp-text);
+}
 
 /* ========== 通话中 Banner ========== */
 .cp-call-banner {
@@ -957,19 +1209,41 @@ const historySample = [
   font-size: 13px;
   min-width: 0;
 }
-.cp-call-banner-right { display: flex; gap: 8px; flex-shrink: 0; }
+.cp-call-banner-right {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
 .cp-call-dot {
-  width: 10px; height: 10px; border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
   background: #fff;
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35);
   animation: cp-call-pulse 1.2s infinite;
 }
-.cp-call-status { font-weight: 600; letter-spacing: 0.5px; }
-.cp-call-duration { font-weight: 700; font-size: 14px; }
-.cp-call-target { opacity: 0.92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cp-call-status {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.cp-call-duration {
+  font-weight: 700;
+  font-size: 14px;
+}
+.cp-call-target {
+  opacity: 0.92;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 @keyframes cp-call-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 /* 产品头部 */

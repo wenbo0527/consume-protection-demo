@@ -47,10 +47,56 @@ function nowStr() {
 
 function buildMock(): KBItem[] {
   return [
-    { id: 'KB-20260610-0001', title: '速贷宝 Pro 产品介绍标准话术', category: '产品介绍', tags: ['速贷宝', '产品介绍'], source: 'manual', summary: '速贷宝 Pro 产品的标准介绍话术与费率说明', content: '速贷宝 Pro 是我行主推的个人消费信贷产品...', status: 'active', updatedAt: '2026-06-10 10:00', author: '王芳' },
-    { id: 'KB-20260705-0002', title: '催收频次投诉处置规范', category: '催收合规', tags: ['催收', '投诉'], source: 'review_archive', reviewId: 'RV-20260705-0003', summary: '针对客户投诉"催收频次过高"的标准处置流程', content: '1. 受理客户投诉... 2. 调取近 30 天催收记录...', status: 'active', updatedAt: '2026-07-05 14:20', author: '王芳' },
-    { id: 'KB-20260714-0003', title: '征信异议申诉话术模板', category: '征信', tags: ['征信异议'], source: 'review_archive', reviewId: 'RV-20260714-0008', summary: '客户提出征信异议时的受理与解释话术', content: '您好,关于您提出的征信异议...', status: 'active', updatedAt: '2026-07-14 16:30', author: '王芳' },
-    { id: 'KB-20260716-0004', title: '扬言客户分级处置预案(草稿)', category: '风险预警', tags: ['扬言', '风险'], source: 'review_archive', summary: '扬言投诉的客户分级与升级路径', content: '一级:一般扬言... 二级:涉及监管/媒体...', status: 'pending', updatedAt: '2026-07-16 09:00', author: '王芳' }
+    {
+      id: 'KB-20260610-0001',
+      title: '速贷宝 Pro 产品介绍标准话术',
+      category: '产品介绍',
+      tags: ['速贷宝', '产品介绍'],
+      source: 'manual',
+      summary: '速贷宝 Pro 产品的标准介绍话术与费率说明',
+      content: '速贷宝 Pro 是我行主推的个人消费信贷产品...',
+      status: 'active',
+      updatedAt: '2026-06-10 10:00',
+      author: '王芳'
+    },
+    {
+      id: 'KB-20260705-0002',
+      title: '催收频次投诉处置规范',
+      category: '催收合规',
+      tags: ['催收', '投诉'],
+      source: 'review_archive',
+      reviewId: 'RV-20260705-0003',
+      summary: '针对客户投诉"催收频次过高"的标准处置流程',
+      content: '1. 受理客户投诉... 2. 调取近 30 天催收记录...',
+      status: 'active',
+      updatedAt: '2026-07-05 14:20',
+      author: '王芳'
+    },
+    {
+      id: 'KB-20260714-0003',
+      title: '征信异议申诉话术模板',
+      category: '征信',
+      tags: ['征信异议'],
+      source: 'review_archive',
+      reviewId: 'RV-20260714-0008',
+      summary: '客户提出征信异议时的受理与解释话术',
+      content: '您好,关于您提出的征信异议...',
+      status: 'active',
+      updatedAt: '2026-07-14 16:30',
+      author: '王芳'
+    },
+    {
+      id: 'KB-20260716-0004',
+      title: '扬言客户分级处置预案(草稿)',
+      category: '风险预警',
+      tags: ['扬言', '风险'],
+      source: 'review_archive',
+      summary: '扬言投诉的客户分级与升级路径',
+      content: '一级:一般扬言... 二级:涉及监管/媒体...',
+      status: 'pending',
+      updatedAt: '2026-07-16 09:00',
+      author: '王芳'
+    }
   ]
 }
 
@@ -80,9 +126,9 @@ export const useKnowledgeStore = defineStore('knowledge', {
     items: loadPersisted() as KBItem[]
   }),
   getters: {
-    active: (s) => s.items.filter(i => i.status === 'active'),
-    pending: (s) => s.items.filter(i => i.status === 'pending'),
-    byCategory: (s) => (cat: string) => s.items.filter(i => i.category === cat && i.status === 'active')
+    active: (s) => s.items.filter((i) => i.status === 'active'),
+    pending: (s) => s.items.filter((i) => i.status === 'pending'),
+    byCategory: (s) => (cat: string) => s.items.filter((i) => i.category === cat && i.status === 'active')
   },
   actions: {
     persist() {
@@ -111,7 +157,7 @@ export const useKnowledgeStore = defineStore('knowledge', {
     },
     /** 知识管理员审核通过 */
     approve(id: string, reviewer: string) {
-      const item = this.items.find(i => i.id === id)
+      const item = this.items.find((i) => i.id === id)
       if (!item) return
       item.status = 'active'
       item.updatedAt = nowStr()
@@ -121,7 +167,7 @@ export const useKnowledgeStore = defineStore('knowledge', {
     },
     /** 知识管理员驳回(下架) */
     reject(id: string) {
-      const item = this.items.find(i => i.id === id)
+      const item = this.items.find((i) => i.id === id)
       if (!item) return
       item.status = 'archived'
       log('log', 'reject', id)
@@ -134,13 +180,13 @@ export const useKnowledgeStore = defineStore('knowledge', {
       this.persist()
     },
     update(id: string, patch: Partial<KBItem>) {
-      const item = this.items.find(i => i.id === id)
+      const item = this.items.find((i) => i.id === id)
       if (!item) return
       Object.assign(item, patch, { updatedAt: nowStr() })
       this.persist()
     },
     remove(id: string) {
-      this.items = this.items.filter(i => i.id !== id)
+      this.items = this.items.filter((i) => i.id !== id)
       this.persist()
     }
   }

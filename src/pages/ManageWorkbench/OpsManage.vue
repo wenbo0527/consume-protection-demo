@@ -27,7 +27,9 @@
       </div>
       <div class="cp-kpi-card">
         <div class="cp-kpi-label">均分</div>
-        <div class="cp-kpi-value" :style="{ color: opsAvgScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)' }">{{ opsAvgScore || '-' }}</div>
+        <div class="cp-kpi-value" :style="{ color: opsAvgScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)' }">
+          {{ opsAvgScore || '-' }}
+        </div>
       </div>
       <div class="cp-kpi-card">
         <div class="cp-kpi-label">待审批请假</div>
@@ -61,12 +63,19 @@
             </a-table-column>
             <a-table-column title="技能" data-index="skills" :width="180">
               <template #cell="{ record }">
-                <a-tag v-for="s in record.skills" :key="s" color="arcoblue" size="small" style="margin-right: 4px">{{ s }}</a-tag>
+                <a-tag v-for="s in record.skills" :key="s" color="arcoblue" size="small" style="margin-right: 4px">{{
+                  s
+                }}</a-tag>
               </template>
             </a-table-column>
             <a-table-column title="作业量" :width="100">
               <template #cell="{ record }">
-                <span :style="{ color: record.monthlyTicketCount >= 80 ? 'var(--cp-success)' : 'var(--cp-text)', fontWeight: 600 }">
+                <span
+                  :style="{
+                    color: record.monthlyTicketCount >= 80 ? 'var(--cp-success)' : 'var(--cp-text)',
+                    fontWeight: 600
+                  }"
+                >
                   {{ record.monthlyTicketCount }}
                 </span>
                 <span style="font-size: 12px; color: var(--cp-text-tertiary); margin-left: 4px">件/月</span>
@@ -74,7 +83,13 @@
             </a-table-column>
             <a-table-column title="质检均分" :width="110">
               <template #cell="{ record }">
-                <span v-if="record.monthlyAvgScore > 0" :style="{ color: record.monthlyAvgScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)', fontWeight: 600 }">
+                <span
+                  v-if="record.monthlyAvgScore > 0"
+                  :style="{
+                    color: record.monthlyAvgScore >= 80 ? 'var(--cp-success)' : 'var(--cp-warning)',
+                    fontWeight: 600
+                  }"
+                >
                   {{ record.monthlyAvgScore }}
                 </span>
                 <span v-else style="color: var(--cp-text-tertiary)">未评分</span>
@@ -104,7 +119,12 @@
           <div class="cp-shift-table">
             <div class="cp-shift-row cp-shift-row-header">
               <div class="cp-shift-cell cp-shift-cell-header" style="width: 130px">姓名 \\ 日期</div>
-              <div v-for="d in dates" :key="d" class="cp-shift-cell cp-shift-cell-header" :class="{ 'cp-shift-cell-today': d === todayStr }">
+              <div
+                v-for="d in dates"
+                :key="d"
+                class="cp-shift-cell cp-shift-cell-header"
+                :class="{ 'cp-shift-cell-today': d === todayStr }"
+              >
                 <div>{{ d.slice(5) }}</div>
                 <div style="font-size: 11px; color: var(--cp-text-tertiary)">{{ dayOfWeekLabel(d) }}</div>
               </div>
@@ -118,14 +138,16 @@
                 v-for="d in dates"
                 :key="d"
                 class="cp-shift-cell"
-                :class="[
-                  `cp-shift-${shiftAt(agent.id, d)}`,
-                  { 'cp-shift-cell-today': d === todayStr }
-                ]"
+                :class="[`cp-shift-${shiftAt(agent.id, d)}`, { 'cp-shift-cell-today': d === todayStr }]"
                 @click="openShiftEditor(agent, d)"
               >
                 {{ shiftLabel(shiftAt(agent.id, d)) }}
-                <div v-if="shiftNote(agent.id, d)" style="font-size: 10px; color: var(--cp-text-tertiary); margin-top: 2px">{{ shiftNote(agent.id, d) }}</div>
+                <div
+                  v-if="shiftNote(agent.id, d)"
+                  style="font-size: 10px; color: var(--cp-text-tertiary); margin-top: 2px"
+                >
+                  {{ shiftNote(agent.id, d) }}
+                </div>
               </div>
             </div>
           </div>
@@ -149,7 +171,9 @@
               <template #cell="{ record }">
                 <span v-if="record.startDate === record.endDate">{{ record.startDate }}</span>
                 <span v-else>{{ record.startDate }} ~ {{ record.endDate }}</span>
-                <span style="font-size: 12px; color: var(--cp-text-tertiary); margin-left: 6px">({{ daysBetween(record) }} 天)</span>
+                <span style="font-size: 12px; color: var(--cp-text-tertiary); margin-left: 6px"
+                  >({{ daysBetween(record) }} 天)</span
+                >
               </template>
             </a-table-column>
             <a-table-column title="事由" data-index="reason" />
@@ -162,8 +186,20 @@
             <a-table-column title="操作" :width="200" v-if="canApprove">
               <template #cell="{ record }">
                 <a-space>
-                  <a-button v-if="record.status === 'pending'" size="small" status="success" @click="approveLeave(record, true)">批准</a-button>
-                  <a-button v-if="record.status === 'pending'" size="small" status="danger" @click="approveLeave(record, false)">驳回</a-button>
+                  <a-button
+                    v-if="record.status === 'pending'"
+                    size="small"
+                    status="success"
+                    @click="approveLeave(record, true)"
+                    >批准</a-button
+                  >
+                  <a-button
+                    v-if="record.status === 'pending'"
+                    size="small"
+                    status="danger"
+                    @click="approveLeave(record, false)"
+                    >驳回</a-button
+                  >
                   <a-tag v-else color="gray">已处理</a-tag>
                 </a-space>
               </template>
@@ -186,7 +222,12 @@
             </a-table-column>
             <a-table-column title="处理工单" :width="180">
               <template #cell="{ record }">
-                <span :style="{ fontWeight: 600, color: record.monthlyTicketCount >= 80 ? 'var(--cp-success)' : 'var(--cp-text)' }">
+                <span
+                  :style="{
+                    fontWeight: 600,
+                    color: record.monthlyTicketCount >= 80 ? 'var(--cp-success)' : 'var(--cp-text)'
+                  }"
+                >
                   {{ record.monthlyTicketCount }}
                 </span>
                 <span style="margin-left: 8px; color: var(--cp-text-tertiary); font-size: 12px">件</span>
@@ -195,10 +236,26 @@
             <a-table-column title="占比图示">
               <template #cell="{ record }">
                 <div style="display: flex; align-items: center; gap: 8px">
-                  <div style="width: 200px; height: 8px; background: var(--cp-bg-soft); border-radius: 4px; overflow: hidden">
-                    <div :style="{ width: Math.min(record.monthlyTicketCount / topCount * 100, 100) + '%', height: '100%', background: 'var(--cp-brand)' }" />
+                  <div
+                    style="
+                      width: 200px;
+                      height: 8px;
+                      background: var(--cp-bg-soft);
+                      border-radius: 4px;
+                      overflow: hidden;
+                    "
+                  >
+                    <div
+                      :style="{
+                        width: Math.min((record.monthlyTicketCount / topCount) * 100, 100) + '%',
+                        height: '100%',
+                        background: 'var(--cp-brand)'
+                      }"
+                    />
                   </div>
-                  <span style="font-size: 12px; color: var(--cp-text-tertiary)">{{ Math.round(record.monthlyTicketCount / topCount * 100) }}% of {{ topName }}</span>
+                  <span style="font-size: 12px; color: var(--cp-text-tertiary)"
+                    >{{ Math.round((record.monthlyTicketCount / topCount) * 100) }}% of {{ topName }}</span
+                  >
                 </div>
               </template>
             </a-table-column>
@@ -210,9 +267,16 @@
     <!-- 班次编辑弹窗 -->
     <a-modal v-model:visible="shiftEditVisible" title="调整班次" :width="420" :ok-text="'保存'" @ok="saveShift">
       <div v-if="shiftEditTarget">
-        <p><b>{{ shiftEditTarget.agent.name }}</b> · {{ shiftEditTarget.date }} ({{ dayOfWeekLabel(shiftEditTarget.date) }})</p>
-        <p>当前班次:<a-tag :color="shiftColor(currentShift)">{{ shiftLabel(currentShift) }}</a-tag></p>
-        <p>调整为:
+        <p>
+          <b>{{ shiftEditTarget.agent.name }}</b> · {{ shiftEditTarget.date }} ({{
+            dayOfWeekLabel(shiftEditTarget.date)
+          }})
+        </p>
+        <p>
+          当前班次:<a-tag :color="shiftColor(currentShift)">{{ shiftLabel(currentShift) }}</a-tag>
+        </p>
+        <p>
+          调整为:
           <a-select v-model="newShift">
             <a-option value="早">早班</a-option>
             <a-option value="中">中班</a-option>
@@ -294,8 +358,8 @@ const dates = computed<string[]>(() => {
 // 排行:作业量 + 质检均分综合
 const rankingList = computed(() => {
   return [...ops.agents]
-    .filter(a => a.role !== 'manage')
-    .map(a => {
+    .filter((a) => a.role !== 'manage')
+    .map((a) => {
       // 综合得分 = 作业量归一 + 均分权重
       const ticketScore = Math.min(a.monthlyTicketCount / 100, 1) * 50
       const qaScore = a.monthlyAvgScore > 0 ? a.monthlyAvgScore * 0.5 : 25 // 未评分给中性分
@@ -310,33 +374,31 @@ const topCount = computed(() => {
 })
 const topName = computed(() => rankingList.value[0]?.name || '-')
 
-const monthlyTotal = computed(() =>
-  ops.agents.reduce((a, c) => a + (c.monthlyTicketCount || 0), 0)
-)
+const monthlyTotal = computed(() => ops.agents.reduce((a, c) => a + (c.monthlyTicketCount || 0), 0))
 
 const opsAvgScore = computed(() => {
-  const scored = ops.agents.filter(a => a.monthlyAvgScore > 0)
+  const scored = ops.agents.filter((a) => a.monthlyAvgScore > 0)
   if (!scored.length) return 0
   return Math.round(scored.reduce((a, c) => a + c.monthlyAvgScore, 0) / scored.length)
 })
 
 const volumeList = computed(() =>
-  ops.agents.filter(a => a.role !== 'manage').sort((a, b) => b.monthlyTicketCount - a.monthlyTicketCount)
+  ops.agents.filter((a) => a.role !== 'manage').sort((a, b) => b.monthlyTicketCount - a.monthlyTicketCount)
 )
 
 // 排班格子数据
 function shiftAt(agentId: string, date: string): ShiftType {
-  const sh = ops.shifts.find(s => s.date === date && s.agentId === agentId)
+  const sh = ops.shifts.find((s) => s.date === date && s.agentId === agentId)
   return sh?.shift || '休'
 }
 function shiftLabel(s: ShiftType) {
-  return ({ 早: '早', 中: '中', 晚: '晚', 休: '休', 假: '假' })[s] || s
+  return { 早: '早', 中: '中', 晚: '晚', 休: '休', 假: '假' }[s] || s
 }
 function shiftColor(s: ShiftType) {
-  return ({ 早: 'orange', 中: 'arcoblue', 晚: 'purple', 休: 'gray', 假: 'red' })[s] || 'gray'
+  return { 早: 'orange', 中: 'arcoblue', 晚: 'purple', 休: 'gray', 假: 'red' }[s] || 'gray'
 }
 function shiftNote(agentId: string, date: string) {
-  const sh = ops.shifts.find(s => s.date === date && s.agentId === agentId)
+  const sh = ops.shifts.find((s) => s.date === date && s.agentId === agentId)
   return sh?.note
 }
 function dayOfWeekLabel(date: string) {
@@ -362,7 +424,12 @@ function openShiftEditor(agent: Agent, date: string) {
 
 function saveShift() {
   if (!shiftEditTarget.value) return
-  ops.updateShift(shiftEditTarget.value.date, shiftEditTarget.value.agent.id, newShift.value, newShiftNote.value || undefined)
+  ops.updateShift(
+    shiftEditTarget.value.date,
+    shiftEditTarget.value.agent.id,
+    newShift.value,
+    newShiftNote.value || undefined
+  )
   Message.success('班次已保存')
   shiftEditVisible.value = false
 }
@@ -397,13 +464,13 @@ function onLeaveApply() {
 const canApprove = computed(() => userStore.currentRole === 'manage')
 
 function approveLeave(record: { id: string }, approved: boolean) {
-  const approver = userStore.currentRole ? (getRoleInfo(userStore.currentRole)?.username || '管理层') : '管理层'
+  const approver = userStore.currentRole ? getRoleInfo(userStore.currentRole)?.username || '管理层' : '管理层'
   ops.approveLeave(record.id, approver, approved)
   Message.success(approved ? '已批准' : '已驳回')
 }
 
 function agentName(id: string) {
-  return ops.agents.find(a => a.id === id)?.name || id
+  return ops.agents.find((a) => a.id === id)?.name || id
 }
 
 function daysBetween(record: { startDate: string; endDate: string }) {
@@ -413,32 +480,32 @@ function daysBetween(record: { startDate: string; endDate: string }) {
 }
 
 function leaveTypeColor(t: LeaveType) {
-  return ({ 事假: 'gray', 病假: 'red', 年假: 'arcoblue', 调休: 'orange', 婚假: 'magenta' })[t] || 'gray'
+  return { 事假: 'gray', 病假: 'red', 年假: 'arcoblue', 调休: 'orange', 婚假: 'magenta' }[t] || 'gray'
 }
 function leaveStatusColor(s: string) {
-  return ({ pending: 'orange', approved: 'green', rejected: 'red' })[s] || 'gray'
+  return { pending: 'orange', approved: 'green', rejected: 'red' }[s] || 'gray'
 }
 function leaveStatusLabel(s: string) {
-  return ({ pending: '待审批', approved: '已批准', rejected: '已驳回' })[s] || s
+  return { pending: '待审批', approved: '已批准', rejected: '已驳回' }[s] || s
 }
 
 function roleColor(r: string) {
-  return ({ agent: 'arcoblue', business: 'orange', review: 'purple', manage: 'red', system: 'gray' })[r] || 'gray'
+  return { agent: 'arcoblue', business: 'orange', review: 'purple', manage: 'red', system: 'gray' }[r] || 'gray'
 }
 function roleLabel(r: string) {
-  return ({ agent: '坐席', business: '业务执行', review: '审查', manage: '管理层', system: '系统' })[r] || r
+  return { agent: '坐席', business: '业务执行', review: '审查', manage: '管理层', system: '系统' }[r] || r
 }
 function statusColor(s: string) {
-  return ({ oncall: 'green', idle: 'arcoblue', offline: 'gray', rest: 'orange' })[s] || 'gray'
+  return { oncall: 'green', idle: 'arcoblue', offline: 'gray', rest: 'orange' }[s] || 'gray'
 }
 function statusLabel(s: string) {
-  return ({ oncall: '通话中', idle: '待命', offline: '离线', rest: '休息' })[s] || s
+  return { oncall: '通话中', idle: '待命', offline: '离线', rest: '休息' }[s] || s
 }
 
 // 从质检刷新所有绩效
 function refreshFromQuality() {
   ops.refreshAllFromQuality(
-    qa.cases.map(c => ({
+    qa.cases.map((c) => ({
       agentName: c.agentName,
       totalScore: c.totalScore,
       status: c.status
@@ -461,8 +528,16 @@ function refreshFromQuality() {
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
 }
-.cp-kpi-label { font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 4px; }
-.cp-kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+.cp-kpi-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 4px;
+}
+.cp-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
 
 .cp-shift-table {
   width: 100%;
@@ -476,7 +551,8 @@ function refreshFromQuality() {
 .cp-shift-row-header {
   background: var(--cp-bg-soft);
   font-weight: 600;
-  position: sticky; top: 0;
+  position: sticky;
+  top: 0;
 }
 .cp-shift-cell {
   flex: 1;
@@ -504,9 +580,24 @@ function refreshFromQuality() {
 .cp-shift-cell-today {
   background: rgba(20, 148, 232, 0.04);
 }
-.cp-shift-早 { background: rgba(255, 165, 0, 0.06); color: #d97706; }
-.cp-shift-中 { background: rgba(20, 148, 232, 0.06); color: #1494e8; }
-.cp-shift-晚 { background: rgba(151, 71, 187, 0.06); color: #9747bb; }
-.cp-shift-休 { background: rgba(180, 180, 180, 0.06); color: #999; }
-.cp-shift-假 { background: rgba(245, 34, 45, 0.06); color: #f5222d; }
+.cp-shift-早 {
+  background: rgba(255, 165, 0, 0.06);
+  color: #d97706;
+}
+.cp-shift-中 {
+  background: rgba(20, 148, 232, 0.06);
+  color: #1494e8;
+}
+.cp-shift-晚 {
+  background: rgba(151, 71, 187, 0.06);
+  color: #9747bb;
+}
+.cp-shift-休 {
+  background: rgba(180, 180, 180, 0.06);
+  color: #999;
+}
+.cp-shift-假 {
+  background: rgba(245, 34, 45, 0.06);
+  color: #f5222d;
+}
 </style>

@@ -7,17 +7,17 @@ import { defineStore } from 'pinia'
 // ============ 类型 ============
 
 export type AppType =
-  | 'stop_collection'    // 停催停扣
-  | 'negotiate'          // 协商还款
-  | 'credit_objection'   // 征信异议
-  | 'transfer_mediate'   // 转调解
+  | 'stop_collection' // 停催停扣
+  | 'negotiate' // 协商还款
+  | 'credit_objection' // 征信异议
+  | 'transfer_mediate' // 转调解
   | 'extended_repayment' // 延期还款
 
 export type AppStatus = 'pending' | 'approved' | 'rejected' | 'in_progress' | 'executed' | 'closed'
 export type AppPriority = 'low' | 'normal' | 'high'
 
 export interface BusinessApplication {
-  id: string                                 // BA-20260715-0001
+  id: string // BA-20260715-0001
   type: AppType
   /** 标题(自动生成可覆盖) */
   title: string
@@ -66,14 +66,18 @@ function loadPersisted(): BusinessApplication[] {
       const arr = JSON.parse(raw)
       if (Array.isArray(arr)) return arr
     }
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
   return buildSeed()
 }
 
 function savePersisted(items: BusinessApplication[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
 }
 
 function buildSeed(): BusinessApplication[] {
@@ -145,23 +149,27 @@ export const useBusinessAppStore = defineStore('businessApp', {
     items: loadPersisted() as BusinessApplication[]
   }),
   getters: {
-    pendingCount: (s) => s.items.filter(a => a.status === 'pending').length,
-    inProgressCount: (s) => s.items.filter(a => a.status === 'approved' || a.status === 'in_progress').length,
-    doneCount: (s) => s.items.filter(a => a.status === 'executed' || a.status === 'closed').length,
+    pendingCount: (s) => s.items.filter((a) => a.status === 'pending').length,
+    inProgressCount: (s) => s.items.filter((a) => a.status === 'approved' || a.status === 'in_progress').length,
+    doneCount: (s) => s.items.filter((a) => a.status === 'executed' || a.status === 'closed').length,
     /** 给指定坐席的申请列表 */
-    listForApplicant: (s) => (id: string) => s.items.filter(a => a.applicantId === id)
-      .sort((a, b) => (b.createdAt < a.createdAt ? -1 : 1)),
+    listForApplicant: (s) => (id: string) =>
+      s.items.filter((a) => a.applicantId === id).sort((a, b) => (b.createdAt < a.createdAt ? -1 : 1)),
     /** 全部待审批(业务执行岗用) */
-    pendingAll: (s) => s.items.filter(a => a.status === 'pending'),
+    pendingAll: (s) => s.items.filter((a) => a.status === 'pending'),
     /** 按类型统计 */
     typeStats: (s) => {
       const map: Record<string, number> = {}
-      s.items.forEach(a => { map[a.type] = (map[a.type] || 0) + 1 })
+      s.items.forEach((a) => {
+        map[a.type] = (map[a.type] || 0) + 1
+      })
       return map
     }
   },
   actions: {
-    persist() { savePersisted(this.items) },
+    persist() {
+      savePersisted(this.items)
+    },
 
     /** 坐席发起申请 */
     create(input: Omit<BusinessApplication, 'id' | 'status' | 'createdAt' | 'updatedAt'>): BusinessApplication {
@@ -175,7 +183,7 @@ export const useBusinessAppStore = defineStore('businessApp', {
 
     /** 业务执行岗审批 */
     approve(id: string, reviewer: string, note: string, workflowInstanceId?: string): boolean {
-      const a = this.items.find(x => x.id === id)
+      const a = this.items.find((x) => x.id === id)
       if (!a) return false
       if (a.status !== 'pending') return false
       a.status = 'approved'
@@ -190,7 +198,7 @@ export const useBusinessAppStore = defineStore('businessApp', {
 
     /** 驳回 */
     reject(id: string, reviewer: string, note: string): boolean {
-      const a = this.items.find(x => x.id === id)
+      const a = this.items.find((x) => x.id === id)
       if (!a) return false
       if (a.status !== 'pending') return false
       a.status = 'rejected'
@@ -204,7 +212,7 @@ export const useBusinessAppStore = defineStore('businessApp', {
 
     /** 业务执行:申请已开始执行 */
     markInProgress(id: string, workflowInstanceId: string): boolean {
-      const a = this.items.find(x => x.id === id)
+      const a = this.items.find((x) => x.id === id)
       if (!a) return false
       a.status = 'in_progress'
       a.workflowInstanceId = workflowInstanceId
@@ -215,7 +223,7 @@ export const useBusinessAppStore = defineStore('businessApp', {
 
     /** 完成(终态) */
     complete(id: string, contractId?: string): boolean {
-      const a = this.items.find(x => x.id === id)
+      const a = this.items.find((x) => x.id === id)
       if (!a) return false
       a.status = 'executed'
       a.executedAt = nowStr()
@@ -226,7 +234,7 @@ export const useBusinessAppStore = defineStore('businessApp', {
     },
 
     close(id: string) {
-      const a = this.items.find(x => x.id === id)
+      const a = this.items.find((x) => x.id === id)
       if (!a) return
       a.status = 'closed'
       a.updatedAt = nowStr()

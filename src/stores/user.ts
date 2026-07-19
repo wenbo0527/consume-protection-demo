@@ -52,11 +52,46 @@ export interface RoleInfo {
 }
 
 export const ROLE_LIST: RoleInfo[] = [
-  { key: 'agent', name: '一线客服坐席', username: '张敏', workbench: '坐席工作台', icon: 'icon-headset', desc: '快速接听、准确建单、高效处置' },
-  { key: 'business', name: '业务支撑岗', username: '李伟', workbench: '业务执行台', icon: 'icon-tool', desc: '规范执行业务操作、审批流程清晰' },
-  { key: 'review', name: '消保审查人员', username: '王芳', workbench: '审查工作台', icon: 'icon-check-circle', desc: '产品上线前消保风险审查' },
-  { key: 'manage', name: '消保管理层', username: '陈强', workbench: '管理工作台', icon: 'icon-dashboard', desc: '看清全局、预警处置、溯源整改' },
-  { key: 'consumer', name: '客户', username: '赵先生', workbench: '消费者之家', icon: 'icon-user', desc: '自助办理、投诉进度查询' }
+  {
+    key: 'agent',
+    name: '一线客服坐席',
+    username: '张敏',
+    workbench: '坐席工作台',
+    icon: 'icon-headset',
+    desc: '快速接听、准确建单、高效处置'
+  },
+  {
+    key: 'business',
+    name: '业务支撑岗',
+    username: '李伟',
+    workbench: '业务执行台',
+    icon: 'icon-tool',
+    desc: '规范执行业务操作、审批流程清晰'
+  },
+  {
+    key: 'review',
+    name: '消保审查人员',
+    username: '王芳',
+    workbench: '审查工作台',
+    icon: 'icon-check-circle',
+    desc: '产品上线前消保风险审查'
+  },
+  {
+    key: 'manage',
+    name: '消保管理层',
+    username: '陈强',
+    workbench: '管理工作台',
+    icon: 'icon-dashboard',
+    desc: '看清全局、预警处置、溯源整改'
+  },
+  {
+    key: 'consumer',
+    name: '客户',
+    username: '赵先生',
+    workbench: '消费者之家',
+    icon: 'icon-user',
+    desc: '自助办理、投诉进度查询'
+  }
 ]
 
 export const useUserStore = defineStore('user', {
@@ -80,5 +115,5 @@ export const useUserStore = defineStore('user', {
 })
 
 export function getRoleInfo(key: RoleKey): RoleInfo | undefined {
-  return ROLE_LIST.find(r => r.key === key)
+  return ROLE_LIST.find((r) => r.key === key)
 }

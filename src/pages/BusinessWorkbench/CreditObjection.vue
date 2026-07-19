@@ -24,7 +24,9 @@
               <a-space>
                 <a-button size="small">详情</a-button>
                 <a-button v-if="record.status === '审批驳回'" size="small" type="primary">修改重提</a-button>
-                <a-button v-if="record.status === '客户不满意'" size="small" type="primary" status="warning">创建升级工单</a-button>
+                <a-button v-if="record.status === '客户不满意'" size="small" type="primary" status="warning"
+                  >创建升级工单</a-button
+                >
               </a-space>
             </template>
           </a-table-column>
@@ -53,19 +55,20 @@ const CUSTOM_STATUS: Record<string, { label: string; color: string }> = {
   finished: { label: '已完成', color: 'gray' }
 }
 
-const list = computed(() => wf.instances
-  .filter(i => i.kind === 'credit_objection')
-  .map(i => {
-    const row = enrichCreditObjectionRow(i)
-    const custom = CUSTOM_STATUS[i.status]
-    return {
-      ...row,
-      type: row.dispute,
-      createdAt: row.createdAt.slice(0, 10),
-      status: custom?.label || row.status,
-      statusColor: custom?.color || row.statusColor
-    }
-  })
+const list = computed(() =>
+  wf.instances
+    .filter((i) => i.kind === 'credit_objection')
+    .map((i) => {
+      const row = enrichCreditObjectionRow(i)
+      const custom = CUSTOM_STATUS[i.status]
+      return {
+        ...row,
+        type: row.dispute,
+        createdAt: row.createdAt.slice(0, 10),
+        status: custom?.label || row.status,
+        statusColor: custom?.color || row.statusColor
+      }
+    })
 )
 
 function color(s: string) {

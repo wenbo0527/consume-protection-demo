@@ -7,9 +7,7 @@
       </div>
       <a-space>
         <a-tag color="arcoblue">活动会话 {{ activeChats.length }}</a-tag>
-        <a-button type="primary">
-          <icon-plus /> 模拟新会话
-        </a-button>
+        <a-button type="primary"> <icon-plus /> 模拟新会话 </a-button>
       </a-space>
     </div>
 
@@ -31,7 +29,15 @@
             <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px">
               {{ c.lastMessage || '(暂无消息)' }}
             </div>
-            <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--cp-text-tertiary)">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                margin-top: 6px;
+                font-size: 11px;
+                color: var(--cp-text-tertiary);
+              "
+            >
               <span>{{ c.channel }}</span>
               <span v-if="c.unread" style="color: var(--cp-warning)">{{ c.unread }} 条未读</span>
               <span>{{ relativeTime(c.lastTime) }}</span>
@@ -53,7 +59,16 @@
 
           <div class="cp-chat-window">
             <div v-for="m in selectedChat.messages" :key="m.id" :class="['cp-msg', `cp-msg-${m.from}`]">
-              <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--cp-text-tertiary); margin-bottom: 2px">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-size: 11px;
+                  color: var(--cp-text-tertiary);
+                  margin-bottom: 2px;
+                "
+              >
                 <span>{{ m.from === 'agent' ? '坐席' : m.from === 'system' ? '系统' : '客户' }}</span>
                 <span>{{ m.time }}</span>
               </div>
@@ -64,20 +79,16 @@
           <a-divider />
 
           <div style="display: flex; gap: 8px">
-            <a-input v-model="draft" placeholder="输入回复(模拟)"
-              @keydown.enter="onSend" />
+            <a-input v-model="draft" placeholder="输入回复(模拟)" @keydown.enter="onSend" />
             <a-button type="primary" @click="onSend">发送</a-button>
           </div>
 
           <!-- 快捷回复 -->
           <div style="margin-top: 8px">
             <span style="font-size: 12px; color: var(--cp-text-tertiary)">快捷: </span>
-            <a-tag
-              v-for="q in QUICK_REPLIES"
-              :key="q"
-              style="cursor: pointer; margin-right: 4px"
-              @click="draft = q"
-            >{{ q }}</a-tag>
+            <a-tag v-for="q in QUICK_REPLIES" :key="q" style="cursor: pointer; margin-right: 4px" @click="draft = q">{{
+              q
+            }}</a-tag>
           </div>
         </a-card>
         <a-empty v-else description="请选择一个会话" />
@@ -133,9 +144,7 @@ const chats = reactive<ChatSession[]>([
     customerName: '孙丽华',
     channel: '微信',
     status: 'active',
-    messages: [
-      { id: 'm1', from: 'customer', content: '请问征信修复进度?', time: '2026-07-15 15:00' }
-    ],
+    messages: [{ id: 'm1', from: 'customer', content: '请问征信修复进度?', time: '2026-07-15 15:00' }],
     unread: 0,
     lastMessage: '请问征信修复进度?',
     lastTime: '2026-07-15 15:00'
@@ -145,8 +154,8 @@ const chats = reactive<ChatSession[]>([
 const selectedId = ref<string>('CHAT-20260715-0001')
 const draft = ref('')
 
-const selectedChat = computed(() => chats.find(c => c.id === selectedId.value) || null)
-const activeChats = computed(() => chats.filter(c => c.status !== 'closed'))
+const selectedChat = computed(() => chats.find((c) => c.id === selectedId.value) || null)
+const activeChats = computed(() => chats.filter((c) => c.status !== 'closed'))
 
 function onSend() {
   if (!draft.value.trim() || !selectedChat.value) return
@@ -182,10 +191,10 @@ function onCloseChat() {
 }
 
 function statusColor(s: string) {
-  return ({ new: 'red', active: 'arcoblue', closed: 'gray' })[s] || 'gray'
+  return { new: 'red', active: 'arcoblue', closed: 'gray' }[s] || 'gray'
 }
 function statusLabel(s: string) {
-  return ({ new: '新', active: '进行中', closed: '已关闭' })[s] || s
+  return { new: '新', active: '进行中', closed: '已关闭' }[s] || s
 }
 function relativeTime(at: string) {
   const diff = Date.now() - new Date(at).getTime()

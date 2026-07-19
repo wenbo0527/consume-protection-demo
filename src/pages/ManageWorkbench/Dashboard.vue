@@ -17,7 +17,15 @@
 
     <!-- KPI 卡片 -->
     <div class="cp-stat-row">
-      <kpi-card label="当日投诉量" :value="162" extra="阈值 120 · 超 35%" trend="up" alert tag="超阈值" tag-color="red" />
+      <kpi-card
+        label="当日投诉量"
+        :value="162"
+        extra="阈值 120 · 超 35%"
+        trend="up"
+        alert
+        tag="超阈值"
+        tag-color="red"
+      />
       <kpi-card label="处理时效" :value="4.2" extra="目标 ≤15 工作日" trend="flat" tag="达标" tag-color="green" />
       <kpi-card label="监管件超时率" :value="3.8" extra="目标 ≤5%" trend="down" tag="达标" tag-color="green" />
       <kpi-card label="一次性解决率" :value="76" extra="目标 ≥70%" trend="up" tag="达标" tag-color="green" />
@@ -42,11 +50,40 @@
           <div class="cp-chart">
             <svg viewBox="0 0 700 240" width="100%" preserveAspectRatio="none">
               <!-- 网格 -->
-              <line v-for="i in 5" :key="'g'+i" x1="40" :y1="40 + i * 30" x2="680" :y2="40 + i * 30" stroke="#eef0f4" stroke-width="1" />
+              <line
+                v-for="i in 5"
+                :key="'g' + i"
+                x1="40"
+                :y1="40 + i * 30"
+                x2="680"
+                :y2="40 + i * 30"
+                stroke="#eef0f4"
+                stroke-width="1"
+              />
               <!-- Y 轴 -->
-              <text v-for="(label, i) in yLabels" :key="'y'+i" x="30" :y="44 + i * 30" text-anchor="end" font-size="11" fill="#86909c">{{ label }}</text>
+              <text
+                v-for="(label, i) in yLabels"
+                :key="'y' + i"
+                x="30"
+                :y="44 + i * 30"
+                text-anchor="end"
+                font-size="11"
+                fill="#86909c"
+              >
+                {{ label }}
+              </text>
               <!-- X 轴 -->
-              <text v-for="(label, i) in xLabels" :key="'x'+i" :x="40 + i * (640 / (xLabels.length - 1))" y="225" text-anchor="middle" font-size="11" fill="#86909c">{{ label }}</text>
+              <text
+                v-for="(label, i) in xLabels"
+                :key="'x' + i"
+                :x="40 + i * (640 / (xLabels.length - 1))"
+                y="225"
+                text-anchor="middle"
+                font-size="11"
+                fill="#86909c"
+              >
+                {{ label }}
+              </text>
               <!-- 折线 -->
               <polyline :points="linePoints" fill="none" stroke="#165dff" stroke-width="2.5" />
               <polyline :points="areaPoints" fill="url(#areaGrad)" opacity="0.3" />
@@ -57,15 +94,32 @@
                 </linearGradient>
               </defs>
               <!-- 数据点 -->
-              <circle v-for="(p, i) in dataPoints" :key="'d'+i" :cx="p.x" :cy="p.y" r="4" fill="#165dff" />
+              <circle v-for="(p, i) in dataPoints" :key="'d' + i" :cx="p.x" :cy="p.y" r="4" fill="#165dff" />
               <!-- 阈值线 -->
               <line x1="40" y1="100" x2="680" y2="100" stroke="#f53f3f" stroke-dasharray="4,4" stroke-width="1" />
               <text x="680" y="96" text-anchor="end" font-size="11" fill="#f53f3f">阈值 120</text>
             </svg>
           </div>
           <div style="display: flex; gap: 24px; margin-top: 12px; font-size: 12px; color: var(--cp-text-secondary)">
-            <span><span style="display: inline-block; width: 10px; height: 2px; background: #165dff; vertical-align: middle"></span> 投诉量</span>
-            <span><span style="display: inline-block; width: 10px; height: 2px; background: #f53f3f; border-top: 1px dashed; vertical-align: middle"></span> 阈值线</span>
+            <span
+              ><span
+                style="display: inline-block; width: 10px; height: 2px; background: #165dff; vertical-align: middle"
+              ></span>
+              投诉量</span
+            >
+            <span
+              ><span
+                style="
+                  display: inline-block;
+                  width: 10px;
+                  height: 2px;
+                  background: #f53f3f;
+                  border-top: 1px dashed;
+                  vertical-align: middle;
+                "
+              ></span>
+              阈值线</span
+            >
             <span style="margin-left: auto; color: var(--cp-text-tertiary)">数据更新: 2026-07-15 14:00</span>
           </div>
         </div>
@@ -132,7 +186,9 @@
                 <a-link size="small">{{ fb.id }}</a-link>
                 <a-rate :model-value="fb.score" readonly size="small" />
               </div>
-              <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px">{{ fb.handler }} · {{ fb.time }} · {{ fb.reason }}</div>
+              <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px">
+                {{ fb.handler }} · {{ fb.time }} · {{ fb.reason }}
+              </div>
             </div>
           </div>
           <div style="text-align: center; margin-top: 12px">
@@ -154,14 +210,16 @@ const period = ref('day')
 const xLabels = ['07-09', '07-10', '07-11', '07-12', '07-13', '07-14', '07-15']
 const yLabels = ['200', '150', '100', '50', '0']
 const data = [80, 95, 88, 110, 92, 128, 162]
-const dataPoints = computed(() => data.map((v, i) => ({
-  x: 40 + i * (640 / (xLabels.length - 1)),
-  y: 190 - (v / 200) * 150
-})))
-const linePoints = computed(() => dataPoints.value.map(p => `${p.x},${p.y}`).join(' '))
+const dataPoints = computed(() =>
+  data.map((v, i) => ({
+    x: 40 + i * (640 / (xLabels.length - 1)),
+    y: 190 - (v / 200) * 150
+  }))
+)
+const linePoints = computed(() => dataPoints.value.map((p) => `${p.x},${p.y}`).join(' '))
 const areaPoints = computed(() => {
   const pts = dataPoints.value
-  return `40,190 ${pts.map(p => `${p.x},${p.y}`).join(' ')} 680,190`
+  return `40,190 ${pts.map((p) => `${p.x},${p.y}`).join(' ')} 680,190`
 })
 
 const channels = [
@@ -179,13 +237,44 @@ const feedback = [
 </script>
 
 <style scoped>
-.cp-section-title { font-size: 14px; font-weight: 600; color: var(--cp-text); }
-.cp-chart { background: var(--cp-bg-soft); border-radius: 6px; padding: 8px 4px; }
-.cp-channel-item { margin-bottom: 14px; }
-.cp-channel-item:last-child { margin-bottom: 0; }
-.cp-reg-stat { flex: 1; text-align: center; padding: 12px; background: var(--cp-bg-soft); border-radius: 6px; }
-.cp-reg-num { font-size: 22px; font-weight: 600; color: var(--cp-brand); }
-.cp-reg-label { font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px; }
-.cp-fb-item { padding: 10px 0; border-bottom: 1px dashed var(--cp-border); }
-.cp-fb-item:last-child { border-bottom: none; }
+.cp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cp-text);
+}
+.cp-chart {
+  background: var(--cp-bg-soft);
+  border-radius: 6px;
+  padding: 8px 4px;
+}
+.cp-channel-item {
+  margin-bottom: 14px;
+}
+.cp-channel-item:last-child {
+  margin-bottom: 0;
+}
+.cp-reg-stat {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  background: var(--cp-bg-soft);
+  border-radius: 6px;
+}
+.cp-reg-num {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--cp-brand);
+}
+.cp-reg-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-top: 4px;
+}
+.cp-fb-item {
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--cp-border);
+}
+.cp-fb-item:last-child {
+  border-bottom: none;
+}
 </style>

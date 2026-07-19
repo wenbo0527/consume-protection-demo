@@ -10,7 +10,8 @@ const STORAGE_KEY = 'cp_alerts_data'
 function log(level: 'log' | 'warn', tag: string, msg: string, extra?: unknown) {
   // eslint-disable-next-line no-console
   if (extra !== undefined) console[level](`[cp-alert][${tag}] ${msg}`, extra)
-  else // eslint-disable-next-line no-console
+  else
+    // eslint-disable-next-line no-console
     console[level](`[cp-alert][${tag}] ${msg}`)
 }
 
@@ -47,9 +48,9 @@ export const useAlertStore = defineStore('alert', {
     items: loadPersisted() as AlertItem[]
   }),
   getters: {
-    openCount: (s) => s.items.filter(a => a.status === 'alert_open').length,
-    handleCount: (s) => s.items.filter(a => a.status === 'alert_handle').length,
-    verifiedCount: (s) => s.items.filter(a => a.status === 'alert_verified').length
+    openCount: (s) => s.items.filter((a) => a.status === 'alert_open').length,
+    handleCount: (s) => s.items.filter((a) => a.status === 'alert_handle').length,
+    verifiedCount: (s) => s.items.filter((a) => a.status === 'alert_verified').length
   },
   actions: {
     persist() {
@@ -58,7 +59,7 @@ export const useAlertStore = defineStore('alert', {
 
     /** 通用:更新某条预警的状态 */
     updateStatus(id: string, status: AlertItem['status'], extra?: Partial<AlertItem>) {
-      const a = this.items.find(x => x.id === id)
+      const a = this.items.find((x) => x.id === id)
       if (!a) {
         log('warn', 'update', `alert ${id} not found`)
         return

@@ -26,7 +26,9 @@
           <a-table-column title="借据" data-index="loanId" />
           <a-table-column title="分期" data-index="period" />
           <a-table-column title="应还总额" data-index="total">
-            <template #cell="{ record }"><span class="mono">¥{{ record.total }}</span></template>
+            <template #cell="{ record }"
+              ><span class="mono">¥{{ record.total }}</span></template
+            >
           </a-table-column>
           <a-table-column title="状态">
             <template #cell="{ record }">
@@ -55,18 +57,19 @@ import { useWorkflowStore } from '@/stores/workflow'
 import { enrichNegotiateRow, getPayload } from '@/utils/workflow-helpers'
 const wf = useWorkflowStore()
 
-const list = computed(() => wf.instances
-  .filter(i => i.kind === 'negotiate')
-  .map(i => {
-    const row = enrichNegotiateRow(i)
-    const payload = getPayload(i)
-    return {
-      ...row,
-      loanId: payload?.loanId || '-',
-      total: '-',
-      violation: '无'
-    }
-  })
+const list = computed(() =>
+  wf.instances
+    .filter((i) => i.kind === 'negotiate')
+    .map((i) => {
+      const row = enrichNegotiateRow(i)
+      const payload = getPayload(i)
+      return {
+        ...row,
+        loanId: payload?.loanId || '-',
+        total: '-',
+        violation: '无'
+      }
+    })
 )
 
 function color(s: string) {

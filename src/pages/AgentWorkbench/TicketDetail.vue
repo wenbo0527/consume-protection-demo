@@ -13,19 +13,11 @@
       </div>
       <div class="cp-tk-actions">
         <a-dropdown trigger="click">
-          <a-button>
-            流转 <icon-down />
-          </a-button>
+          <a-button> 流转 <icon-down /> </a-button>
           <template #content>
-            <a-doption @click="showTransfer = true">
-              <icon-swap /> 转办给他人
-            </a-doption>
-            <a-doption @click="showAssist = true">
-              <icon-user-group /> 协办
-            </a-doption>
-            <a-doption @click="showUpgrade = true">
-              <icon-up /> 升级上级
-            </a-doption>
+            <a-doption @click="showTransfer = true"> <icon-swap /> 转办给他人 </a-doption>
+            <a-doption @click="showAssist = true"> <icon-user-group /> 协办 </a-doption>
+            <a-doption @click="showUpgrade = true"> <icon-up /> 升级上级 </a-doption>
           </template>
         </a-dropdown>
         <a-button type="primary" status="success" :disabled="ticket.status === 'closed'" @click="close">
@@ -80,9 +72,7 @@
               <div class="cp-kw-title">{{ k.title }}</div>
               <div class="cp-kw-content">{{ k.content.slice(0, 60) }}...</div>
             </div>
-            <a-button size="small" type="primary" @click="cite(k)">
-              <icon-link /> 引用
-            </a-button>
+            <a-button size="small" type="primary" @click="cite(k)"> <icon-link /> 引用 </a-button>
           </div>
         </div>
         <a-empty v-else size="small" description="暂无相关知识" />
@@ -104,7 +94,14 @@
         />
         <div v-if="cited.length" class="cp-cite-list">
           <icon-link style="color: var(--cp-brand)" />
-          <a-tag v-for="c in cited" :key="c.id" size="small" closable @close="cited = cited.filter(x => x.id !== c.id)" style="margin: 2px">
+          <a-tag
+            v-for="c in cited"
+            :key="c.id"
+            size="small"
+            closable
+            @close="cited = cited.filter((x) => x.id !== c.id)"
+            style="margin: 2px"
+          >
             {{ c.title }}
           </a-tag>
         </div>
@@ -216,8 +213,8 @@ const emit = defineEmits<{ (e: 'close'): void }>()
 const route = useRoute()
 const router = useRouter()
 
-const ticket = computed(() => tickets.find(t => t.id === (props.ticketId || route.params.id)))
-const customer = computed(() => customers.find(c => c.id === ticket.value?.customerId))
+const ticket = computed(() => tickets.find((t) => t.id === (props.ticketId || route.params.id)))
+const customer = computed(() => customers.find((c) => c.id === ticket.value?.customerId))
 
 const opinion = ref('')
 const cited = ref<any[]>([])
@@ -238,10 +235,11 @@ const upgradeForm = reactive({ target: '组长', reason: '' })
 // 场景化知识匹配
 const relatedKnowledge = computed(() => {
   if (!ticket.value) return []
-  return knowledge.filter(k =>
-    k.relatedCategories?.includes(ticket.value!.category) ||
-    k.relatedReasons?.includes(ticket.value!.reason)
-  ).slice(0, 3)
+  return knowledge
+    .filter(
+      (k) => k.relatedCategories?.includes(ticket.value!.category) || k.relatedReasons?.includes(ticket.value!.reason)
+    )
+    .slice(0, 3)
 })
 
 function typeColor(t: string) {
@@ -249,7 +247,7 @@ function typeColor(t: string) {
 }
 
 function cite(k: any) {
-  if (cited.value.find(c => c.id === k.id)) {
+  if (cited.value.find((c) => c.id === k.id)) {
     Message.warning('该知识已引用')
     return
   }
@@ -261,7 +259,7 @@ function cite(k: any) {
 const extendedTimeline = computed(() => {
   if (!ticket.value) return []
   const items = [...ticket.value.timeline]
-  cited.value.forEach(c => {
+  cited.value.forEach((c) => {
     items.push({ time: '刚刚', action: `引用知识:${c.title}`, operator: '坐席', ref: c.source } as any)
   })
   return items
@@ -274,9 +272,9 @@ function goCustomer() {
 function save() {
   if (opinion.value.trim()) {
     const now = new Date()
-    const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+    const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
     ticket.value!.timeline.push({ time: ts, action: '保存处理意见', operator: '张敏' })
-    cited.value.forEach(c => {
+    cited.value.forEach((c) => {
       if (!ticket.value!.timeline.find((t: any) => t.action === `引用知识:${c.title}`)) {
         ticket.value!.timeline.push({ time: ts, action: `引用知识:${c.title}`, operator: '张敏' } as any)
       }
@@ -288,7 +286,7 @@ function save() {
 function close() {
   // 高优 3 + 高优 2:关单时持久化引用和处理意见到工单时间轴
   const now = new Date()
-  const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+  const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
   ticket.value!.timeline.push({ time: ts, action: `关单 · 处理结果:${closeResult.value}`, operator: '张敏' })
   if (cited.value.length) {
     cited.value.forEach((c, i) => {
@@ -296,7 +294,11 @@ function close() {
     })
   }
   if (closeResult.value === 'unresolved') {
-    ticket.value!.timeline.push({ time: ts, action: `≤2星自动创建回访工单 · 原因:${closeUnresolvedReason.value}`, operator: '系统' })
+    ticket.value!.timeline.push({
+      time: ts,
+      action: `≤2星自动创建回访工单 · 原因:${closeUnresolvedReason.value}`,
+      operator: '系统'
+    })
   }
 
   closeConfirmVisible.value = false
@@ -429,8 +431,14 @@ function doFlow(action: string) {
   border-radius: 4px;
   transition: all 0.15s;
 }
-.cp-kw-item:hover { box-shadow: var(--cp-shadow); }
-.cp-kw-title { font-size: 12px; font-weight: 500; color: var(--cp-text); }
+.cp-kw-item:hover {
+  box-shadow: var(--cp-shadow);
+}
+.cp-kw-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cp-text);
+}
 .cp-kw-content {
   font-size: 11px;
   color: var(--cp-text-tertiary);
@@ -443,7 +451,11 @@ function doFlow(action: string) {
   -webkit-box-orient: vertical;
 }
 
-.cp-opinion { display: flex; flex-direction: column; min-width: 0; }
+.cp-opinion {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
 .cp-cite-list {
   display: flex;
   align-items: center;
@@ -470,6 +482,8 @@ function doFlow(action: string) {
 
 /* 响应式 */
 @media (max-width: 880px) {
-  .cp-tk-work { grid-template-columns: 1fr; }
+  .cp-tk-work {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

@@ -66,7 +66,9 @@
                 </template>
               </a-table-column>
               <a-table-column title="场景" data-index="scene">
-                <template #cell="{ record }"><a-tag color="arcoblue" size="small">{{ record.scene }}</a-tag></template>
+                <template #cell="{ record }"
+                  ><a-tag color="arcoblue" size="small">{{ record.scene }}</a-tag></template
+                >
               </a-table-column>
               <a-table-column title="来源" data-index="source" />
               <a-table-column title="更新时间" data-index="updatedAt" />
@@ -81,7 +83,9 @@
               <a-table-column title="操作">
                 <template #cell="{ record }">
                   <a-space :size="4">
-                    <a-button v-if="record.status === 'pending'" size="small" type="primary" @click="approve(record)">审核生效</a-button>
+                    <a-button v-if="record.status === 'pending'" size="small" type="primary" @click="approve(record)"
+                      >审核生效</a-button
+                    >
                     <a-button v-if="record.status === 'active'" size="small" status="warning">下架</a-button>
                     <a-button size="small">编辑</a-button>
                   </a-space>
@@ -132,12 +136,12 @@ import { Message } from '@arco-design/web-vue'
 
 const wf = useWorkflowStore()
 
-const activeCount = computed(() => knowledge.filter(k => k.status === 'active').length)
-const pendingCount = computed(() => knowledge.filter(k => k.status === 'pending').length)
-const scenes = computed(() => Array.from(new Set(knowledge.map(k => k.scene).filter(Boolean))) as string[])
+const activeCount = computed(() => knowledge.filter((k) => k.status === 'active').length)
+const pendingCount = computed(() => knowledge.filter((k) => k.status === 'pending').length)
+const scenes = computed(() => Array.from(new Set(knowledge.map((k) => k.scene).filter(Boolean))) as string[])
 
 function groupByScene(scene: string) {
-  return knowledge.filter(k => k.scene === scene)
+  return knowledge.filter((k) => k.scene === scene)
 }
 
 function approve(record: KnowledgeItem) {
@@ -145,7 +149,9 @@ function approve(record: KnowledgeItem) {
   // 找到关联 review 工作流实例(如果有 reviewId),推进 kb_review 节点
   const reviewId = record.source?.includes('消保审查') ? record.source.split('·')[1] : undefined
   if (reviewId) {
-    const inst = wf.instances.find(i => i.kind === 'review_archive' && i.reviewId === reviewId && i.status === 'running')
+    const inst = wf.instances.find(
+      (i) => i.kind === 'review_archive' && i.reviewId === reviewId && i.status === 'running'
+    )
     if (inst) {
       wf.approve(inst.id, '知识管理员', `审核通过知识条目:${record.title}`)
       // 副作用 notify_seat 在 store._advance 中自动触发
@@ -155,25 +161,66 @@ function approve(record: KnowledgeItem) {
 }
 
 const syncLogs = [
-  { time: '2026-07-14 16:32', source: '2026-0078', type: '审查归档→知识库', target: '速贷宝 Pro 产品介绍', result: 'success' },
-  { time: '2026-07-14 16:32', source: '2026-0078', type: '审查归档→投诉信息库', target: '投诉管控目标:新户≤0.5%', result: 'success' },
-  { time: '2026-07-10 14:20', source: '2026-0075', type: '审查归档→知识库', target: '催收频次合规标准', result: 'approved' },
-  { time: '2026-07-08 11:15', source: '2026-0072', type: '审查归档→知识库', target: '征信异议处理话术模板', result: 'approved' }
+  {
+    time: '2026-07-14 16:32',
+    source: '2026-0078',
+    type: '审查归档→知识库',
+    target: '速贷宝 Pro 产品介绍',
+    result: 'success'
+  },
+  {
+    time: '2026-07-14 16:32',
+    source: '2026-0078',
+    type: '审查归档→投诉信息库',
+    target: '投诉管控目标:新户≤0.5%',
+    result: 'success'
+  },
+  {
+    time: '2026-07-10 14:20',
+    source: '2026-0075',
+    type: '审查归档→知识库',
+    target: '催收频次合规标准',
+    result: 'approved'
+  },
+  {
+    time: '2026-07-08 11:15',
+    source: '2026-0072',
+    type: '审查归档→知识库',
+    target: '征信异议处理话术模板',
+    result: 'approved'
+  }
 ]
 </script>
 
 <style scoped>
-.cp-scene-card { padding: 16px 20px; margin-bottom: 16px; transition: all 0.2s; }
-.cp-scene-card:hover { box-shadow: var(--cp-shadow-md); transform: translateY(-2px); }
+.cp-scene-card {
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  transition: all 0.2s;
+}
+.cp-scene-card:hover {
+  box-shadow: var(--cp-shadow-md);
+  transform: translateY(-2px);
+}
 .cp-scene-head {
-  display: flex; align-items: center; gap: 8px;
-  padding-bottom: 12px; border-bottom: 1px solid var(--cp-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--cp-border);
   margin-bottom: 12px;
 }
-.cp-scene-title { font-size: 14px; font-weight: 600; }
-.cp-scene-item {
-  padding: 8px 10px; background: var(--cp-bg-soft);
-  border-radius: 4px; transition: background 0.2s;
+.cp-scene-title {
+  font-size: 14px;
+  font-weight: 600;
 }
-.cp-scene-item:hover { background: var(--cp-brand-soft); }
+.cp-scene-item {
+  padding: 8px 10px;
+  background: var(--cp-bg-soft);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.cp-scene-item:hover {
+  background: var(--cp-brand-soft);
+}
 </style>

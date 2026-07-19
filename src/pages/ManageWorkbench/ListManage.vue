@@ -25,7 +25,11 @@
               <a-table-column title="到期时间">
                 <template #cell="{ record }">
                   <span v-if="record.isPermanent" style="color: var(--cp-text-tertiary)">永久</span>
-                  <span v-else :class="{ 'cp-pulse': record.status === 'expiring' }" :style="{ color: record.status === 'expiring' ? 'var(--cp-warning)' : 'inherit' }">
+                  <span
+                    v-else
+                    :class="{ 'cp-pulse': record.status === 'expiring' }"
+                    :style="{ color: record.status === 'expiring' ? 'var(--cp-warning)' : 'inherit' }"
+                  >
                     {{ record.expireAt }}
                   </span>
                 </template>
@@ -91,6 +95,6 @@
 import { blackList } from '@/mock/data'
 
 function filterList(type: string) {
-  return blackList.filter(b => b.type === type)
+  return blackList.filter((b) => b.type === type)
 }
 </script>

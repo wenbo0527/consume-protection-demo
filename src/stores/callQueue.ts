@@ -8,7 +8,7 @@ export type CallStatus = 'waiting' | 'assigned' | 'connected' | 'finished' | 'dr
 export type AgentLoadStatus = 'online' | 'busy' | 'offline'
 
 export interface CallQueueEntry {
-  id: string                     // CALL-20260715-0001
+  id: string // CALL-20260715-0001
   customerId: string
   customerName: string
   channel: '电话' | '微信' | '邮件' | '12345'
@@ -22,10 +22,10 @@ export interface CallQueueEntry {
 }
 
 export interface CallAgent {
-  id: string                     // 与 useOpsStore 中的 agent.id 不同,callQueue 独立
+  id: string // 与 useOpsStore 中的 agent.id 不同,callQueue 独立
   name: string
   status: AgentLoadStatus
-  currentLoad: number            // 当前通话数(同时只能 1)
+  currentLoad: number // 当前通话数(同时只能 1)
   maxConcurrent: number
   avgHandleSeconds: number
   skillTags: string[]
@@ -45,14 +45,18 @@ function loadPersisted(): PersistedState {
       const arr = JSON.parse(raw)
       if (arr && Array.isArray(arr.entries)) return arr
     }
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
   return buildSeed()
 }
 
 function savePersisted(state: PersistedState) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
 }
 
 function buildSeed(): PersistedState {
@@ -80,9 +84,33 @@ function buildSeed(): PersistedState {
       }
     ],
     agents: [
-      { id: 'A001', name: '张敏', status: 'online', currentLoad: 1, maxConcurrent: 1, avgHandleSeconds: 480, skillTags: ['电话', '投诉'] },
-      { id: 'A002', name: '王浩', status: 'online', currentLoad: 0, maxConcurrent: 1, avgHandleSeconds: 360, skillTags: ['电话', '在线客服'] },
-      { id: 'A003', name: '赵雪', status: 'busy',   currentLoad: 1, maxConcurrent: 1, avgHandleSeconds: 420, skillTags: ['12345', '在线客服'] }
+      {
+        id: 'A001',
+        name: '张敏',
+        status: 'online',
+        currentLoad: 1,
+        maxConcurrent: 1,
+        avgHandleSeconds: 480,
+        skillTags: ['电话', '投诉']
+      },
+      {
+        id: 'A002',
+        name: '王浩',
+        status: 'online',
+        currentLoad: 0,
+        maxConcurrent: 1,
+        avgHandleSeconds: 360,
+        skillTags: ['电话', '在线客服']
+      },
+      {
+        id: 'A003',
+        name: '赵雪',
+        status: 'busy',
+        currentLoad: 1,
+        maxConcurrent: 1,
+        avgHandleSeconds: 420,
+        skillTags: ['12345', '在线客服']
+      }
     ]
   }
 }
@@ -102,8 +130,8 @@ export const useCallQueueStore = defineStore('callQueue', {
     }
   },
   getters: {
-    waiting: (s) => s.entries.filter(e => e.status === 'waiting'),
-    onlineAgents: (s) => s.agents.filter(a => a.status === 'online')
+    waiting: (s) => s.entries.filter((e) => e.status === 'waiting'),
+    onlineAgents: (s) => s.agents.filter((a) => a.status === 'online')
   },
   actions: {
     persist() {
@@ -128,7 +156,7 @@ export const useCallQueueStore = defineStore('callQueue', {
       // urgent 自动分配
       if (entry.priority === 'urgent') {
         const target = this.agents
-          .filter(a => a.status === 'online' && a.currentLoad < a.maxConcurrent)
+          .filter((a) => a.status === 'online' && a.currentLoad < a.maxConcurrent)
           .sort((a, b) => a.currentLoad - b.currentLoad)[0]
         if (target) this.assignToAgent(entry.id, target.id)
       }
@@ -139,8 +167,8 @@ export const useCallQueueStore = defineStore('callQueue', {
 
     /** 手动/自动分配给坐席 */
     assignToAgent(entryId: string, agentId: string): boolean {
-      const e = this.entries.find(x => x.id === entryId)
-      const a = this.agents.find(x => x.id === agentId)
+      const e = this.entries.find((x) => x.id === entryId)
+      const a = this.agents.find((x) => x.id === agentId)
       if (!e || !a) return false
       if (e.status !== 'waiting') return false
       e.status = 'assigned'
@@ -154,7 +182,7 @@ export const useCallQueueStore = defineStore('callQueue', {
 
     /** 接通 */
     markConnected(entryId: string): boolean {
-      const e = this.entries.find(x => x.id === entryId)
+      const e = this.entries.find((x) => x.id === entryId)
       if (!e || e.status !== 'assigned') return false
       e.status = 'connected'
       e.connectedAt = nowStr()
@@ -164,12 +192,12 @@ export const useCallQueueStore = defineStore('callQueue', {
 
     /** 挂断 */
     markFinished(entryId: string): boolean {
-      const e = this.entries.find(x => x.id === entryId)
+      const e = this.entries.find((x) => x.id === entryId)
       if (!e) return false
       e.status = 'finished'
       e.finishedAt = nowStr()
       // 释放坐席
-      const a = this.agents.find(x => x.name === e.assignedAgentId)
+      const a = this.agents.find((x) => x.name === e.assignedAgentId)
       if (a && a.currentLoad > 0) {
         a.currentLoad -= 1
         if (a.currentLoad === 0) a.status = 'online'
@@ -180,7 +208,7 @@ export const useCallQueueStore = defineStore('callQueue', {
 
     /** 移除 */
     remove(entryId: string): boolean {
-      const idx = this.entries.findIndex(e => e.id === entryId)
+      const idx = this.entries.findIndex((e) => e.id === entryId)
       if (idx === -1) return false
       this.entries.splice(idx, 1)
       this.persist()
@@ -198,7 +226,9 @@ export const useCallQueueStore = defineStore('callQueue', {
         { id: 'C006', name: '赵建国', priority: 'high' as CallPriority }
       ]
       const c = customers[Math.floor(Math.random() * customers.length)]
-      const ch: CallQueueEntry['channel'] = (['电话', '微信', '12345', '邮件'] as const)[Math.floor(Math.random() * 4)] as any
+      const ch: CallQueueEntry['channel'] = (['电话', '微信', '12345', '邮件'] as const)[
+        Math.floor(Math.random() * 4)
+      ] as any
       this.incomingCall({
         customerId: c.id,
         customerName: c.name,

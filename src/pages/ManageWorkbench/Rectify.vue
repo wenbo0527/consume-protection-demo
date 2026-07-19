@@ -6,9 +6,7 @@
         <div class="cp-page-subtitle">投诉数据 → 根因分析 → 下发整改 → 跟踪 → 验证 → 沉淀标准/知识</div>
       </div>
       <a-space>
-        <a-button @click="showTrace = true" type="primary">
-          <icon-plus /> 新建溯源报告
-        </a-button>
+        <a-button @click="showTrace = true" type="primary"> <icon-plus /> 新建溯源报告 </a-button>
       </a-space>
     </div>
 
@@ -46,9 +44,7 @@
                 报告编号 <span class="mono">{{ r.id }}</span> · {{ r.createdAt }} · 作者 {{ r.author }}
               </div>
             </div>
-            <a-button size="small" type="primary" @click="openCreateTask(r)">
-              <icon-send /> 下发整改任务
-            </a-button>
+            <a-button size="small" type="primary" @click="openCreateTask(r)"> <icon-send /> 下发整改任务 </a-button>
           </div>
           <p style="color: var(--cp-text-secondary); margin: 4px 0">{{ r.description }}</p>
           <a-row :gutter="16" style="margin-top: 8px">
@@ -98,7 +94,9 @@
                 <template #cell="{ record }">
                   <a-tooltip :content="record.requirement">
                     <span style="font-size: 12px; color: var(--cp-text-secondary)">
-                      {{ record.requirement.length > 30 ? record.requirement.slice(0, 30) + '...' : record.requirement }}
+                      {{
+                        record.requirement.length > 30 ? record.requirement.slice(0, 30) + '...' : record.requirement
+                      }}
                     </span>
                   </a-tooltip>
                 </template>
@@ -112,7 +110,12 @@
                 <template #cell="{ record }">
                   <a-space :size="4">
                     <a-button size="small" @click="openDetail(record)">详情</a-button>
-                    <a-button v-if="record.status === 'pending' || record.status === 'in_progress'" size="small" type="primary" @click="openProgress(record)">
+                    <a-button
+                      v-if="record.status === 'pending' || record.status === 'in_progress'"
+                      size="small"
+                      type="primary"
+                      @click="openProgress(record)"
+                    >
                       填写进度
                     </a-button>
                     <a-button v-if="record.status === 'done'" size="small" status="success" @click="openVerify(record)">
@@ -230,7 +233,16 @@
         </a-form-item>
 
         <!-- OPT-2:验证通过时,一键生成标准项 -->
-        <div v-if="verifyForm.result === 'pass'" style="margin-top: 16px; padding: 12px; background: rgba(20, 148, 232, 0.05); border: 1px solid rgba(20, 148, 232, 0.2); border-radius: 6px">
+        <div
+          v-if="verifyForm.result === 'pass'"
+          style="
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(20, 148, 232, 0.05);
+            border: 1px solid rgba(20, 148, 232, 0.2);
+            border-radius: 6px;
+          "
+        >
           <a-checkbox v-model="verifyForm.alsoGenerateStandard">
             <b>同步沉淀为审查标准(OPT-2 一键生成)</b>
           </a-checkbox>
@@ -286,29 +298,54 @@
         </a-timeline>
 
         <a-divider v-if="currentTask.verification" style="margin: 12px 0">验证结果</a-divider>
-        <a-alert v-if="currentTask.verification"
-          :type="currentTask.verification.result === 'pass' ? 'success' : 'error'" show-icon style="margin-bottom: 12px"
+        <a-alert
+          v-if="currentTask.verification"
+          :type="currentTask.verification.result === 'pass' ? 'success' : 'error'"
+          show-icon
+          style="margin-bottom: 12px"
         >
           <template #title>
             {{ currentTask.verification.result === 'pass' ? '✓ 验证通过' : '✗ 验证不通过' }}
-            <span v-if="currentTask.verification.metricDrop !== undefined" style="margin-left: 8px; font-weight: normal">
+            <span
+              v-if="currentTask.verification.metricDrop !== undefined"
+              style="margin-left: 8px; font-weight: normal"
+            >
               实际下降率 {{ currentTask.verification.metricDrop }}%
             </span>
           </template>
           <template #content>
-            <div style="margin-top: 4px">{{ currentTask.verification.operator }} · {{ currentTask.verification.time }}</div>
+            <div style="margin-top: 4px">
+              {{ currentTask.verification.operator }} · {{ currentTask.verification.time }}
+            </div>
             <div style="margin-top: 4px">{{ currentTask.verification.note }}</div>
           </template>
         </a-alert>
 
-        <a-alert v-if="currentTask.generatedStandardIds?.length || currentTask.generatedKbIds?.length" type="info" show-icon style="margin-bottom: 12px">
+        <a-alert
+          v-if="currentTask.generatedStandardIds?.length || currentTask.generatedKbIds?.length"
+          type="info"
+          show-icon
+          style="margin-bottom: 12px"
+        >
           <template #title>整改 → 标准/知识沉淀</template>
           <template #content>
             <div v-if="currentTask.generatedStandardIds?.length" style="margin-top: 4px">
-              已生成审查标准:<span v-for="id in currentTask.generatedStandardIds" :key="id" class="mono" style="margin-right: 6px">{{ id }}</span>
+              已生成审查标准:<span
+                v-for="id in currentTask.generatedStandardIds"
+                :key="id"
+                class="mono"
+                style="margin-right: 6px"
+                >{{ id }}</span
+              >
             </div>
             <div v-if="currentTask.generatedKbIds?.length" style="margin-top: 4px">
-              已生成知识条目:<span v-for="id in currentTask.generatedKbIds" :key="id" class="mono" style="margin-right: 6px">{{ id }}</span>
+              已生成知识条目:<span
+                v-for="id in currentTask.generatedKbIds"
+                :key="id"
+                class="mono"
+                style="margin-right: 6px"
+                >{{ id }}</span
+              >
             </div>
           </template>
         </a-alert>
@@ -327,22 +364,26 @@ const store = useRectifyStore()
 const reviewStore = useReviewStore()
 
 function statusColor(s: string) {
-  return {
-    pending: 'orange',
-    in_progress: 'arcoblue',
-    done: 'green',
-    verified: 'green',
-    rejected: 'red'
-  }[s] || 'gray'
+  return (
+    {
+      pending: 'orange',
+      in_progress: 'arcoblue',
+      done: 'green',
+      verified: 'green',
+      rejected: 'red'
+    }[s] || 'gray'
+  )
 }
 function statusLabel(s: string) {
-  return {
-    pending: '待开始',
-    in_progress: '进行中',
-    done: '已完成',
-    verified: '已验证',
-    rejected: '驳回'
-  }[s] || s
+  return (
+    {
+      pending: '待开始',
+      in_progress: '进行中',
+      done: '已完成',
+      verified: '已验证',
+      rejected: '驳回'
+    }[s] || s
+  )
 }
 
 // 新建报告
@@ -358,7 +399,10 @@ const traceForm = reactive({
 })
 
 function onCreateReport() {
-  if (!traceForm.scene) { Message.warning('请填写场景'); return }
+  if (!traceForm.scene) {
+    Message.warning('请填写场景')
+    return
+  }
   store.createReport({
     scene: traceForm.scene,
     rootCause: traceForm.rootCause,
@@ -376,7 +420,13 @@ function onCreateReport() {
   showTrace.value = false
   // 重置
   Object.assign(traceForm, {
-    scene: '', rootCause: '流程', description: '', complaintCount: 0, customerAffected: 0, dropRate: 30, conclusion: ''
+    scene: '',
+    rootCause: '流程',
+    description: '',
+    complaintCount: 0,
+    customerAffected: 0,
+    dropRate: 30,
+    conclusion: ''
   })
 }
 
@@ -384,7 +434,10 @@ function onCreateReport() {
 const showTask = ref(false)
 const activeReport = ref<TraceReport | null>(null)
 const taskForm = reactive({
-  dept: '', owner: '', requirement: '', deadline: ''
+  dept: '',
+  owner: '',
+  requirement: '',
+  deadline: ''
 })
 
 function openCreateTask(r: TraceReport) {
@@ -512,5 +565,10 @@ function openDetail(t: RectifyTask) {
 </script>
 
 <style scoped>
-.cp-section-title { font-size: 14px; font-weight: 600; margin: 0 0 12px; color: var(--cp-text); }
+.cp-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--cp-text);
+}
 </style>

@@ -118,17 +118,25 @@
             <a-tag :color="statusColor(currentApp.status)">{{ statusLabel(currentApp.status) }}</a-tag>
           </a-descriptions-item>
           <a-descriptions-item label="申请人">{{ currentApp.applicantName }}</a-descriptions-item>
-          <a-descriptions-item label="客户">{{ currentApp.customerName }} ({{ currentApp.customerId }})</a-descriptions-item>
+          <a-descriptions-item label="客户"
+            >{{ currentApp.customerName }} ({{ currentApp.customerId }})</a-descriptions-item
+          >
           <a-descriptions-item label="工单" :span="2">
             <span v-if="currentApp.ticketId">{{ currentApp.ticketId }}</span>
             <span v-else style="color: var(--cp-text-tertiary)">-</span>
           </a-descriptions-item>
           <a-descriptions-item label="标题" :span="2">{{ currentApp.title }}</a-descriptions-item>
           <a-descriptions-item label="申请说明" :span="2">{{ currentApp.reason }}</a-descriptions-item>
-          <a-descriptions-item v-if="currentApp.context" label="前情提要" :span="2">{{ currentApp.context }}</a-descriptions-item>
+          <a-descriptions-item v-if="currentApp.context" label="前情提要" :span="2">{{
+            currentApp.context
+          }}</a-descriptions-item>
           <a-descriptions-item v-if="currentApp.reviewer" label="审批人">{{ currentApp.reviewer }}</a-descriptions-item>
-          <a-descriptions-item v-if="currentApp.reviewedAt" label="审批时间">{{ currentApp.reviewedAt }}</a-descriptions-item>
-          <a-descriptions-item v-if="currentApp.reviewNote" label="审批意见" :span="2">{{ currentApp.reviewNote }}</a-descriptions-item>
+          <a-descriptions-item v-if="currentApp.reviewedAt" label="审批时间">{{
+            currentApp.reviewedAt
+          }}</a-descriptions-item>
+          <a-descriptions-item v-if="currentApp.reviewNote" label="审批意见" :span="2">{{
+            currentApp.reviewNote
+          }}</a-descriptions-item>
           <a-descriptions-item v-if="currentApp.workflowInstanceId" label="工作流实例" :span="2">
             <a-link @click="goWorkflow(currentApp.workflowInstanceId)">{{ currentApp.workflowInstanceId }}</a-link>
           </a-descriptions-item>
@@ -137,11 +145,23 @@
     </a-drawer>
 
     <!-- 审批弹窗 -->
-    <a-modal v-model:visible="approveVisible" :title="`审批 · ${approveAction === 'pass' ? '批准' : '驳回'}`" :width="480" :ok-text="'提交'" @ok="onSubmitApprove">
+    <a-modal
+      v-model:visible="approveVisible"
+      :title="`审批 · ${approveAction === 'pass' ? '批准' : '驳回'}`"
+      :width="480"
+      :ok-text="'提交'"
+      @ok="onSubmitApprove"
+    >
       <div v-if="approveTarget">
-        <p>申请:<b>{{ approveTarget.id }}</b></p>
-        <p>客户:<b>{{ approveTarget.customerName }}</b></p>
-        <p>申请说明:<b style="font-weight: normal">{{ approveTarget.reason }}</b></p>
+        <p>
+          申请:<b>{{ approveTarget.id }}</b>
+        </p>
+        <p>
+          客户:<b>{{ approveTarget.customerName }}</b>
+        </p>
+        <p>
+          申请说明:<b style="font-weight: normal">{{ approveTarget.reason }}</b>
+        </p>
         <p v-if="approveAction === 'pass'" style="font-size: 12px; color: var(--cp-text-tertiary)">
           批准后将自动启动对应工作流(停催/协商/异议等)。
         </p>
@@ -157,13 +177,7 @@
 import { computed, reactive, ref } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { useRouter } from 'vue-router'
-import {
-  useBusinessAppStore,
-  APP_TYPE_LABEL,
-  AppType,
-  AppStatus,
-  AppPriority
-} from '@/stores/businessApp'
+import { useBusinessAppStore, APP_TYPE_LABEL, AppType, AppStatus, AppPriority } from '@/stores/businessApp'
 import { useWorkflowStore, WorkflowKind } from '@/stores/workflow'
 import { useUserStore, getRoleInfo } from '@/stores/user'
 
@@ -176,41 +190,47 @@ const statusFilter = ref<'all' | 'pending' | 'inProgress' | 'executed' | 'reject
 
 const filteredList = computed(() => {
   if (statusFilter.value === 'all') return businessApp.items
-  if (statusFilter.value === 'pending') return businessApp.items.filter(a => a.status === 'pending')
-  if (statusFilter.value === 'inProgress') return businessApp.items.filter(a => a.status === 'approved' || a.status === 'in_progress')
-  if (statusFilter.value === 'executed') return businessApp.items.filter(a => a.status === 'executed' || a.status === 'closed')
-  if (statusFilter.value === 'rejected') return businessApp.items.filter(a => a.status === 'rejected')
+  if (statusFilter.value === 'pending') return businessApp.items.filter((a) => a.status === 'pending')
+  if (statusFilter.value === 'inProgress')
+    return businessApp.items.filter((a) => a.status === 'approved' || a.status === 'in_progress')
+  if (statusFilter.value === 'executed')
+    return businessApp.items.filter((a) => a.status === 'executed' || a.status === 'closed')
+  if (statusFilter.value === 'rejected') return businessApp.items.filter((a) => a.status === 'rejected')
   return businessApp.items
 })
 
 const passRate = computed(() => {
-  const finish = businessApp.items.filter(a => a.status === 'approved' || a.status === 'in_progress' || a.status === 'executed' || a.status === 'rejected')
+  const finish = businessApp.items.filter(
+    (a) => a.status === 'approved' || a.status === 'in_progress' || a.status === 'executed' || a.status === 'rejected'
+  )
   if (!finish.length) return 0
-  const passed = businessApp.items.filter(a => a.status === 'approved' || a.status === 'in_progress' || a.status === 'executed')
-  return Math.round(passed.length / finish.length * 100)
+  const passed = businessApp.items.filter(
+    (a) => a.status === 'approved' || a.status === 'in_progress' || a.status === 'executed'
+  )
+  return Math.round((passed.length / finish.length) * 100)
 })
 
 // 详情
 const detailVisible = ref(false)
-const currentApp = ref<typeof businessApp.items[0] | null>(null)
-function openDetail(a: typeof businessApp.items[0]) {
+const currentApp = ref<(typeof businessApp.items)[0] | null>(null)
+function openDetail(a: (typeof businessApp.items)[0]) {
   currentApp.value = a
   detailVisible.value = true
 }
 
 // 审批弹窗
 const approveVisible = ref(false)
-const approveTarget = ref<typeof businessApp.items[0] | null>(null)
+const approveTarget = ref<(typeof businessApp.items)[0] | null>(null)
 const approveAction = ref<'pass' | 'reject'>('pass')
 const approveNote = ref('')
 
-function onApprove(a: typeof businessApp.items[0]) {
+function onApprove(a: (typeof businessApp.items)[0]) {
   approveTarget.value = a
   approveAction.value = 'pass'
   approveNote.value = '同意启动'
   approveVisible.value = true
 }
-function onReject(a: typeof businessApp.items[0]) {
+function onReject(a: (typeof businessApp.items)[0]) {
   approveTarget.value = a
   approveAction.value = 'reject'
   approveNote.value = ''
@@ -218,9 +238,7 @@ function onReject(a: typeof businessApp.items[0]) {
 }
 
 function getCurrentOperator(): string {
-  return userStore.currentRole
-    ? (getRoleInfo(userStore.currentRole)?.username || '业务执行岗')
-    : '李伟'
+  return userStore.currentRole ? getRoleInfo(userStore.currentRole)?.username || '业务执行岗' : '李伟'
 }
 
 function onSubmitApprove() {
@@ -273,7 +291,7 @@ function onSubmitApprove() {
   approveVisible.value = false
 }
 
-function onMarkInProgress(a: typeof businessApp.items[0]) {
+function onMarkInProgress(a: (typeof businessApp.items)[0]) {
   if (a.status === 'approved') {
     businessApp.markInProgress(a.id, a.workflowInstanceId || 'n/a')
     Message.success('已进入执行状态')
@@ -300,26 +318,50 @@ function goWorkflow(instId: string) {
 
 // tools
 function typeColor(t: AppType) {
-  return ({
-    stop_collection: 'cyan',
-    negotiate: 'arcoblue',
-    credit_objection: 'purple',
-    transfer_mediate: 'magenta',
-    extended_repayment: 'gold'
-  } as const)[t] || 'gray'
+  return (
+    (
+      {
+        stop_collection: 'cyan',
+        negotiate: 'arcoblue',
+        credit_objection: 'purple',
+        transfer_mediate: 'magenta',
+        extended_repayment: 'gold'
+      } as const
+    )[t] || 'gray'
+  )
 }
-function typeLabel(t: AppType) { return APP_TYPE_LABEL[t] || t }
+function typeLabel(t: AppType) {
+  return APP_TYPE_LABEL[t] || t
+}
 function priorityColor(p: AppPriority) {
-  return ({ low: 'gray', normal: 'arcoblue', high: 'orange' })[p] || 'gray'
+  return { low: 'gray', normal: 'arcoblue', high: 'orange' }[p] || 'gray'
 }
 function priorityLabel(p: AppPriority) {
-  return ({ low: '低', normal: '普通', high: '紧急' })[p] || p
+  return { low: '低', normal: '普通', high: '紧急' }[p] || p
 }
 function statusColor(s: AppStatus) {
-  return ({ pending: 'orange', approved: 'arcoblue', rejected: 'red', in_progress: 'blue', executed: 'green', closed: 'gray' })[s] || 'gray'
+  return (
+    {
+      pending: 'orange',
+      approved: 'arcoblue',
+      rejected: 'red',
+      in_progress: 'blue',
+      executed: 'green',
+      closed: 'gray'
+    }[s] || 'gray'
+  )
 }
 function statusLabel(s: AppStatus) {
-  return ({ pending: '待审批', approved: '已批准', rejected: '已驳回', in_progress: '执行中', executed: '已执行', closed: '已关闭' })[s] || s
+  return (
+    {
+      pending: '待审批',
+      approved: '已批准',
+      rejected: '已驳回',
+      in_progress: '执行中',
+      executed: '已执行',
+      closed: '已关闭'
+    }[s] || s
+  )
 }
 </script>
 
@@ -336,6 +378,14 @@ function statusLabel(s: AppStatus) {
   border: 1px solid var(--cp-border-light);
   border-radius: 6px;
 }
-.cp-kpi-label { font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 4px; }
-.cp-kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+.cp-kpi-label {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 4px;
+}
+.cp-kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
 </style>

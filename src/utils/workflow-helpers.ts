@@ -69,12 +69,12 @@ export function mapInstanceToRow(inst: WorkflowInstance): InstanceRow {
 
 /** 取首个 execution 的 payload */
 export function getPayload(inst: WorkflowInstance, code: string = 'apply') {
-  return inst.executions.find(e => e.nodeCode === code)?.payload
+  return inst.executions.find((e) => e.nodeCode === code)?.payload
 }
 
 /** 取首个审批节点 execution */
 export function getApproveExecution(inst: WorkflowInstance) {
-  return inst.executions.find(e => e.nodeCode === 'approve')
+  return inst.executions.find((e) => e.nodeCode === 'approve')
 }
 
 /** 通用 stop_collection 业务字段 */

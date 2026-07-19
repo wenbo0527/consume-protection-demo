@@ -14,7 +14,9 @@
             <template #columns>
               <a-table-column title="优先级" :width="80">
                 <template #cell="{ record }">
-                  <a-tag :color="record.priority <= 2 ? 'red' : record.priority <= 4 ? 'orange' : 'gray'">P{{ record.priority }}</a-tag>
+                  <a-tag :color="record.priority <= 2 ? 'red' : record.priority <= 4 ? 'orange' : 'gray'"
+                    >P{{ record.priority }}</a-tag
+                  >
                 </template>
               </a-table-column>
               <a-table-column title="渠道" data-index="channel">
@@ -29,7 +31,10 @@
               </a-table-column>
               <a-table-column title="紧急度" data-index="urgency">
                 <template #cell="{ record }">
-                  <a-tag size="small" :color="record.urgency === '特急' ? 'red' : record.urgency === '紧急' ? 'orange' : 'gray'">
+                  <a-tag
+                    size="small"
+                    :color="record.urgency === '特急' ? 'red' : record.urgency === '紧急' ? 'orange' : 'gray'"
+                  >
                     {{ record.urgency }}
                   </a-tag>
                 </template>
@@ -56,7 +61,9 @@
           </a-table>
         </div>
         <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center">
-          <span style="font-size: 12px; color: var(--cp-text-tertiary)">支持 ≥20 条规则 · 当前 {{ dispatch.length }} 条 · 优先级数字越小越优先匹配</span>
+          <span style="font-size: 12px; color: var(--cp-text-tertiary)"
+            >支持 ≥20 条规则 · 当前 {{ dispatch.length }} 条 · 优先级数字越小越优先匹配</span
+          >
           <a-button type="primary" @click="showAddRule = true"><icon-plus /> 新增分单规则</a-button>
         </div>
       </a-tab-pane>
@@ -127,16 +134,21 @@
             <div class="cp-card" style="padding: 12px">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px">
                 <h3 class="cp-section-title" style="margin: 0">规则列表</h3>
-                <a-button size="small" type="primary" @click="openNewRule">
-                  <icon-plus /> 新建规则
-                </a-button>
+                <a-button size="small" type="primary" @click="openNewRule"> <icon-plus /> 新建规则 </a-button>
               </div>
-              <div v-for="r in tagRules.rules" :key="r.id"
+              <div
+                v-for="r in tagRules.rules"
+                :key="r.id"
                 :class="['cp-bizflow-item', { 'is-active': activeRuleId === r.id }]"
-                @click="activeRuleId = r.id">
+                @click="activeRuleId = r.id"
+              >
                 <div style="display: flex; justify-content: space-between; align-items: center">
                   <span style="font-weight: 600">{{ r.name }}</span>
-                  <a-switch :model-value="r.enabled" size="small" @change="(v: any) => toggleRule(r.id, v as boolean)" />
+                  <a-switch
+                    :model-value="r.enabled"
+                    size="small"
+                    @change="(v: any) => toggleRule(r.id, v as boolean)"
+                  />
                 </div>
                 <div style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 4px; line-height: 1.5">
                   命中标签:
@@ -151,7 +163,9 @@
             <div class="cp-card" style="padding: 16px">
               <div v-if="activeRule">
                 <h3 class="cp-section-title">{{ activeRule.name }}</h3>
-                <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 12px">{{ activeRule.desc }}</div>
+                <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 12px">
+                  {{ activeRule.desc }}
+                </div>
 
                 <a-form :model="activeRule">
                   <a-row :gutter="12">
@@ -191,8 +205,18 @@
                         <a-radio value="error">错误</a-radio>
                         <a-radio value="warning">警告</a-radio>
                       </a-radio-group>
-                      <a-input v-model="act.title" placeholder="弹屏标题" @blur="persistActive" style="margin-top: 4px" />
-                      <a-input v-model="act.actionsText" placeholder="推荐动作,逗号分隔" @blur="onActionsText(idx)" style="margin-top: 4px" />
+                      <a-input
+                        v-model="act.title"
+                        placeholder="弹屏标题"
+                        @blur="persistActive"
+                        style="margin-top: 4px"
+                      />
+                      <a-input
+                        v-model="act.actionsText"
+                        placeholder="推荐动作,逗号分隔"
+                        @blur="onActionsText(idx)"
+                        style="margin-top: 4px"
+                      />
                     </div>
                     <div v-else-if="act.kind === 'restrict_call'" style="margin-top: 6px">
                       <a-input v-model="act.note" placeholder="限制说明" @blur="persistActive" />
@@ -202,16 +226,19 @@
                         <a-radio value="manage">管理层</a-radio>
                         <a-radio value="review">审查</a-radio>
                       </a-radio-group>
-                      <a-input v-model="act.note" placeholder="升级说明" @blur="persistActive" style="margin-top: 4px" />
+                      <a-input
+                        v-model="act.note"
+                        placeholder="升级说明"
+                        @blur="persistActive"
+                        style="margin-top: 4px"
+                      />
                     </div>
                     <div v-else-if="act.kind === 'link_history'" style="margin-top: 6px">
                       <a-input v-model="act.note" placeholder="关联说明" @blur="persistActive" />
                     </div>
                   </div>
 
-                  <a-button size="small" @click="showAddAction = true">
-                    <icon-plus /> 添加动作
-                  </a-button>
+                  <a-button size="small" @click="showAddAction = true"> <icon-plus /> 添加动作 </a-button>
 
                   <a-alert type="info" show-icon style="margin-top: 12px">
                     <template #title>配置即时生效</template>
@@ -239,15 +266,26 @@
           </div>
         </a-modal>
       </a-tab-pane>
-                   
 
       <a-tab-pane key="list" title="名单规则 (ZN-003)">
         <div class="cp-card" style="padding: 20px">
           <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 12px">名单自动匹配规则</h3>
-          <div v-for="r in listRules" :key="r.name" style="padding: 12px; border-bottom: 1px dashed var(--cp-border); display: flex; justify-content: space-between; align-items: center">
+          <div
+            v-for="r in listRules"
+            :key="r.name"
+            style="
+              padding: 12px;
+              border-bottom: 1px dashed var(--cp-border);
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
             <div>
               <div style="font-weight: 500">{{ r.name }}</div>
-              <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px">{{ r.condition }} → {{ r.action }}</div>
+              <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-top: 4px">
+                {{ r.condition }} → {{ r.action }}
+              </div>
             </div>
             <a-switch v-model="r.enabled" />
           </div>
@@ -267,7 +305,9 @@
               </a-form-item>
               <a-form-item label="触发工单">
                 <a-select v-model="simForm.ticketId" placeholder="可选">
-                  <a-option v-for="t in customerTickets" :key="t.id" :value="t.id">{{ t.id }} · {{ t.typeLabel }}</a-option>
+                  <a-option v-for="t in customerTickets" :key="t.id" :value="t.id"
+                    >{{ t.id }} · {{ t.typeLabel }}</a-option
+                  >
                 </a-select>
               </a-form-item>
               <a-form-item label="渠道">
@@ -311,17 +351,29 @@
               <div v-else>
                 <a-descriptions :column="2" bordered size="small" style="margin-bottom: 12px">
                   <a-descriptions-item label="分单结果">{{ simResult.assignTo }}</a-descriptions-item>
-                  <a-descriptions-item label="命中分单规则">{{ simResult.dispatchHit?.name || '命中默认分单' }}</a-descriptions-item>
+                  <a-descriptions-item label="命中分单规则">{{
+                    simResult.dispatchHit?.name || '命中默认分单'
+                  }}</a-descriptions-item>
                   <a-descriptions-item label="触发的预警">
-                    <a-tag v-for="a in simResult.alerts" :key="a.id" :color="a.level === 'urgent' ? 'red' : 'orange'" style="margin-right: 4px">{{ a.name }}</a-tag>
+                    <a-tag
+                      v-for="a in simResult.alerts"
+                      :key="a.id"
+                      :color="a.level === 'urgent' ? 'red' : 'orange'"
+                      style="margin-right: 4px"
+                      >{{ a.name }}</a-tag
+                    >
                     <span v-if="!simResult.alerts.length" style="color: var(--cp-text-tertiary)">无</span>
                   </a-descriptions-item>
                   <a-descriptions-item label="命中的标签">
-                    <a-tag v-for="t in simResult.tagRuleHits" :key="t.ruleId" color="arcoblue" style="margin-right: 4px">{{ t.ruleName }} · {{ t.actions }}</a-tag>
+                    <a-tag v-for="t in simResult.tagRuleHits" :key="t.ruleId" color="arcoblue" style="margin-right: 4px"
+                      >{{ t.ruleName }} · {{ t.actions }}</a-tag
+                    >
                     <span v-if="!simResult.tagRuleHits.length" style="color: var(--cp-text-tertiary)">无</span>
                   </a-descriptions-item>
                   <a-descriptions-item label="命中的名单" :span="2">
-                    <a-tag v-for="l in simResult.listHits" :key="l.listType" color="purple" style="margin-right: 4px">{{ l.listType }}</a-tag>
+                    <a-tag v-for="l in simResult.listHits" :key="l.listType" color="purple" style="margin-right: 4px">{{
+                      l.listType
+                    }}</a-tag>
                     <span v-if="!simResult.listHits.length" style="color: var(--cp-text-tertiary)">无</span>
                   </a-descriptions-item>
                 </a-descriptions>
@@ -348,12 +400,19 @@
                 </a-table-column>
                 <a-table-column title="分单">
                   <template #cell="{ record }">
-                    <span :style="{ color: record.result?.assignTo === '已转出' ? 'var(--cp-warning)' : 'var(--cp-text)' }">{{ record.result?.assignTo }}</span>
+                    <span
+                      :style="{ color: record.result?.assignTo === '已转出' ? 'var(--cp-warning)' : 'var(--cp-text)' }"
+                      >{{ record.result?.assignTo }}</span
+                    >
                   </template>
                 </a-table-column>
                 <a-table-column title="命中规则数">
                   <template #cell="{ record }">
-                    {{ (record.result?.alerts.length || 0) + (record.result?.tagRuleHits.length || 0) + (record.result?.listHits.length || 0) }}
+                    {{
+                      (record.result?.alerts.length || 0) +
+                      (record.result?.tagRuleHits.length || 0) +
+                      (record.result?.listHits.length || 0)
+                    }}
                   </template>
                 </a-table-column>
               </a-table>
@@ -441,7 +500,7 @@ const editing = reactive<{ rule: TagRule | null }>({ rule: null })
 const activeRule = computed<TagRule | null>(() => {
   // 编辑时优先使用 editing.rule;否则从 store 派生
   if (editing.rule && editing.rule.id === activeRuleId.value) return editing.rule
-  const r = tagRules.rules.find(x => x.id === activeRuleId.value) || null
+  const r = tagRules.rules.find((x) => x.id === activeRuleId.value) || null
   if (r && (!editing.rule || editing.rule.id !== activeRuleId.value)) {
     // 切换时同步拷贝
     Object.assign(editing, { rule: JSON.parse(JSON.stringify(r)) })
@@ -484,7 +543,10 @@ function onActionsText(idx: number) {
   if (!activeRule.value) return
   const a = activeRule.value.actions[idx] as any
   if (a && a.actionsText !== undefined) {
-    a.actions = a.actionsText.split(/[,，]/).map((s: string) => s.trim()).filter(Boolean)
+    a.actions = a.actionsText
+      .split(/[,，]/)
+      .map((s: string) => s.trim())
+      .filter(Boolean)
     persistActive()
   }
 }
@@ -506,7 +568,9 @@ function actionColor(k: string) {
   return { show_alert: 'orange', restrict_call: 'red', auto_upgrade: 'magenta', link_history: 'arcoblue' }[k] || 'gray'
 }
 function actionLabel(k: string) {
-  return { show_alert: '弹屏预警', restrict_call: '限制呼入', auto_upgrade: '自动升级', link_history: '关联历史' }[k] || k
+  return (
+    { show_alert: '弹屏预警', restrict_call: '限制呼入', auto_upgrade: '自动升级', link_history: '关联历史' }[k] || k
+  )
 }
 
 function typeColor(t: string) {
@@ -557,14 +621,14 @@ const simForm = reactive<SimForm>({
 })
 
 const customerTickets = computed(() => {
-  const c = customers.find(c => c.id === simForm.customerId)
+  const c = customers.find((c) => c.id === simForm.customerId)
   if (!c) return []
-  return allTickets.filter(t => (t as any).customerId === c.id || (t as any).customerName === c.name)
+  return allTickets.filter((t) => (t as any).customerId === c.id || (t as any).customerName === c.name)
 })
 
 function onSimCustomerChange() {
   simForm.ticketId = ''
-  const c = customers.find(c => c.id === simForm.customerId)
+  const c = customers.find((c) => c.id === simForm.customerId)
   if (c) {
     simForm.loanBalance = c.loanBalance || simForm.loanBalance
     simForm.maxOverdueDays = (c as any).maxOverdueDays || 0
@@ -582,7 +646,7 @@ const simResult = ref<SimResult | null>(null)
 const simHistory = ref<{ at: string; customerName: string; result: SimResult }[]>([])
 
 function runSimulation() {
-  const customer = customers.find(c => c.id === simForm.customerId)
+  const customer = customers.find((c) => c.id === simForm.customerId)
   if (!customer) {
     Message.warning('请选择客户')
     return
@@ -598,8 +662,11 @@ function runSimulation() {
   }
 
   // 1) 分单规则匹配
-  steps.push({ stage: '① 分单规则', detail: `按渠道 ${simForm.channel} + 类型 ${simForm.type} + 紧急度 ${simForm.urgency} 匹配分单规则...` })
-  const dispatchHit = dispatchRules.find(r => {
+  steps.push({
+    stage: '① 分单规则',
+    detail: `按渠道 ${simForm.channel} + 类型 ${simForm.type} + 紧急度 ${simForm.urgency} 匹配分单规则...`
+  })
+  const dispatchHit = dispatchRules.find((r) => {
     if (!r.enabled) return false
     if (r.channel !== simForm.channel && r.channel !== '全部') return false
     if (r.type !== simForm.type && r.type !== '全部') return false
@@ -609,21 +676,30 @@ function runSimulation() {
   if (dispatchHit) {
     result.assignTo = dispatchHit.assign
     result.dispatchHit = { name: `分单规则 R-${dispatchHit.id}(${dispatchHit.priority})` }
-    steps.push({ stage: '✓ 分单命中', detail: `命中规则 R-${dispatchHit.id}(优先级 ${dispatchHit.priority})→ 分配至 ${dispatchHit.assign}` })
+    steps.push({
+      stage: '✓ 分单命中',
+      detail: `命中规则 R-${dispatchHit.id}(优先级 ${dispatchHit.priority})→ 分配至 ${dispatchHit.assign}`
+    })
   } else {
     result.assignTo = '默认池(坐席·张敏)'
     steps.push({ stage: '✓ 默认分单', detail: '未命中任何规则,进入默认分单池' })
   }
 
   // 2) 预警规则匹配
-  steps.push({ stage: '② 预警规则', detail: `基于在贷 ¥${simForm.loanBalance.toLocaleString()} / 逾期 ${simForm.maxOverdueDays} 天 评估预警触发...` })
+  steps.push({
+    stage: '② 预警规则',
+    detail: `基于在贷 ¥${simForm.loanBalance.toLocaleString()} / 逾期 ${simForm.maxOverdueDays} 天 评估预警触发...`
+  })
   if (simForm.maxOverdueDays > 30) {
     result.alerts.push({ id: 'A001', name: '长时间逾期预警', level: 'urgent' })
     steps.push({ stage: '⚠ 预警触发', detail: `逾期 ${simForm.maxOverdueDays} 天 > 30 天阈值,触发 [长时间逾期预警]` })
   }
   if (simForm.loanBalance > 200000) {
     result.alerts.push({ id: 'A002', name: '大额贷款风险预警', level: 'warning' })
-    steps.push({ stage: '⚠ 预警触发', detail: `在贷 ¥${simForm.loanBalance.toLocaleString()} > 20w 阈值,触发 [大额贷款风险预警]` })
+    steps.push({
+      stage: '⚠ 预警触发',
+      detail: `在贷 ¥${simForm.loanBalance.toLocaleString()} > 20w 阈值,触发 [大额贷款风险预警]`
+    })
   }
   if (simForm.type === '投诉' && simForm.urgency === 'urgent') {
     result.alerts.push({ id: 'A003', name: '紧急投诉升级', level: 'urgent' })

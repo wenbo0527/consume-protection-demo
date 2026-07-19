@@ -42,6 +42,8 @@ if (typeof window !== 'undefined') {
   setInterval(() => {
     try {
       useCompliancePromiseStore().markOverdue()
-    } catch (e) { /* 静默 */ }
+    } catch (e) {
+      /* 静默 */
+    }
   }, 60_000) // 与 workflow tick 同频,简单可靠
 }

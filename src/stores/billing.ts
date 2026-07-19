@@ -11,7 +11,7 @@ export type DeliveryChannel = 'email' | 'wechat' | 'hand' | 'registered_mail'
 
 export interface ContractTemplate {
   id: string
-  name: string                          // '借款合同 v3.2'
+  name: string // '借款合同 v3.2'
   type: DocType
   /** 占位符定义 */
   fields: { key: string; label: string; example: string }[]
@@ -22,7 +22,7 @@ export interface ContractTemplate {
 }
 
 export interface BillingDoc {
-  id: string                           // BD-20260715-0001
+  id: string // BD-20260715-0001
   type: DocType
   templateId: string
   customerId: string
@@ -37,7 +37,7 @@ export interface BillingDoc {
   status: DocStatus
   /** 发送渠道 + 收件信息 */
   delivery?: { channel: DeliveryChannel; target: string; at: string }
-  signerAt?: string                       // 客户签字时间
+  signerAt?: string // 客户签字时间
   archivedAt?: string
   createdAt: string
   updatedAt: string
@@ -60,14 +60,18 @@ function loadPersisted(): { templates: ContractTemplate[]; docs: BillingDoc[] } 
       const arr = JSON.parse(raw)
       if (arr && Array.isArray(arr.templates)) return arr
     }
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
   return buildSeed()
 }
 
 function savePersisted(state: { templates: ContractTemplate[]; docs: BillingDoc[] }) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  } catch { /* 静默 */ }
+  } catch {
+    /* 静默 */
+  }
 }
 
 function buildSeed() {
@@ -248,17 +252,19 @@ export const useBillingStore = defineStore('billing', {
     }
   },
   getters: {
-    contractCount: (s) => s.docs.filter(d => d.type === 'contract').length,
-    invoiceCount: (s) => s.docs.filter(d => d.type === 'invoice').length,
-    noticeCount: (s) => s.docs.filter(d => d.type === 'notice').length,
-    sentCount: (s) => s.docs.filter(d => d.status === 'sent').length,
+    contractCount: (s) => s.docs.filter((d) => d.type === 'contract').length,
+    invoiceCount: (s) => s.docs.filter((d) => d.type === 'invoice').length,
+    noticeCount: (s) => s.docs.filter((d) => d.type === 'notice').length,
+    sentCount: (s) => s.docs.filter((d) => d.status === 'sent').length,
     totalContractAmount(s): number {
-      return s.docs.filter(d => d.type === 'contract').reduce((a, d) => {
-        const amt = d.fields['loanAmount']
-        if (!amt) return a
-        const num = parseFloat(amt.replace(/[^\d.]/g, ''))
-        return a + (isNaN(num) ? 0 : num)
-      }, 0)
+      return s.docs
+        .filter((d) => d.type === 'contract')
+        .reduce((a, d) => {
+          const amt = d.fields['loanAmount']
+          if (!amt) return a
+          const num = parseFloat(amt.replace(/[^\d.]/g, ''))
+          return a + (isNaN(num) ? 0 : num)
+        }, 0)
     }
   },
   actions: {
@@ -288,7 +294,7 @@ export const useBillingStore = defineStore('billing', {
       refId: string
       fields: Record<string, string>
     }): BillingDoc | null {
-      const tpl = this.templates.find(t => t.id === input.templateId)
+      const tpl = this.templates.find((t) => t.id === input.templateId)
       if (!tpl) return null
       const id = `BD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(Math.floor(Math.random() * 9000) + 1000)}`
       const doc: BillingDoc = {
@@ -312,7 +318,7 @@ export const useBillingStore = defineStore('billing', {
 
     /** 发送(归档前一步) */
     send(id: string, channel: DeliveryChannel, target: string) {
-      const d = this.docs.find(x => x.id === id)
+      const d = this.docs.find((x) => x.id === id)
       if (!d) return false
       d.delivery = { channel, target, at: nowStr() }
       d.status = 'sent'
@@ -323,7 +329,7 @@ export const useBillingStore = defineStore('billing', {
 
     /** 签字 */
     sign(id: string) {
-      const d = this.docs.find(x => x.id === id)
+      const d = this.docs.find((x) => x.id === id)
       if (!d) return false
       d.signerAt = nowStr()
       d.status = 'signed'
@@ -334,7 +340,7 @@ export const useBillingStore = defineStore('billing', {
 
     /** 归档 */
     archive(id: string) {
-      const d = this.docs.find(x => x.id === id)
+      const d = this.docs.find((x) => x.id === id)
       if (!d) return false
       d.archivedAt = nowStr()
       d.status = 'archived'

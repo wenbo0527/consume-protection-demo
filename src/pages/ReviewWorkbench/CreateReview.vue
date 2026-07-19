@@ -43,15 +43,29 @@
           </a-col>
         </a-row>
 
-        <a-divider><span style="font-size: 13px; color: var(--cp-text-tertiary)">{{ form.type === 'marketing' ? '营销活动专项' : '立项材料' }}</span></a-divider>
+        <a-divider
+          ><span style="font-size: 13px; color: var(--cp-text-tertiary)">{{
+            form.type === 'marketing' ? '营销活动专项' : '立项材料'
+          }}</span></a-divider
+        >
 
         <a-form-item v-if="form.type === 'newProduct'" label="项目说明书 (附件)" required>
           <a-upload :auto-upload="false" />
         </a-form-item>
 
         <a-form-item label="知识库内容" required>
-          <a-textarea v-if="form.type === 'newProduct'" v-model="form.knowledge" :rows="6" placeholder="请输入新产品涉及的业务规则、定价、客户权益等知识库内容..." />
-          <a-textarea v-else-if="form.type === 'change'" v-model="form.knowledge" :rows="6" placeholder="请输入本次变更的规则更新内容..." />
+          <a-textarea
+            v-if="form.type === 'newProduct'"
+            v-model="form.knowledge"
+            :rows="6"
+            placeholder="请输入新产品涉及的业务规则、定价、客户权益等知识库内容..."
+          />
+          <a-textarea
+            v-else-if="form.type === 'change'"
+            v-model="form.knowledge"
+            :rows="6"
+            placeholder="请输入本次变更的规则更新内容..."
+          />
           <a-radio-group v-else v-model="form.needKnowledge">
             <a-radio :value="true">需要新增知识库</a-radio>
             <a-radio :value="false">不需要新增</a-radio>
@@ -78,8 +92,13 @@ import { reactive } from 'vue'
 import { Message } from '@arco-design/web-vue'
 
 const form = reactive({
-  type: 'newProduct', name: '', dept: '', applicant: '',
-  knowledge: '', target: '', needKnowledge: true
+  type: 'newProduct',
+  name: '',
+  dept: '',
+  applicant: '',
+  knowledge: '',
+  target: '',
+  needKnowledge: true
 })
 
 function submit() {

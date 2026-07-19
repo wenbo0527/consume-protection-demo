@@ -19,7 +19,7 @@
         <a-radio value="">全部 ({{ list.length }})</a-radio>
         <a-radio value="draft">草稿</a-radio>
         <a-radio value="fill">任务填写</a-radio>
-        <a-radio value="inReview">待审查 ({{ list.filter(x => x.status === 'inReview').length }})</a-radio>
+        <a-radio value="inReview">待审查 ({{ list.filter((x) => x.status === 'inReview').length }})</a-radio>
         <a-radio value="revise">待修改</a-radio>
         <a-radio value="archive">已归档</a-radio>
       </a-radio-group>
@@ -39,7 +39,17 @@
 
           <workflow-steps :steps="steps" :current="p.status" style="margin: 12px 0" />
 
-          <div v-if="p.conclusion" style="background: #f6ffed; padding: 8px 10px; border-radius: 4px; font-size: 12px; color: var(--cp-text-secondary); margin-bottom: 10px">
+          <div
+            v-if="p.conclusion"
+            style="
+              background: #f6ffed;
+              padding: 8px 10px;
+              border-radius: 4px;
+              font-size: 12px;
+              color: var(--cp-text-secondary);
+              margin-bottom: 10px;
+            "
+          >
             <b>审查结论:</b> {{ p.conclusion }}
           </div>
 
@@ -47,8 +57,21 @@
             <span style="font-size: 12px; color: var(--cp-text-tertiary)">审查人: {{ p.reviewer || '-' }}</span>
             <a-space :size="4">
               <a-button size="small">查看</a-button>
-              <a-button v-if="p.status === 'fill' || p.status === 'draft'" size="small" type="primary" @click="$router.push(`/review/execute/${p.id}`)">开始审查</a-button>
-              <a-button v-if="p.status === 'inReview'" size="small" type="primary" status="success" @click="$router.push(`/review/execute/${p.id}`)">继续审查</a-button>
+              <a-button
+                v-if="p.status === 'fill' || p.status === 'draft'"
+                size="small"
+                type="primary"
+                @click="$router.push(`/review/execute/${p.id}`)"
+                >开始审查</a-button
+              >
+              <a-button
+                v-if="p.status === 'inReview'"
+                size="small"
+                type="primary"
+                status="success"
+                @click="$router.push(`/review/execute/${p.id}`)"
+                >继续审查</a-button
+              >
               <a-button v-if="p.status === 'inReview'" size="small" type="primary" status="success">提交结论</a-button>
             </a-space>
           </div>
@@ -68,7 +91,7 @@ import WorkflowTodosCard from '@/components/WorkflowTodosCard.vue'
 const status = ref('')
 const list = reviewProjects
 
-const filtered = computed(() => status.value ? list.filter(p => p.status === status.value) : list)
+const filtered = computed(() => (status.value ? list.filter((p) => p.status === status.value) : list))
 
 const steps = [
   { key: 'draft', name: '草稿' },
@@ -87,10 +110,32 @@ function typeColor(t: string) {
 </script>
 
 <style scoped>
-.cp-project-card { padding: 16px 20px; margin-bottom: 16px; transition: all 0.2s; }
-.cp-project-card:hover { box-shadow: var(--cp-shadow-md); transform: translateY(-2px); }
-.cp-project-head { display: flex; justify-content: space-between; }
-.cp-project-name { font-size: 16px; font-weight: 600; margin: 8px 0 4px; color: var(--cp-text); }
-.cp-project-id { font-size: 12px; color: var(--cp-text-tertiary); }
-.cp-project-time { font-size: 12px; color: var(--cp-text-tertiary); margin-top: 2px; }
+.cp-project-card {
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  transition: all 0.2s;
+}
+.cp-project-card:hover {
+  box-shadow: var(--cp-shadow-md);
+  transform: translateY(-2px);
+}
+.cp-project-head {
+  display: flex;
+  justify-content: space-between;
+}
+.cp-project-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 8px 0 4px;
+  color: var(--cp-text);
+}
+.cp-project-id {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+}
+.cp-project-time {
+  font-size: 12px;
+  color: var(--cp-text-tertiary);
+  margin-top: 2px;
+}
 </style>
