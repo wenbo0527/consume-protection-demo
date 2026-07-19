@@ -1,0 +1,33 @@
+name: Release Drafter
+
+# 每当有 PR 合并 / 新 commit push 到 main 时,自动更新"待发布"草稿
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update_release_draft:
+    name: 更新 Release 草稿
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Update release notes draft
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-name: release-drafter.yml
+          # 不自动发布,需要人手动 edit 草稿 → "Publish release"
+          publish: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[release]') }}
+          tag: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[release]') && 'v$RESOLVED_VERSION' || '' }}
+          version: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[release]') && 'v$RESOLVED_VERSION' || '' }}
+          name: ${{ github.event_name == 'push' && contains(github.event.commit.message, '[release]') && 'v$RESOLVED_VERSION' || 'Next Release' }}
+          # 自动把每次 push 与 PR 都归类入下一稿
+          commitish: main

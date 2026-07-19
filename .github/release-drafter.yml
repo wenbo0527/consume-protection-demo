@@ -1,0 +1,61 @@
+# Release Drafter 配置
+# 自动从 PR + commit message 分类 + 生成 release notes
+
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+version-template: '$MAJOR.$MINOR.$PATCH'
+version-resolver:
+  major:
+    labels: ['breaking', 'major']
+  minor:
+    labels: ['feature', 'enhancement']
+  patch:
+    labels: ['bug', 'fix', 'docs', 'chore', 'refactor', 'ci']
+  default: patch
+
+categories:
+  - title: '🚀 Features'
+    labels: ['feature', 'enhancement', 'feat']
+  - title: '🐛 Bug Fixes'
+    labels: ['bug', 'fix']
+  - title: '🏗️ Architecture'
+    labels: ['arch', 'refactor']
+  - title: '👷 CI / DevOps'
+    labels: ['ci', 'cd', 'release']
+  - title: '📝 Docs'
+    labels: ['docs']
+  - title: '🧹 Chores'
+    labels: ['chore']
+
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'
+exclude-labels: ['skip-changelog']
+
+template: |
+  ## 新增 / 改动
+
+  $CHANGES
+
+  ---
+
+  ## 完整变更历史
+
+  • 完整 commit 列表:https://github.com/$OWNER/$REPOSITORY/compare/v$PREVIOUS_TAG...v$RESOLVED_VERSION
+  • 完整 diff:https://github.com/$OWNER/$REPOSITORY/compare/v$PREVIOUS_TAG...v$RESOLVED_VERSION.diff
+
+  ### 安装 / 试用
+
+  ```bash
+  git clone https://github.com/$OWNER/$REPOSITORY.git
+  cd $REPOSITORY
+  pnpm install
+  pnpm dev
+  # 打开 http://localhost:5170
+  ```
+
+  ### 在线 demo
+
+  - 部署 URL:https://$OWNER.github.io/$REPOSITORY/
+
+  ---
+
+  _由 [release-drafter](https://github.com/release-drafter/release-drafter) 自动生成_
