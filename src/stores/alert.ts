@@ -43,18 +43,79 @@ function savePersisted(alerts: AlertItem[]) {
   }
 }
 
+const READ_STORAGE_KEY = 'cp_alert_read_roles'
+/** 已读集合 { alertId: { role: true } } */
+function loadReadRoles(): Record<string, Record<string, boolean>> {
+  try {
+    const raw = localStorage.getItem(READ_STORAGE_KEY)
+    if (raw) {
+      const o = JSON.parse(raw)
+      if (o && typeof o === 'object') return o
+    }
+  } catch {
+    /* ignore */
+  }
+  return {}
+}
+function saveReadRoles(map: Record<string, Record<string, boolean>>) {
+  try {
+    localStorage.setItem(READ_STORAGE_KEY, JSON.stringify(map))
+  } catch (e) {
+    log('warn', 'save', 'write readRoles localStorage failed', e)
+  }
+}
+
 export const useAlertStore = defineStore('alert', {
   state: () => ({
-    items: loadPersisted() as AlertItem[]
+    items: loadPersisted() as AlertItem[],
+    readRoles: loadReadRoles() as Record<string, Record<string, boolean>>
   }),
   getters: {
+    /** 全部 open / handle / upgrade 状态都算"活跃" */
+    activeAlerts: (s) => s.items.filter((a) => ['alert_open', 'alert_handle', 'alert_upgrade'].includes(a.status)),
     openCount: (s) => s.items.filter((a) => a.status === 'alert_open').length,
     handleCount: (s) => s.items.filter((a) => a.status === 'alert_handle').length,
-    verifiedCount: (s) => s.items.filter((a) => a.status === 'alert_verified').length
+    verifiedCount: (s) => s.items.filter((a) => a.status === 'alert_verified').length,
+    /** 当前角色未读预警数 */
+    unreadCountForCurrentRole(): number {
+      // 不能直接引 user store(循环),由组件层传入 role 计算
+      return 0
+    }
   },
   actions: {
     persist() {
       savePersisted(this.items)
+    },
+    persistRead() {
+      saveReadRoles(this.readRoles)
+    },
+
+    /** 计算某角色某 alert 是否已读 */
+    isReadBy(id: string, role: string): boolean {
+      return !!this.readRoles[id]?.[role]
+    },
+
+    /** 给某角色的某预警标已读 */
+    markRead(id: string, role: string) {
+      if (!this.readRoles[id]) this.readRoles[id] = {}
+      this.readRoles[id][role] = true
+      log('log', 'read', `${id} <- ${role}`)
+      this.persistRead()
+    },
+
+    /** 给某角色批量标所有活跃预警已读 */
+    markAllRead(role: string) {
+      this.activeAlerts.forEach((a) => {
+        if (!this.readRoles[a.id]) this.readRoles[a.id] = {}
+        this.readRoles[a.id][role] = true
+      })
+      log('log', 'read-all', `${role} clear unread`)
+      this.persistRead()
+    },
+
+    /** 计算指定角色的未读数 */
+    unreadByRole(role: string): number {
+      return this.activeAlerts.filter((a) => !this.isReadBy(a.id, role)).length
     },
 
     /** 通用:更新某条预警的状态 */

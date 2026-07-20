@@ -54,9 +54,7 @@
               </a-badge>
             </a-tooltip>
             <a-tooltip content="预警">
-              <a-badge :count="alertBadge" :dot="alertBadge === 0" :offset="[-2, 2]" :max-count="99">
-                <a-button shape="circle" size="medium"><icon-exclamation-circle /></a-button>
-              </a-badge>
+              <alert-center-popover />
             </a-tooltip>
             <notification-center />
             <a-divider direction="vertical" style="height: 20px; margin: 0 4px" />
@@ -121,9 +119,9 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore, ROLE_LIST, RoleKey } from '@/stores/user'
 import { useWorkflowStore } from '@/stores/workflow'
-import { alerts } from '@/mock/data'
 import NotificationCenter from '@/components/NotificationCenter.vue'
 import InstructionCenter from '@/components/InstructionCenter.vue'
+import AlertCenterPopover from '@/components/AlertCenterPopover.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -142,7 +140,6 @@ const todoBadge = computed(() => {
   if (role === 'manage' || role === 'review') return wf.manageTodos.length
   return 0
 })
-const alertBadge = computed(() => alerts.filter((a) => a.status === 'alert_open' || a.status === 'alert_handle').length)
 
 interface MenuItem {
   name: string
