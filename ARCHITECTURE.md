@@ -4,13 +4,13 @@
 
 ## 1. 设计目标
 
-| 维度 | 目标 |
-| --- | --- |
-| **业务完整度** | 跨角色业务全链路,演示完整治理闭环 |
-| **架构清晰度** | 严格分层 · 数据归属明确 · 事件名收口 |
-| **类型安全** | TypeScript strict · 0 类型错误 |
-| **可维护性** | 路由/菜单元数据统一 · 业务规则集中 |
-| **可测试性** | store 可独立单元测试 · 业务规则可独立复用 |
+| 维度           | 目标                                      |
+| -------------- | ----------------------------------------- |
+| **业务完整度** | 跨角色业务全链路,演示完整治理闭环         |
+| **架构清晰度** | 严格分层 · 数据归属明确 · 事件名收口      |
+| **类型安全**   | TypeScript strict · 0 类型错误            |
+| **可维护性**   | 路由/菜单元数据统一 · 业务规则集中        |
+| **可测试性**   | store 可独立单元测试 · 业务规则可独立复用 |
 
 ## 2. 分层架构
 
@@ -47,12 +47,12 @@ mock/data.ts  ──→ store.items (拷贝初始) ──→ store actions ─�
 ```typescript
 export const useAlertStore = defineStore('alert', {
   state: () => ({
-    items: loadPersisted()  // ← 拷贝,不是引用
+    items: loadPersisted() // ← 拷贝,不是引用
   }),
   actions: {
     updateStatus(id, status) {
       // 唯一修改入口
-      const a = this.items.find(x => x.id === id)
+      const a = this.items.find((x) => x.id === id)
       if (a) {
         a.status = status
         this.persist()
@@ -69,7 +69,7 @@ export const useAlertStore = defineStore('alert', {
 ```typescript
 // ❌ 在 workflow store 中直接改 alerts:
 import { alerts as mockAlerts } from '../mock/data'
-mockAlerts[i].status = 'alert_verified'  // 跨 store mutate mock
+mockAlerts[i].status = 'alert_verified' // 跨 store mutate mock
 ```
 
 > **正模式**(当前):
@@ -91,18 +91,18 @@ interface WorkflowInstance {
   id: string
   kind: 'negotiate' | 'stop_collection' | 'credit_objection' | 'transfer_mediate' | 'review_archive'
   status: 'running' | 'approved' | 'finished' | 'rejected' | 'expired'
-  currentNode: string             // 当前节点
-  currentNodeStartedAt: string    // 节点推进时间,用于超时检测
-  expireAt: string                // SLA 截止时间
+  currentNode: string // 当前节点
+  currentNodeStartedAt: string // 节点推进时间,用于超时检测
+  expireAt: string // SLA 截止时间
   executions: WorkflowExecution[] // 节点执行历史
 }
 
 // 操作
-- startWorkflowInstance(kind, payload)    // 发起
-- approve(id, approver, comment)          // 审批
-- reject(id, approver, comment)           // 驳回
-- advanceTo(id, nodeCode, payload)        // 推进节点
-- tickOverdue()                           // 定时扫描超时
+;-startWorkflowInstance(kind, payload) - // 发起
+  approve(id, approver, comment) - // 审批
+  reject(id, approver, comment) - // 驳回
+  advanceTo(id, nodeCode, payload) - // 推进节点
+  tickOverdue() // 定时扫描超时
 ```
 
 ### 节点流转示意
@@ -169,6 +169,7 @@ export const EVT = {
 ```
 
 **规则**:
+
 - ✅ 允许:`dispatchEvent(EVT.WORKFLOW_NOTIFY_SEAT, ...)` / `addEventListener(EVT.WORKFLOW_NOTIFY_SEAT, ...)`
 - ❌ 禁止:业务代码直接写字符串 `'cp-workflow-notify-seat'`
 
@@ -176,12 +177,12 @@ CI 中有自动化检查守卫这条规则,详见 [.github/workflows/ci.yml](./.
 
 ### 已废弃的事件(清理后保留文档)
 
-| 事件名 | 状态 | 原因 |
-| --- | --- | --- |
-| `cp-knowledge-approved` | 删除(监听 0 dispatch 1) | 知识审批无外部动作,无需事件 |
+| 事件名                             | 状态                      | 原因                               |
+| ---------------------------------- | ------------------------- | ---------------------------------- |
+| `cp-knowledge-approved`            | 删除(监听 0 dispatch 1)   | 知识审批无外部动作,无需事件        |
 | `cp-system-stop-collection-active` | 删除(2 dispatch 0 listen) | 死代码,系统联动改由 store 直接调用 |
-| `cp-system-negotiate-active` | 删除(1 dispatch 0 listen) | 同上 |
-| `cp-nc-open` | 删除(1 dispatch 0 listen) | 通知中心改用 link 字段跳转 |
+| `cp-system-negotiate-active`       | 删除(1 dispatch 0 listen) | 同上                               |
+| `cp-nc-open`                       | 删除(1 dispatch 0 listen) | 通知中心改用 link 字段跳转         |
 
 ## 7. 持久化策略
 
@@ -195,7 +196,7 @@ function loadPersisted() {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) return JSON.parse(raw)
   } catch {}
-  return buildSeed()  // 回退到初始 mock
+  return buildSeed() // 回退到初始 mock
 }
 
 function savePersisted(state) {
@@ -206,6 +207,7 @@ function savePersisted(state) {
 ```
 
 优势:
+
 - 刷新页面数据不丢失
 - 演示期间每一步操作可即时反馈
 - 切换角色互不影响
@@ -230,13 +232,13 @@ export function enrichStopCollectionRow(inst) {
 
 ## 9. 类型安全策略
 
-| 级别 | 状态 | 备注 |
-| --- | --- | --- |
-| `strict: true` | ✅ 开启 | 全套 strict 子项 |
-| `noUnusedLocals: false` | ⚠️ 关闭 | 可逐步开启 |
-| `noUnusedParameters: false` | ⚠️ 关闭 | 可逐步开启 |
-| `useUnknownInCatchVariables` | ✅ 开启 | catch 默认 unknown |
-| `noUncheckedIndexedAccess` | ⚠️ 关闭 | 开启会让所有 `arr[i]` 变 `T \| undefined` |
+| 级别                         | 状态    | 备注                                      |
+| ---------------------------- | ------- | ----------------------------------------- |
+| `strict: true`               | ✅ 开启 | 全套 strict 子项                          |
+| `noUnusedLocals: false`      | ⚠️ 关闭 | 可逐步开启                                |
+| `noUnusedParameters: false`  | ⚠️ 关闭 | 可逐步开启                                |
+| `useUnknownInCatchVariables` | ✅ 开启 | catch 默认 unknown                        |
+| `noUncheckedIndexedAccess`   | ⚠️ 关闭 | 开启会让所有 `arr[i]` 变 `T \| undefined` |
 
 外加使用 `interface` 而非 `type` 描述领域对象,显式 `export type Foo = ...` 作为联合字面量。
 

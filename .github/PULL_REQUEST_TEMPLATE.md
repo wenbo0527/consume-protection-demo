@@ -21,6 +21,7 @@
 ### 修改的文件
 
 列主要变更:
+
 - `src/stores/xxx.ts` — 添加新 action ...
 - `src/pages/yyy.vue` — 接入 xx store ...
 

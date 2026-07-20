@@ -10,27 +10,27 @@
 [![Arco Design](https://img.shields.io/badge/Arco--Design-Vue-2.55+-0093ff)](https://arco.design/vue)
 [![Vite](https://img.shields.io/badge/Vite-5.0+-646cff?logo=vite)](https://vitejs.dev)
 
-| 维度 | 数值 |
-| --- | --- |
-| **PRD 闭环度** | ![100%](https://img.shields.io/badge/PRD-100%25%20✅-brightgreen) |
-| **类型安全** | ![TS strict](https://img.shields.io/badge/TS%20strict-0%20errors-blue) |
-| **Build 状态** | ![Built](https://img.shields.io/badge/build-1271%20modules%20✓-blueviolet) |
-| **代码量** | ![Lines](https://img.shields.io/badge/lines-19K%2B-green) |
-| **路由** | ![Routes](https://img.shields.io/badge/routes-47-ff69b4) |
-| **Stores** | ![Stores](https://img.shields.io/badge/pinia%20stores-17-orange) |
-| **页面** | ![Pages](https://img.shields.io/badge/pages-50+-success) |
-| **工作流 templates** | ![WF](https://img.shields.io/badge/workflow%20templates-6-9cf) |
-| **最新版** | ![v0.4.0](https://img.shields.io/badge/release-v0.4.0-blue) |
-| **License** | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE) |
-| **PRs** | [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md) |
+| 维度                 | 数值                                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| **PRD 闭环度**       | ![100%](https://img.shields.io/badge/PRD-100%25%20✅-brightgreen)                             |
+| **类型安全**         | ![TS strict](https://img.shields.io/badge/TS%20strict-0%20errors-blue)                        |
+| **Build 状态**       | ![Built](https://img.shields.io/badge/build-1271%20modules%20✓-blueviolet)                    |
+| **代码量**           | ![Lines](https://img.shields.io/badge/lines-19K%2B-green)                                     |
+| **路由**             | ![Routes](https://img.shields.io/badge/routes-47-ff69b4)                                      |
+| **Stores**           | ![Stores](https://img.shields.io/badge/pinia%20stores-17-orange)                              |
+| **页面**             | ![Pages](https://img.shields.io/badge/pages-50+-success)                                      |
+| **工作流 templates** | ![WF](https://img.shields.io/badge/workflow%20templates-6-9cf)                                |
+| **最新版**           | ![v0.4.0](https://img.shields.io/badge/release-v0.4.0-blue)                                   |
+| **License**          | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)             |
+| **PRs**              | [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md) |
 
 ## 🚀 Deploy / CI
 
-| 部署 | 状态 |
-| --- | --- |
-| **gh-pages** | ![gh-pages](https://img.shields.io/badge/gh--pages-自动部署-blue) |
-| **CI** | ![CI](https://img.shields.io/badge/CI-3%20jobs%20passing-brightgreen) |
-| **Release Drafter** | ![RD](https://img.shields.io/badge/RD-自动%20CHANGELOG-orange) |
+| 部署                | 状态                                                                  |
+| ------------------- | --------------------------------------------------------------------- |
+| **gh-pages**        | ![gh-pages](https://img.shields.io/badge/gh--pages-自动部署-blue)     |
+| **CI**              | ![CI](https://img.shields.io/badge/CI-3%20jobs%20passing-brightgreen) |
+| **Release Drafter** | ![RD](https://img.shields.io/badge/RD-自动%20CHANGELOG-orange)        |
 
 ## 🎬 演示
 
@@ -55,16 +55,16 @@
 8 个业务领域 + 1 个系统 + 1 个工作台
 ```
 
-| 维度 | 数值 |
-| --- | --- |
-| 源码总行数 | ~14,000 |
-| Pinia stores | 11 |
-| Vue 路由 | 43 |
-| 菜单项 | 36 |
-| Arco 组件数 | 50+ 组件 / 7 业务页面 |
-| 业务闭环 | 9(管理层/支撑/坐席/审查/消费者) |
-| TS strict | ✅ 0 错误 |
-| Vite build | ✅ 0 error |
+| 维度         | 数值                            |
+| ------------ | ------------------------------- |
+| 源码总行数   | ~14,000                         |
+| Pinia stores | 11                              |
+| Vue 路由     | 43                              |
+| 菜单项       | 36                              |
+| Arco 组件数  | 50+ 组件 / 7 业务页面           |
+| 业务闭环     | 9(管理层/支撑/坐席/审查/消费者) |
+| TS strict    | ✅ 0 错误                       |
+| Vite build   | ✅ 0 error                      |
 
 ## 🚀 快速开始
 
@@ -190,13 +190,13 @@ src/
 
 ## 🎯 角色 & 入口
 
-| 角色 | 用户名(登录选) | 入口 |
-| --- | --- | --- |
-| 坐席 | 张敏 / 王浩 / 赵雪 | `/agent/desk` |
-| 业务执行 | 李伟 / 陈静 | `/business/desk` |
-| 管理层 | 陈强 | `/manage/dashboard` |
-| 审查 | 刘丽 / 王芳 | `/review/pending` |
-| 消费者 | 王秀英 | `/consumer/complaints` |
+| 角色     | 用户名(登录选)     | 入口                   |
+| -------- | ------------------ | ---------------------- |
+| 坐席     | 张敏 / 王浩 / 赵雪 | `/agent/desk`          |
+| 业务执行 | 李伟 / 陈静        | `/business/desk`       |
+| 管理层   | 陈强               | `/manage/dashboard`    |
+| 审查     | 刘丽 / 王芳        | `/review/pending`      |
+| 消费者   | 王秀英             | `/consumer/complaints` |
 
 切换角色:`http://localhost:5170/login`
 
@@ -221,26 +221,26 @@ pnpm ci
 
 ## 📦 依赖
 
-| 依赖 | 版本 | 用途 |
-| --- | --- | --- |
-| `vue` | ^3.4 | 框架 |
-| `vue-router` | ^4.3 | 路由 |
-| `pinia` | ^2.1 | 状态管理 |
-| `@arco-design/web-vue` | ^2.55 | UI 组件库 |
-| `dayjs` | ^1.11 | 日期处理(预留) |
-| `lodash-es` | ^4.17 | 工具(预留) |
+| 依赖                   | 版本  | 用途           |
+| ---------------------- | ----- | -------------- |
+| `vue`                  | ^3.4  | 框架           |
+| `vue-router`           | ^4.3  | 路由           |
+| `pinia`                | ^2.1  | 状态管理       |
+| `@arco-design/web-vue` | ^2.55 | UI 组件库      |
+| `dayjs`                | ^1.11 | 日期处理(预留) |
+| `lodash-es`            | ^4.17 | 工具(预留)     |
 
 ## 📝 文档
 
-| 文件 | 内容 |
-| --- | --- |
-| [README.md](./README.md) | 本文件 |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | 架构详解 / 设计原则 / 数据流向 |
-| [CONTRIBUTING.md](./CONTRIBUTING.md) | 贡献指南 |
-| [CHANGELOG.md](./CHANGELOG.md) | 版本变更日志 |
-| [doc/architecture-review.md](./doc/architecture-review.md) | 架构 Review + 重构实施日志 |
-| [doc/review-checklist.md](./doc/review-checklist.md) | 自动化 review 与类型校验清单 |
-| [doc/user-journey-analysis.md](./doc/user-journey-analysis.md) | 用户旅程分析 |
+| 文件                                                           | 内容                           |
+| -------------------------------------------------------------- | ------------------------------ |
+| [README.md](./README.md)                                       | 本文件                         |
+| [ARCHITECTURE.md](./ARCHITECTURE.md)                           | 架构详解 / 设计原则 / 数据流向 |
+| [CONTRIBUTING.md](./CONTRIBUTING.md)                           | 贡献指南                       |
+| [CHANGELOG.md](./CHANGELOG.md)                                 | 版本变更日志                   |
+| [doc/architecture-review.md](./doc/architecture-review.md)     | 架构 Review + 重构实施日志     |
+| [doc/review-checklist.md](./doc/review-checklist.md)           | 自动化 review 与类型校验清单   |
+| [doc/user-journey-analysis.md](./doc/user-journey-analysis.md) | 用户旅程分析                   |
 
 ## 🤝 贡献
 

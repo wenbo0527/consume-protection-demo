@@ -10,11 +10,11 @@
 
 本项目提供 3 种 Issue 模板:
 
-| 类型 | 模板 | 适用场景 |
-| --- | --- | --- |
-| Bug 报告 | `bug_report.md` | 跑不通、报错、行为异常 |
-| 功能请求 | `feature_request.md` | 新页面 / 新 store / 新能力 |
-| 架构 review | `arch_review.md` | 数据归属、模块边界、类型安全 |
+| 类型        | 模板                 | 适用场景                     |
+| ----------- | -------------------- | ---------------------------- |
+| Bug 报告    | `bug_report.md`      | 跑不通、报错、行为异常       |
+| 功能请求    | `feature_request.md` | 新页面 / 新 store / 新能力   |
+| 架构 review | `arch_review.md`     | 数据归属、模块边界、类型安全 |
 
 请选用**最匹配**的模板,缺失信息会影响 review。
 
@@ -37,13 +37,13 @@ pnpm ci
 
 ## 🌿 分支策略
 
-| 分支 | 用途 |
-| --- | --- |
-| `main` | 主分支,CI 必须通过 |
-| `develop` | 开发分支 |
-| `feature/<name>` | 新功能(如 `feature/quality-mgmt`) |
-| `release/<version>` | 发布分支 |
-| `fix/<name>` | Bug 修复(如 `fix/sim-history-empty`) |
+| 分支                | 用途                                 |
+| ------------------- | ------------------------------------ |
+| `main`              | 主分支,CI 必须通过                   |
+| `develop`           | 开发分支                             |
+| `feature/<name>`    | 新功能(如 `feature/quality-mgmt`)    |
+| `release/<version>` | 发布分支                             |
+| `fix/<name>`        | Bug 修复(如 `fix/sim-history-empty`) |
 
 ## 📤 提交规范
 

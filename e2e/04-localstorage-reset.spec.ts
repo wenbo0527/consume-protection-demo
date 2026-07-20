@@ -19,14 +19,34 @@ test('localStorage.clear() 后 reload 仍能进入基础页面', async ({ page }
 
 test('47 路由都可直接访问(不强制登录)', async ({ page }) => {
   const ROUTES = [
-    '/agent/desk', '/agent/phone', '/agent/online-chat', '/agent/ticket',
-    '/business/desk', '/business/apply', '/business/negotiate', '/business/stop-coll',
-    '/business/transfer', '/business/credit', '/business/credit-objection',
-    '/manage/dashboard', '/manage/alert', '/manage/rectify', '/manage/quality',
-    '/manage/ops', '/manage/billing', '/manage/exit', '/manage/rule-config',
-    '/manage/workflow-config', '/manage/workflow-monitor',
-    '/review/pending', '/review/create', '/review/promises', '/review/standards',
-    '/review/audit-trail', '/manage/tickets', '/manage/ticket'
+    '/agent/desk',
+    '/agent/phone',
+    '/agent/online-chat',
+    '/agent/ticket',
+    '/business/desk',
+    '/business/apply',
+    '/business/negotiate',
+    '/business/stop-coll',
+    '/business/transfer',
+    '/business/credit',
+    '/business/credit-objection',
+    '/manage/dashboard',
+    '/manage/alert',
+    '/manage/rectify',
+    '/manage/quality',
+    '/manage/ops',
+    '/manage/billing',
+    '/manage/exit',
+    '/manage/rule-config',
+    '/manage/workflow-config',
+    '/manage/workflow-monitor',
+    '/review/pending',
+    '/review/create',
+    '/review/promises',
+    '/review/standards',
+    '/review/audit-trail',
+    '/manage/tickets',
+    '/manage/ticket'
   ]
 
   for (const path of ROUTES) {

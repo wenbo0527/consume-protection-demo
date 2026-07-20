@@ -62,13 +62,13 @@
 └──────────────────────────────────────────────────────────────┘
 ```
 
-| 角色 | 工作台目录 | 主要页面 |
-| --- | --- | --- |
-| 坐席 agent | `src/pages/AgentWorkbench/` | Desk · CustomerProfile · PhoneChannel · OnlineChat · TicketCreate |
-| 业务执行 business | `src/pages/BusinessWorkbench/` | BusinessDesk · BusinessApply · Negotiate · StopCollection · Credit · Transfer |
-| 管理层 manage | `src/pages/ManageWorkbench/` | Dashboard · AlertHandle · Rectify · Quality · Ops · Billing · ExitCase · RuleConfig · WorkflowConfig · WorkflowMonitor |
-| 审查 review | `src/pages/ReviewWorkbench/` | PendingReview · ReviewExecute · Standards · PromiseTracking · AuditTrail · CreateReview |
-| 消费者 consumer | `src/pages/ConsumerWorkbench/` | ProgressSearch · FeedbackSubmit |
+| 角色              | 工作台目录                     | 主要页面                                                                                                               |
+| ----------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| 坐席 agent        | `src/pages/AgentWorkbench/`    | Desk · CustomerProfile · PhoneChannel · OnlineChat · TicketCreate                                                      |
+| 业务执行 business | `src/pages/BusinessWorkbench/` | BusinessDesk · BusinessApply · Negotiate · StopCollection · Credit · Transfer                                          |
+| 管理层 manage     | `src/pages/ManageWorkbench/`   | Dashboard · AlertHandle · Rectify · Quality · Ops · Billing · ExitCase · RuleConfig · WorkflowConfig · WorkflowMonitor |
+| 审查 review       | `src/pages/ReviewWorkbench/`   | PendingReview · ReviewExecute · Standards · PromiseTracking · AuditTrail · CreateReview                                |
+| 消费者 consumer   | `src/pages/ConsumerWorkbench/` | ProgressSearch · FeedbackSubmit                                                                                        |
 
 ---
 
@@ -173,14 +173,14 @@ items.unshift(newItem)        items 触发 reactivity         items 触发 react
 
 ### 5.1 模板清单
 
-| kind | 名称 | 节点 |
-| --- | --- | --- |
-| `stop_collection` | 停催停扣 | apply → approve → effective → notify → archive |
-| `negotiate` | 协商还款 | apply → trial_calc → approve → effective → notify → archive |
-| `credit_objection` | 征信异议 | apply → approve → investigate → resolve → notify |
-| `transfer_mediate` | 转调解 | apply → match → approve → execute → notify → archive |
-| `review_archive` | 审查归档 | archive → auto_archive_kb → kb_review → notify_seat → archive2 |
-| `alert_directive` | 预警指令 | create_alert → confirm → seat_exec → mark_alert_verified → archive |
+| kind               | 名称     | 节点                                                               |
+| ------------------ | -------- | ------------------------------------------------------------------ |
+| `stop_collection`  | 停催停扣 | apply → approve → effective → notify → archive                     |
+| `negotiate`        | 协商还款 | apply → trial_calc → approve → effective → notify → archive        |
+| `credit_objection` | 征信异议 | apply → approve → investigate → resolve → notify                   |
+| `transfer_mediate` | 转调解   | apply → match → approve → execute → notify → archive               |
+| `review_archive`   | 审查归档 | archive → auto_archive_kb → kb_review → notify_seat → archive2     |
+| `alert_directive`  | 预警指令 | create_alert → confirm → seat_exec → mark_alert_verified → archive |
 
 ### 5.2 节点推进状态机
 
@@ -220,13 +220,13 @@ items.unshift(newItem)        items 触发 reactivity         items 触发 react
 
 每个节点可声明 `sideEffect`:
 
-| sideEffect | 自动行为 |
-| --- | --- |
-| `stop_collection_active` | 写 ticket.status='stopped' |
-| `negotiate_active` | 写 ticket.status='negotiating' + 派 notify_seat |
-| `archive_to_kb` | 写 knowledge.items.push({source:'review_archive', status:'pending'}) |
-| `notify_seat` | 派 `cp-workflow-notify-seat` event |
-| `mark_alert_verified` | 调 alertStore.verifyByWorkflow + 派 event |
+| sideEffect               | 自动行为                                                             |
+| ------------------------ | -------------------------------------------------------------------- |
+| `stop_collection_active` | 写 ticket.status='stopped'                                           |
+| `negotiate_active`       | 写 ticket.status='negotiating' + 派 notify_seat                      |
+| `archive_to_kb`          | 写 knowledge.items.push({source:'review_archive', status:'pending'}) |
+| `notify_seat`            | 派 `cp-workflow-notify-seat` event                                   |
+| `mark_alert_verified`    | 调 alertStore.verifyByWorkflow + 派 event                            |
 
 ---
 
@@ -277,6 +277,7 @@ URL 形如:
 ```
 
 **好处**:
+
 - gh-pages 友好(无需 nginx 配置)
 - 不需要后端(都在前端 mock)
 - 直接跳子路径不会 404(只是路由不命中,JS 拦截)

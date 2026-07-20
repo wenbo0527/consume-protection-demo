@@ -75,8 +75,13 @@ describe('useReviewStore', () => {
     const s = useReviewStore()
     s.standards.length = 0
     s.generateFromRectify({
-      category: 'c', item: 't', basis: 'd', required: false, author: 'x',
-      rectifyTaskId: 'RT-002', rectifyReportId: 'RP-002'
+      category: 'c',
+      item: 't',
+      basis: 'd',
+      required: false,
+      author: 'x',
+      rectifyTaskId: 'RT-002',
+      rectifyReportId: 'RP-002'
     })
     expect(s.rectifyStandards.length).toBe(1)
   })

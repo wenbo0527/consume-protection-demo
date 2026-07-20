@@ -1,12 +1,7 @@
 // 5 个角色的核心路由可达
 import { test, expect } from '@playwright/test'
 
-const AGENT_ROUTES = [
-  '/agent/desk',
-  '/agent/phone',
-  '/agent/online-chat',
-  '/agent/ticket'
-]
+const AGENT_ROUTES = ['/agent/desk', '/agent/phone', '/agent/online-chat', '/agent/ticket']
 
 const BUSINESS_ROUTES = [
   '/business/desk',
@@ -46,11 +41,11 @@ test.describe('routes 可达(无角色切换)', () => {
       expect(res).not.toBeNull()
       // 不能出现未捕获错误(浏览器原生 error)
       const errors: string[] = []
-      page.on('pageerror', e => errors.push(e.message))
+      page.on('pageerror', (e) => errors.push(e.message))
       // 等内容
       await page.waitForLoadState('domcontentloaded')
       await page.waitForTimeout(500)
-      expect(errors.filter(e => !e.includes('test env')).length).toBe(0)
+      expect(errors.filter((e) => !e.includes('test env')).length).toBe(0)
     })
   }
 })

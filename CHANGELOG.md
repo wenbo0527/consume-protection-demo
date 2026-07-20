@@ -10,6 +10,7 @@
 **🎉 收口里程碑**:P0-P3 全部 34 项缺口完全实现(无任何部分实现)
 
 ### Added
+
 - OPT-FIX-1/P3-3:`PhoneChannel.vue` + `OnlineChatChannel.vue` 菜单占位页
 - OPT-P2-10:`useCallQueueStore` 来电队列 + 抢单 + 自动分单 + 坐席负载
 - OPT-5/P1-7:`useBusinessAppStore` + `BusinessApply.vue` 业务申请双向闭环
@@ -24,12 +25,14 @@
 - `MILESTONES.md` 推送交付清单
 
 ### Changed
+
 - `workflow.ts` RoleKey 从 user.ts 单一来源(删自定义)
 - `MainLayout.vue` 重构菜单路径
 - `router.ts` + `router-meta.ts` 双层 metadata
 - `vite.config.ts` base path 支持 gh-pages
 
 ### CI/CD
+
 - 3 个 GitHub Actions workflow(ci / deploy / release-drafter)
 - Husky pre-commit + commit-msg (commitlint)
 - 推送脚本 `scripts/push-to-github.sh`
@@ -41,11 +44,13 @@
 ## [0.3.0] - 2026-07-19
 
 ### Added
+
 - OPT-FIX-2 P3-8:`canApproveFor` getter + approve/reject operatorRole 守卫
 - OPT-FIX-3 P3-10:`useCompliancePromiseStore` + `PromiseTracking.vue` + `ReviewExecute` 同步承诺
 - main.ts `markOverdue` 定时扫描
 
 ### Notes
+
 - P3 全部 100% 闭环;P1-6 仍 partially
 
 ---
@@ -53,6 +58,7 @@
 ## [0.2.0] - 2026-07-19
 
 ### Added
+
 - OPT-FIX-1 P3-3 PhoneChannel + OnlineChatChannel 占位页
 - OPT-2 P2-10 抢单队列(callQueue store)
 - OPT-FIX-3 P1-7 StopCollection banner
@@ -63,6 +69,7 @@
 ## [0.1.0] - 2026-07-19
 
 ### Added
+
 - 项目初始化(Vue3 + TS + Pinia + Arco Design)
 - 14 GitHub 文件(README/CHANGELOG/ARCHITECTURE 等)
 - Husky + commitlint

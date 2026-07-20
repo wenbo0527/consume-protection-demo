@@ -4,7 +4,6 @@ about: 提交架构层(数据归属、模块边界、复用、类型安全)的�
 title: 'arch: '
 labels: ['architecture']
 assignees: []
-
 ---
 
 ## 现状

@@ -4,26 +4,26 @@
 
 ## 版本历史
 
-| 版本 | 日期 | 重要变更 | 闭环进度 |
-| --- | --- | --- | --- |
-| **v0.4.0** | 2026-07-19 | P1-6 工单重复检测三源查重 | **100% 完全闭环** |
-| v0.3.0 | 2026-07-19 | P3-8 审批 role 守卫 + P3-10 投诉管控承诺 + 自动 follow-up | 94% 完全 / 100% 含部分 |
-| v0.2.0 | 2026-07-19 | P3-3 / P2-10 / P1-7 / P3-7 收口 | 82% 完全 / 100% 含部分 |
-| v0.1.0 | 2026-07-19 | 首次初始化 + 14 文件 + Husky + commitlint | 70% 模拟数据 |
+| 版本       | 日期       | 重要变更                                                  | 闭环进度               |
+| ---------- | ---------- | --------------------------------------------------------- | ---------------------- |
+| **v0.4.0** | 2026-07-19 | P1-6 工单重复检测三源查重                                 | **100% 完全闭环**      |
+| v0.3.0     | 2026-07-19 | P3-8 审批 role 守卫 + P3-10 投诉管控承诺 + 自动 follow-up | 94% 完全 / 100% 含部分 |
+| v0.2.0     | 2026-07-19 | P3-3 / P2-10 / P1-7 / P3-7 收口                           | 82% 完全 / 100% 含部分 |
+| v0.1.0     | 2026-07-19 | 首次初始化 + 14 文件 + Husky + commitlint                 | 70% 模拟数据           |
 
 ## 项目指标(2026-07-19)
 
-| 维度 | 数值 |
-| --- | --- |
-| Pinia stores | 17 |
-| Vue 组件 | 8 + 50 页面 = 58 |
-| 路由 | 47 |
-| Git commits | 21 |
-| 文档文件(doc/) | 9 |
-| 总代码行数 | ~19000 |
-| TypeScript strict | 0 错 |
-| Vite build | 0 错,1271 modules |
-| 路由 HTTP smoke | 全部 200 |
+| 维度              | 数值              |
+| ----------------- | ----------------- |
+| Pinia stores      | 17                |
+| Vue 组件          | 8 + 50 页面 = 58  |
+| 路由              | 47                |
+| Git commits       | 21                |
+| 文档文件(doc/)    | 9                 |
+| 总代码行数        | ~19000            |
+| TypeScript strict | 0 错              |
+| Vite build        | 0 错,1271 modules |
+| 路由 HTTP smoke   | 全部 200          |
 
 ## 推送交付清单
 
@@ -65,6 +65,7 @@ bash scripts/release-trigger.sh v0.4.0
 ```
 
 效果:
+
 - GitHub Releases 页面自动出现 `v0.4.0 · 2026-07-19`
 - 自带 Changelog:Features/Bug Fixes/Architecture/CI/Docs/Chores 分类
 - 标题为:完整 commit 列表 + 完整 diff 链接 + 安装命令 + 部署 URL
@@ -72,6 +73,7 @@ bash scripts/release-trigger.sh v0.4.0
 ### gh-pages 部署 URL 形式
 
 部署完成后:
+
 - 主入口:`https://YOUR_ORG.github.io/consume-protection-demo/`
 - 任意页:`https://YOUR_ORG.github.io/consume-protection-demo/#/agent/desk`(hash 路由)
 - `#/manage/quality` `#/business/apply` `#/review/promises` ...

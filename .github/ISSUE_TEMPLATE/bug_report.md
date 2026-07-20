@@ -4,7 +4,6 @@ about: 报告 bug · 帮助改进项目
 title: 'bug: '
 labels: ['bug']
 assignees: []
-
 ---
 
 ## 现象描述

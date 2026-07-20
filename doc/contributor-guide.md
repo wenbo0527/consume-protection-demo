@@ -62,18 +62,18 @@ git checkout -b hotfix/critical-bug
 
 **type**(必填,枚举):
 
-| type | 用途 | 触发版本 |
-| --- | --- | --- |
-| `feat` | 新功能 | minor |
-| `fix` | 修 Bug | patch |
-| `chore` | 工程性(无产品改动) | patch |
-| `docs` | 纯文档 | patch |
-| `style` | 格式(无逻辑) | patch |
-| `refactor` | 重构(无功能变化) | patch |
-| `perf` | 性能优化 | patch |
-| `test` | 测试 | patch |
-| `ci` | CI workflow | patch |
-| `arch` | 架构变更 | minor |
+| type       | 用途               | 触发版本 |
+| ---------- | ------------------ | -------- |
+| `feat`     | 新功能             | minor    |
+| `fix`      | 修 Bug             | patch    |
+| `chore`    | 工程性(无产品改动) | patch    |
+| `docs`     | 纯文档             | patch    |
+| `style`    | 格式(无逻辑)       | patch    |
+| `refactor` | 重构(无功能变化)   | patch    |
+| `perf`     | 性能优化           | patch    |
+| `test`     | 测试               | patch    |
+| `ci`       | CI workflow        | patch    |
+| `arch`     | 架构变更           | minor    |
 
 **scope**(选填):`role` 或 `module`
 
@@ -106,16 +106,20 @@ PR 创建时会自动加载模板。
 
 ```markdown
 ## 改动描述
+
 (1-3 句话说明做了什么)
 
 ## 关联 Issue
+
 - close #123
 - (or) 关联但不 close #456
 
 ## 截图(可选)
+
 (对 UI 改动贴 1-2 张图)
 
 ## 自检清单
+
 - [ ] pnpm run build:type-check 通过
 - [ ] pnpm dev 自测新功能
 - [ ] 已有功能未破坏
@@ -133,6 +137,7 @@ PR 创建时会自动加载模板。
 ### 3.2 PR Preview 自动触发
 
 每开个 PR, [.github/workflows/pr-preview.yml](../../.github/workflows/pr-preview.yml) 会:
+
 - 自动跑 `pnpm build`
 - 上传 artifact(7 天有效)
 - 在 PR 底部评论预览状态
@@ -275,6 +280,7 @@ pnpm dev                     # 3. 自测功能正常
 ### 6.2 自动测试(尚无,推荐后续加)
 
 未来 v0.5+ 计划接入 `vitest`,覆盖:
+
 - workflow 状态机
 - instruction 通知
 - tagRule 联动
@@ -290,12 +296,12 @@ pnpm dev                     # 3. 自测功能正常
 
 ### 7.1 何时加新文档?
 
-| 触发 | 新增 |
-| --- | --- |
-| 新页面类型页(OP-FIX 块做完后) | 更新 `prd-final-coverage.md` |
-| 新增 architecture 决策 | 更新 `architecture-product-alignment.md` |
-| 新增业务模式/演示 | 加到 `demo-script.md` |
-| 新 commit | 跟 `CHANGELOG.md` |
+| 触发                          | 新增                                     |
+| ----------------------------- | ---------------------------------------- |
+| 新页面类型页(OP-FIX 块做完后) | 更新 `prd-final-coverage.md`             |
+| 新增 architecture 决策        | 更新 `architecture-product-alignment.md` |
+| 新增业务模式/演示             | 加到 `demo-script.md`                    |
+| 新 commit                     | 跟 `CHANGELOG.md`                        |
 
 ### 7.2 文档规范
 
@@ -332,7 +338,7 @@ export const useBStore = defineStore('b', {
 export const useBStore = defineStore('b', {
   actions: {
     someAction() {
-      const a = useAStore()  // 在 action 内动态 import 是 OK 的
+      const a = useAStore() // 在 action 内动态 import 是 OK 的
     }
   }
 })
@@ -359,8 +365,8 @@ commit 主题可以用中文,但 commitlint 通过(ascii 范围)。
 ```ts
 import { RoleKey } from '@/stores/user'
 
-const r: RoleKey = 'review'    // ✅
-const r: RoleKey = 'Reviewer'  // ❌ TS 编译失败
+const r: RoleKey = 'review' // ✅
+const r: RoleKey = 'Reviewer' // ❌ TS 编译失败
 ```
 
 `RoleKey` 已存在 `['agent' | 'business' | 'review' | 'manage' | 'consumer']`,新增角色先在 `user.ts` 改这个联合类型。
@@ -369,11 +375,11 @@ const r: RoleKey = 'Reviewer'  // ❌ TS 编译失败
 
 ## 9. 仓库角色
 
-| 角色 | 权限 |
-| --- | --- |
-| **maintainer** | merge main / 创建 release tag |
-| **reviewer** | 强制 1 个人 review 才能 merge |
-| **contributor** | 开 PR / 写 issue |
+| 角色            | 权限                          |
+| --------------- | ----------------------------- |
+| **maintainer**  | merge main / 创建 release tag |
+| **reviewer**    | 强制 1 个人 review 才能 merge |
+| **contributor** | 开 PR / 写 issue              |
 
 ---
 
@@ -386,6 +392,7 @@ const r: RoleKey = 'Reviewer'  // ❌ TS 编译失败
 ---
 
 需要其他说明吗?建议:
+
 - 详细看下 [architecture-product-alignment.md](./architecture-product-alignment.md) — 了解为何本项目是这样设计
 - 跟 [demo-script.md](./demo-script.md) 走一遍 5 步 — 理解系统怎么运作
 - 对比 [prd-final-coverage.md](./prd-final-coverage.md) — 看每个 commit 对应哪个 PRD 缺口

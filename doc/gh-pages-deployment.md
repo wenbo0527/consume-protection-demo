@@ -78,6 +78,7 @@ createRouter({
 ```
 
 hash 模式好处:
+
 - 不需要后端 SPA fallback(GitHub Pages 不支持 nginx try_files)
 - 直接访问子路径 `/agent/desk` 会重定向到 `/index.html#/agent/desk` → 404(GH Pages 静态托管默认行为)
 - 但 hash 路由访问 `#/agent/desk` 会在前端正确解析
@@ -85,9 +86,9 @@ hash 模式好处:
 
 ## 故障排查
 
-| 现象 | 排查 |
-| --- | --- |
-| 部署后页面 404 | 检查 `vite.config.ts` 的 `basePath` 是否设置正确,GitHub Actions 日志 |
-| asset 路径错乱 | 说明 basePath 与部署路径不匹配,vite 必须用 `/repo-name/` 结尾 |
-| 部署成功但登录后白屏 | 检查 router mode 是 `createWebHashHistory` 而非 `createWebHistory` |
-| Action 跑不了 | 确认 `Permissions` → `pages: write` + `id-token: write` 已启用 |
+| 现象                 | 排查                                                                 |
+| -------------------- | -------------------------------------------------------------------- |
+| 部署后页面 404       | 检查 `vite.config.ts` 的 `basePath` 是否设置正确,GitHub Actions 日志 |
+| asset 路径错乱       | 说明 basePath 与部署路径不匹配,vite 必须用 `/repo-name/` 结尾        |
+| 部署成功但登录后白屏 | 检查 router mode 是 `createWebHashHistory` 而非 `createWebHistory`   |
+| Action 跑不了        | 确认 `Permissions` → `pages: write` + `id-token: write` 已启用       |

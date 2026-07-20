@@ -4,7 +4,6 @@ about: 提出新功能建议
 title: 'feat: '
 labels: ['enhancement']
 assignees: []
-
 ---
 
 ## 需求背景

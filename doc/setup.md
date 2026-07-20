@@ -55,12 +55,12 @@ code .
 
 **推荐插件**(可选用):
 
-| 插件 | 作用 |
-| --- | --- |
-| `Vue.volar` | Vue 3 最新语法 |
-| `esbenp.prettier-vscode` | 格式化 |
-| `dbaeumer.vscode-eslint` | 静态检查 |
-| `Vue.vscode-typescript-vue-plugin` | TS .vue 类型 |
+| 插件                               | 作用           |
+| ---------------------------------- | -------------- |
+| `Vue.volar`                        | Vue 3 最新语法 |
+| `esbenp.prettier-vscode`           | 格式化         |
+| `dbaeumer.vscode-eslint`           | 静态检查       |
+| `Vue.vscode-typescript-vue-plugin` | TS .vue 类型   |
 
 ---
 
@@ -161,13 +161,13 @@ consume-protection-demo/
 
 ### 5 个工作台文件夹
 
-| 文件夹 | 角色 | 关键页面 |
-| --- | --- | --- |
-| `AgentWorkbench/` | 坐席 | `AgentDesk`、`CustomerProfile`、`PhoneChannel`、`OnlineChatChannel`、`TicketCreate` |
-| `BusinessWorkbench/` | 业务执行 | `BusinessDesk`、`BusinessApply`、`Negotiate`、`StopCollection`、`CreditObjection` |
-| `ManageWorkbench/` | 管理层 | `Dashboard`、`AlertHandle`、`Rectify`、`QualityManage`、`OpsManage` |
-| `ReviewWorkbench/` | 审查 | `PendingReview`、`ReviewExecute`、`Standards`、`PromiseTracking`、`AuditTrail` |
-| `ConsumerWorkbench/` | 消费者 | `ProgressSearch`、`FeedbackSubmit` |
+| 文件夹               | 角色     | 关键页面                                                                            |
+| -------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `AgentWorkbench/`    | 坐席     | `AgentDesk`、`CustomerProfile`、`PhoneChannel`、`OnlineChatChannel`、`TicketCreate` |
+| `BusinessWorkbench/` | 业务执行 | `BusinessDesk`、`BusinessApply`、`Negotiate`、`StopCollection`、`CreditObjection`   |
+| `ManageWorkbench/`   | 管理层   | `Dashboard`、`AlertHandle`、`Rectify`、`QualityManage`、`OpsManage`                 |
+| `ReviewWorkbench/`   | 审查     | `PendingReview`、`ReviewExecute`、`Standards`、`PromiseTracking`、`AuditTrail`      |
+| `ConsumerWorkbench/` | 消费者   | `ProgressSearch`、`FeedbackSubmit`                                                  |
 
 ---
 
@@ -204,8 +204,8 @@ location.reload()
 ```js
 // 在 console:
 Object.keys(localStorage)
-  .filter(k => k.startsWith('cp_'))
-  .forEach(k => console.log(k, JSON.parse(localStorage.getItem(k))))
+  .filter((k) => k.startsWith('cp_'))
+  .forEach((k) => console.log(k, JSON.parse(localStorage.getItem(k))))
 ```
 
 ### 8.3 切换角色(快速试用全链路)
@@ -232,40 +232,52 @@ wf.$subscribe((mutation, state) => {
 ## Step 9 · 常见问题
 
 ### Q1: 启动后白屏?
+
 **A**:检查 `pnpm install` 是否完成,浏览器 console 有没有红色错误。
 99% 是 `vue-tsc` 报错 — 跑 `pnpm run build:type-check` 看具体 TS 错。
 
 ### Q2: 接通按钮无效?
+
 **A**:在 `useWorkbench` store 里看 `wb.incoming` 是否有值;如果路由是 `#/agent/desk` 但 `wb.incoming == null`,先点"模拟来电"按钮。
 
 ### Q3: 工作流一直没动?
+
 **A**:检查浏览器 console 是否有 dispatchEvent 报错;`useWorkflowStore.start()` 实际是异步的(200ms 模拟延迟),没报错应该会跳节点。
 
 ### Q4: 推 GitHub 部署后页面 404?
+
 **A**:`Settings → Pages → Source` 要选 `GitHub Actions`(不是 `Deploy from a branch`)。看 Deploy workflow log 是否有 ❌。
 
 ### Q5: 想看生产构建?
+
 **A**:
+
 ```bash
 pnpm build      # 生成 dist/
 pnpm preview    # 起 http://localhost:4173 预览
 ```
 
 ### Q6: TypeScript 报了一个不存在的类型?
+
 **A**:通常是因为循环 import。重启 dev server(`pkill -f vite` + `pnpm dev`)。
 
 ### Q7: 怎么添加新角色?
+
 **A**:在 `src/stores/user.ts` 加新 `RoleKey`,`MainLayout.vue` 在 `switch (userStore.currentRole)` 加新 case,`stores/` 加新 store。
 
 ### Q8: 怎么添加新页面?
+
 **A**:
+
 1. `src/pages/<RoleDir>/<Name>.vue` — 新页面
 2. `src/router.ts` — 加路由
 3. `src/router-meta.ts` — 加菜单条目
 4. `src/layout/MainLayout.vue` — 若新分组
 
 ### Q9: 如何发布一个新版本?
+
 **A**:
+
 ```bash
 # 1. 改 CHANGELOG.md
 # 2. 提交 + 创建 tag
@@ -275,6 +287,7 @@ bash scripts/release-trigger.sh v0.5.0
 ```
 
 ### Q10: gh-pages 部署 URL 在哪?
+
 **A**:`Settings → Pages` 顶部显示。或跑 `git push` 后看 Actions log。
 
 ---
