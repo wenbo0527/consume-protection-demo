@@ -1,0 +1,73 @@
+﻿2026-07-20T03:03:33.8384948Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-20T03:03:33.8393967Z ##[group]Run actions/checkout@v4
+2026-07-20T03:03:33.8394669Z with:
+2026-07-20T03:03:33.8395170Z   repository: wenbo0527/consume-protection-demo
+2026-07-20T03:03:33.8399377Z   token: ***
+2026-07-20T03:03:33.8399815Z   ssh-strict: true
+2026-07-20T03:03:33.8400255Z   ssh-user: git
+2026-07-20T03:03:33.8400701Z   persist-credentials: true
+2026-07-20T03:03:33.8401189Z   clean: true
+2026-07-20T03:03:33.8401636Z   sparse-checkout-cone-mode: true
+2026-07-20T03:03:33.8402161Z   fetch-depth: 1
+2026-07-20T03:03:33.8402594Z   fetch-tags: false
+2026-07-20T03:03:33.8403115Z   show-progress: true
+2026-07-20T03:03:33.8403565Z   lfs: false
+2026-07-20T03:03:33.8403981Z   submodules: false
+2026-07-20T03:03:33.8404485Z   set-safe-directory: true
+2026-07-20T03:03:33.8405181Z ##[endgroup]
+2026-07-20T03:03:33.9414711Z Syncing repository: wenbo0527/consume-protection-demo
+2026-07-20T03:03:33.9417264Z ##[group]Getting Git version info
+2026-07-20T03:03:33.9418864Z Working directory is '/home/runner/work/consume-protection-demo/consume-protection-demo'
+2026-07-20T03:03:33.9421030Z [command]/usr/bin/git version
+2026-07-20T03:03:33.9481292Z git version 2.54.0
+2026-07-20T03:03:33.9534754Z ##[endgroup]
+2026-07-20T03:03:33.9551604Z Temporarily overriding HOME='/home/runner/work/_temp/4e10d852-760a-4c63-8d06-6347dfd9ca51' before making global git config changes
+2026-07-20T03:03:33.9554070Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-20T03:03:33.9557455Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/consume-protection-demo/consume-protection-demo
+2026-07-20T03:03:33.9609304Z Deleting the contents of '/home/runner/work/consume-protection-demo/consume-protection-demo'
+2026-07-20T03:03:33.9612869Z ##[group]Initializing the repository
+2026-07-20T03:03:33.9618930Z [command]/usr/bin/git init /home/runner/work/consume-protection-demo/consume-protection-demo
+2026-07-20T03:03:33.9705812Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-07-20T03:03:33.9706883Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-07-20T03:03:33.9708007Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-07-20T03:03:33.9709128Z hint: call:
+2026-07-20T03:03:33.9709807Z hint:
+2026-07-20T03:03:33.9710333Z hint: 	git config --global init.defaultBranch <name>
+2026-07-20T03:03:33.9710962Z hint:
+2026-07-20T03:03:33.9711531Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-07-20T03:03:33.9712434Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-07-20T03:03:33.9713149Z hint:
+2026-07-20T03:03:33.9713550Z hint: 	git branch -m <name>
+2026-07-20T03:03:33.9714058Z hint:
+2026-07-20T03:03:33.9714673Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-07-20T03:03:33.9722884Z Initialized empty Git repository in /home/runner/work/consume-protection-demo/consume-protection-demo/.git/
+2026-07-20T03:03:33.9740713Z [command]/usr/bin/git remote add origin https://github.com/wenbo0527/consume-protection-demo
+2026-07-20T03:03:33.9787920Z ##[endgroup]
+2026-07-20T03:03:33.9790355Z ##[group]Disabling automatic garbage collection
+2026-07-20T03:03:33.9792019Z [command]/usr/bin/git config --local gc.auto 0
+2026-07-20T03:03:33.9825277Z ##[endgroup]
+2026-07-20T03:03:33.9826079Z ##[group]Setting up auth
+2026-07-20T03:03:33.9832984Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-20T03:03:33.9868930Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-20T03:03:34.0219048Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-20T03:03:34.0268962Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-20T03:03:34.0508888Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-20T03:03:34.0545842Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-20T03:03:34.0787206Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-07-20T03:03:34.0828725Z ##[endgroup]
+2026-07-20T03:03:34.0829926Z ##[group]Fetching the repository
+2026-07-20T03:03:34.0840082Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +22d070910e9e67d4555b9eadf58b9a6d0d7b8fb3:refs/remotes/origin/main
+2026-07-20T03:03:34.6217811Z From https://github.com/wenbo0527/consume-protection-demo
+2026-07-20T03:03:34.6219730Z  * [new ref]         22d070910e9e67d4555b9eadf58b9a6d0d7b8fb3 -> origin/main
+2026-07-20T03:03:34.6248721Z ##[endgroup]
+2026-07-20T03:03:34.6249884Z ##[group]Determining the checkout info
+2026-07-20T03:03:34.6251337Z ##[endgroup]
+2026-07-20T03:03:34.6259007Z [command]/usr/bin/git sparse-checkout disable
+2026-07-20T03:03:34.6308241Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-07-20T03:03:34.6342467Z ##[group]Checking out the ref
+2026-07-20T03:03:34.6345815Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-07-20T03:03:34.6625670Z Switched to a new branch 'main'
+2026-07-20T03:03:34.6627478Z branch 'main' set up to track 'origin/main'.
+2026-07-20T03:03:34.6635419Z ##[endgroup]
+2026-07-20T03:03:34.6680273Z [command]/usr/bin/git log -1 --format=%H
+2026-07-20T03:03:34.6709753Z 22d070910e9e67d4555b9eadf58b9a6d0d7b8fb3

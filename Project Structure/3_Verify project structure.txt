@@ -1,0 +1,21 @@
+﻿2026-07-20T03:03:34.6975091Z ##[group]Run test -f src/main.ts
+2026-07-20T03:03:34.6976496Z [36;1mtest -f src/main.ts[0m
+2026-07-20T03:03:34.6977895Z [36;1mtest -f src/router.ts[0m
+2026-07-20T03:03:34.6979365Z [36;1mtest -d src/stores[0m
+2026-07-20T03:03:34.6980521Z [36;1mtest -d src/pages[0m
+2026-07-20T03:03:34.6981839Z [36;1mSTORES=$(find src/stores -name "*.ts" | wc -l)[0m
+2026-07-20T03:03:34.6983487Z [36;1mPAGES=$(find src/pages -name "*.vue" | wc -l)[0m
+2026-07-20T03:03:34.6984980Z [36;1mecho "stores: $STORES"[0m
+2026-07-20T03:03:34.6986186Z [36;1mecho "pages: $PAGES"[0m
+2026-07-20T03:03:34.6987369Z [36;1mif [ "$STORES" -lt 10 ]; then[0m
+2026-07-20T03:03:34.6988972Z [36;1m  echo "::error::Stores too few: $STORES < 10"[0m
+2026-07-20T03:03:34.6990416Z [36;1m  exit 1[0m
+2026-07-20T03:03:34.6991374Z [36;1mfi[0m
+2026-07-20T03:03:34.6992349Z [36;1mif [ "$PAGES" -lt 30 ]; then[0m
+2026-07-20T03:03:34.6993728Z [36;1m  echo "::error::Pages too few: $PAGES < 30"[0m
+2026-07-20T03:03:34.6995207Z [36;1m  exit 1[0m
+2026-07-20T03:03:34.6996239Z [36;1mfi[0m
+2026-07-20T03:03:34.7084881Z shell: /usr/bin/bash -e {0}
+2026-07-20T03:03:34.7086116Z ##[endgroup]
+2026-07-20T03:03:34.7245125Z stores: 21
+2026-07-20T03:03:34.7246976Z pages: 45

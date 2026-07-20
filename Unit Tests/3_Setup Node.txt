@@ -1,0 +1,23 @@
+﻿2026-07-20T03:03:36.2711240Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-20T03:03:36.2712506Z ##[group]Run actions/setup-node@v4
+2026-07-20T03:03:36.2712701Z with:
+2026-07-20T03:03:36.2712861Z   node-version-file: .nvmrc
+2026-07-20T03:03:36.2713040Z   cache: pnpm
+2026-07-20T03:03:36.2713207Z   always-auth: false
+2026-07-20T03:03:36.2713384Z   check-latest: false
+2026-07-20T03:03:36.2715041Z   token: ***
+2026-07-20T03:03:36.2715198Z ##[endgroup]
+2026-07-20T03:03:36.3682632Z Resolved .nvmrc as 20
+2026-07-20T03:03:36.3990554Z Attempting to download 20...
+2026-07-20T03:03:36.4067358Z (node:2061) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-07-20T03:03:36.4068156Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-07-20T03:03:37.0082799Z Acquiring 20.20.2 - x64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-linux-x64.tar.gz
+2026-07-20T03:03:37.4848945Z Extracting ...
+2026-07-20T03:03:37.4925367Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/82036be5-d6c6-4636-8286-3525d147903b -f /home/runner/work/_temp/184467a7-2a83-4d82-abba-a5b5b1090ff6
+2026-07-20T03:03:38.3016166Z Adding to the cache ...
+2026-07-20T03:03:40.3131960Z ##[group]Environment details
+2026-07-20T03:03:40.6000900Z node: v20.20.2
+2026-07-20T03:03:40.6001370Z npm: 10.8.2
+2026-07-20T03:03:40.6001687Z yarn: 1.22.22
+2026-07-20T03:03:40.6002308Z ##[endgroup]
+2026-07-20T03:03:40.6041542Z ##[error]Unable to locate executable file: pnpm. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also check the file mode to verify the file is executable.

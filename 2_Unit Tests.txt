@@ -1,0 +1,146 @@
+﻿2026-07-20T03:03:33.3183462Z Current runner version: '2.335.1'
+2026-07-20T03:03:33.3201281Z ##[group]Runner Image Provisioner
+2026-07-20T03:03:33.3201906Z Hosted Compute Agent
+2026-07-20T03:03:33.3202408Z Version: 20260707.563
+2026-07-20T03:03:33.3202825Z Commit: 02667638d2b423fbc733a8e32a88b44996a3ba6e
+2026-07-20T03:03:33.3203365Z Build Date: 2026-07-07T19:33:50Z
+2026-07-20T03:03:33.3203856Z Worker ID: {579d8ced-67e6-4129-b9c1-e93ec35e0321}
+2026-07-20T03:03:33.3204403Z Azure Region: centralus
+2026-07-20T03:03:33.3204793Z ##[endgroup]
+2026-07-20T03:03:33.3205689Z ##[group]Operating System
+2026-07-20T03:03:33.3206104Z Ubuntu
+2026-07-20T03:03:33.3206473Z 24.04.4
+2026-07-20T03:03:33.3206839Z LTS
+2026-07-20T03:03:33.3207193Z ##[endgroup]
+2026-07-20T03:03:33.3207598Z ##[group]Runner Image
+2026-07-20T03:03:33.3207999Z Image: ubuntu-24.04
+2026-07-20T03:03:33.3208373Z Version: 20260714.240.1
+2026-07-20T03:03:33.3209260Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260714.240/images/ubuntu/Ubuntu2404-Readme.md
+2026-07-20T03:03:33.3210504Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260714.240
+2026-07-20T03:03:33.3211180Z ##[endgroup]
+2026-07-20T03:03:33.3212006Z ##[group]GITHUB_TOKEN Permissions
+2026-07-20T03:03:33.3213528Z Contents: read
+2026-07-20T03:03:33.3213934Z Metadata: read
+2026-07-20T03:03:33.3214341Z Packages: read
+2026-07-20T03:03:33.3214767Z ##[endgroup]
+2026-07-20T03:03:33.3216525Z Secret source: Actions
+2026-07-20T03:03:33.3217077Z Prepare workflow directory
+2026-07-20T03:03:33.3484938Z Prepare all required actions
+2026-07-20T03:03:33.3513930Z Getting action download info
+2026-07-20T03:03:33.5938883Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-07-20T03:03:34.0978529Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-07-20T03:03:34.5091615Z Download action repository 'pnpm/action-setup@v3' (SHA:a3252b78c470c02df07e9d59298aecedc3ccdd6d)
+2026-07-20T03:03:35.1034227Z Complete job name: Unit Tests
+2026-07-20T03:03:35.1585935Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-20T03:03:35.1593163Z ##[group]Run actions/checkout@v4
+2026-07-20T03:03:35.1593744Z with:
+2026-07-20T03:03:35.1594141Z   repository: wenbo0527/consume-protection-demo
+2026-07-20T03:03:35.1598725Z   token: ***
+2026-07-20T03:03:35.1599063Z   ssh-strict: true
+2026-07-20T03:03:35.1599390Z   ssh-user: git
+2026-07-20T03:03:35.1599738Z   persist-credentials: true
+2026-07-20T03:03:35.1600398Z   clean: true
+2026-07-20T03:03:35.1600806Z   sparse-checkout-cone-mode: true
+2026-07-20T03:03:35.1601253Z   fetch-depth: 1
+2026-07-20T03:03:35.1601577Z   fetch-tags: false
+2026-07-20T03:03:35.1601922Z   show-progress: true
+2026-07-20T03:03:35.1602342Z   lfs: false
+2026-07-20T03:03:35.1602751Z   submodules: false
+2026-07-20T03:03:35.1603121Z   set-safe-directory: true
+2026-07-20T03:03:35.1603864Z ##[endgroup]
+2026-07-20T03:03:35.2341412Z Syncing repository: wenbo0527/consume-protection-demo
+2026-07-20T03:03:35.2343270Z ##[group]Getting Git version info
+2026-07-20T03:03:35.2344145Z Working directory is '/home/runner/work/consume-protection-demo/consume-protection-demo'
+2026-07-20T03:03:35.2345300Z [command]/usr/bin/git version
+2026-07-20T03:03:35.4037296Z git version 2.54.0
+2026-07-20T03:03:35.4054157Z ##[endgroup]
+2026-07-20T03:03:35.4066000Z Temporarily overriding HOME='/home/runner/work/_temp/1a106168-6e0f-429f-ac08-a8f6d9170487' before making global git config changes
+2026-07-20T03:03:35.4067530Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-20T03:03:35.4070528Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/consume-protection-demo/consume-protection-demo
+2026-07-20T03:03:35.4100591Z Deleting the contents of '/home/runner/work/consume-protection-demo/consume-protection-demo'
+2026-07-20T03:03:35.4103666Z ##[group]Initializing the repository
+2026-07-20T03:03:35.4107374Z [command]/usr/bin/git init /home/runner/work/consume-protection-demo/consume-protection-demo
+2026-07-20T03:03:35.4177198Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-07-20T03:03:35.4178424Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-07-20T03:03:35.4179714Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-07-20T03:03:35.4181255Z hint: call:
+2026-07-20T03:03:35.4181844Z hint:
+2026-07-20T03:03:35.4182415Z hint: 	git config --global init.defaultBranch <name>
+2026-07-20T03:03:35.4183105Z hint:
+2026-07-20T03:03:35.4183722Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-07-20T03:03:35.4184935Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-07-20T03:03:35.4185956Z hint:
+2026-07-20T03:03:35.4186377Z hint: 	git branch -m <name>
+2026-07-20T03:03:35.4186812Z hint:
+2026-07-20T03:03:35.4187594Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-07-20T03:03:35.4189163Z Initialized empty Git repository in /home/runner/work/consume-protection-demo/consume-protection-demo/.git/
+2026-07-20T03:03:35.4191825Z [command]/usr/bin/git remote add origin https://github.com/wenbo0527/consume-protection-demo
+2026-07-20T03:03:35.4209774Z ##[endgroup]
+2026-07-20T03:03:35.4210788Z ##[group]Disabling automatic garbage collection
+2026-07-20T03:03:35.4212154Z [command]/usr/bin/git config --local gc.auto 0
+2026-07-20T03:03:35.4232680Z ##[endgroup]
+2026-07-20T03:03:35.4233310Z ##[group]Setting up auth
+2026-07-20T03:03:35.4237048Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-20T03:03:35.4259191Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-20T03:03:35.5189158Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-20T03:03:35.5212878Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-20T03:03:35.5354502Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-20T03:03:35.5377401Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-20T03:03:35.5531042Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-07-20T03:03:35.5576903Z ##[endgroup]
+2026-07-20T03:03:35.5577440Z ##[group]Fetching the repository
+2026-07-20T03:03:35.5584182Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +22d070910e9e67d4555b9eadf58b9a6d0d7b8fb3:refs/remotes/origin/main
+2026-07-20T03:03:36.2204592Z From https://github.com/wenbo0527/consume-protection-demo
+2026-07-20T03:03:36.2205078Z  * [new ref]         22d070910e9e67d4555b9eadf58b9a6d0d7b8fb3 -> origin/main
+2026-07-20T03:03:36.2220618Z ##[endgroup]
+2026-07-20T03:03:36.2221035Z ##[group]Determining the checkout info
+2026-07-20T03:03:36.2222464Z ##[endgroup]
+2026-07-20T03:03:36.2227269Z [command]/usr/bin/git sparse-checkout disable
+2026-07-20T03:03:36.2258115Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-07-20T03:03:36.2278601Z ##[group]Checking out the ref
+2026-07-20T03:03:36.2281339Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-07-20T03:03:36.2481093Z Switched to a new branch 'main'
+2026-07-20T03:03:36.2481488Z branch 'main' set up to track 'origin/main'.
+2026-07-20T03:03:36.2484568Z ##[endgroup]
+2026-07-20T03:03:36.2509058Z [command]/usr/bin/git log -1 --format=%H
+2026-07-20T03:03:36.2525427Z 22d070910e9e67d4555b9eadf58b9a6d0d7b8fb3
+2026-07-20T03:03:36.2711277Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-20T03:03:36.2712509Z ##[group]Run actions/setup-node@v4
+2026-07-20T03:03:36.2712703Z with:
+2026-07-20T03:03:36.2712864Z   node-version-file: .nvmrc
+2026-07-20T03:03:36.2713042Z   cache: pnpm
+2026-07-20T03:03:36.2713210Z   always-auth: false
+2026-07-20T03:03:36.2713387Z   check-latest: false
+2026-07-20T03:03:36.2715043Z   token: ***
+2026-07-20T03:03:36.2715200Z ##[endgroup]
+2026-07-20T03:03:36.3682691Z Resolved .nvmrc as 20
+2026-07-20T03:03:36.3990611Z Attempting to download 20...
+2026-07-20T03:03:36.4067390Z (node:2061) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-07-20T03:03:36.4068230Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-07-20T03:03:37.0082845Z Acquiring 20.20.2 - x64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-linux-x64.tar.gz
+2026-07-20T03:03:37.4849004Z Extracting ...
+2026-07-20T03:03:37.4925405Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/82036be5-d6c6-4636-8286-3525d147903b -f /home/runner/work/_temp/184467a7-2a83-4d82-abba-a5b5b1090ff6
+2026-07-20T03:03:38.3016228Z Adding to the cache ...
+2026-07-20T03:03:40.3132029Z ##[group]Environment details
+2026-07-20T03:03:40.6000961Z node: v20.20.2
+2026-07-20T03:03:40.6001376Z npm: 10.8.2
+2026-07-20T03:03:40.6001692Z yarn: 1.22.22
+2026-07-20T03:03:40.6002312Z ##[endgroup]
+2026-07-20T03:03:40.6041645Z ##[error]Unable to locate executable file: pnpm. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also check the file mode to verify the file is executable.
+2026-07-20T03:03:40.6212654Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-20T03:03:40.6213499Z Post job cleanup.
+2026-07-20T03:03:40.6822977Z [command]/usr/bin/git version
+2026-07-20T03:03:40.6855941Z git version 2.54.0
+2026-07-20T03:03:40.6886126Z Temporarily overriding HOME='/home/runner/work/_temp/a106850b-26f8-4066-9651-86f9695c8f32' before making global git config changes
+2026-07-20T03:03:40.6886777Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-20T03:03:40.6891186Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/consume-protection-demo/consume-protection-demo
+2026-07-20T03:03:40.6921725Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-20T03:03:40.6945961Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-20T03:03:40.7107879Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-20T03:03:40.7124320Z http.https://github.com/.extraheader
+2026-07-20T03:03:40.7144881Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-07-20T03:03:40.7166769Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-20T03:03:40.7328384Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-20T03:03:40.7351016Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-20T03:03:40.7626273Z Cleaning up orphan processes
+2026-07-20T03:03:40.7785232Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
