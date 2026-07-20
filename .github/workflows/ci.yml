@@ -29,6 +29,11 @@ jobs:
           corepack enable
           corepack prepare pnpm@9.15.0 --activate
 
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
+
 
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -51,6 +56,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
 
       - name: Enable pnpm
         run: |
@@ -91,6 +101,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.15.0 --activate
 
       - name: Enable pnpm
         run: |
