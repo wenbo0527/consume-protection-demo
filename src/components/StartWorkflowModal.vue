@@ -86,6 +86,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { useWorkflowStore, WorkflowKind, RoleKey, WorkflowInstance, WorkflowNode } from '@/stores/workflow'
+import { roleShortLabel as baseRoleLabel } from '@/utils/role-name'
 
 const props = defineProps<{
   visible: boolean
@@ -143,14 +144,9 @@ function nodeColor(k: WorkflowNode['kind']) {
 }
 
 function roleLabel(r: WorkflowNode['handlerRole']) {
-  return {
-    agent: '坐席',
-    business: '支撑岗',
-    review: '审查人员',
-    manage: '管理层',
-    consumer: '消费者',
-    system: '系统'
-  }[r]
+  // 原生数据里 system 不是 RoleKey,不能裸用 roleShortLabel,加入兜底映射
+  if (r === 'system') return '系统'
+  return baseRoleLabel(r)
 }
 
 function onCancel() {

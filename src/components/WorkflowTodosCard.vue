@@ -186,6 +186,7 @@ import { computed, ref } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { useWorkflowStore, WorkflowInstance, RoleKey } from '@/stores/workflow'
 import { useUserStore, getRoleInfo } from '@/stores/user'
+import { roleShortLabel as roleLabel, roleLabelByKey } from '@/utils/role-name'
 
 const props = defineProps<{
   /** 当前角色,用于过滤待办 */
@@ -285,13 +286,6 @@ function nodeKindColor(k: string) {
 
 function kindShort(k: string) {
   return { apply: '申请', approve: '审批', execute: '执行', notify: '通知', auto: '自动', archive: '归档' }[k] || k
-}
-
-function roleLabel(r: string) {
-  return { agent: '坐席', business: '支撑岗', review: '审查人员', manage: '管理层' }[r] || r
-}
-function roleLabelByKey(r: any) {
-  return roleLabel(r)
 }
 
 function statusColor(s: WorkflowInstance['status']) {

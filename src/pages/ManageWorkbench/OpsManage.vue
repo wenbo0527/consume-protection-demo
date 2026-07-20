@@ -332,6 +332,7 @@ import { Message } from '@arco-design/web-vue'
 import { useOpsStore, Agent, ShiftType, ShiftEntry, LeaveType } from '@/stores/ops'
 import { useUserStore, getRoleInfo } from '@/stores/user'
 import { useQualityStore } from '@/stores/quality'
+import { roleShortLabel as baseRoleLabel } from '@/utils/role-name'
 
 const ops = useOpsStore()
 const userStore = useUserStore()
@@ -493,7 +494,8 @@ function roleColor(r: string) {
   return { agent: 'arcoblue', business: 'orange', review: 'purple', manage: 'red', system: 'gray' }[r] || 'gray'
 }
 function roleLabel(r: string) {
-  return { agent: '坐席', business: '业务执行', review: '审查', manage: '管理层', system: '系统' }[r] || r
+  if (r === 'system') return '系统'
+  return baseRoleLabel(r)
 }
 function statusColor(s: string) {
   return { oncall: 'green', idle: 'arcoblue', offline: 'gray', rest: 'orange' }[s] || 'gray'

@@ -360,6 +360,7 @@ import { computed, ref } from 'vue'
 import { tickets } from '@/mock/data'
 import { useWorkflowStore, WorkflowInstance, WorkflowKind } from '@/stores/workflow'
 import { useRectifyStore } from '@/stores/rectify'
+import { roleShortLabel as baseRoleLabel } from '@/utils/role-name'
 import StatusBadge from '@/components/StatusBadge.vue'
 
 const period = ref('today')
@@ -505,15 +506,9 @@ function nodeKindColor(k: string) {
 function nodeKindShort(k: string) {
   return { apply: '申请', approve: '审批', execute: '执行', notify: '通知', auto: '自动', archive: '归档' }[k] || k
 }
-const ROLE_LABELS: Record<string, string> = {
-  agent: '坐席',
-  business: '支撑岗',
-  review: '审查',
-  manage: '管理层',
-  system: '系统'
-}
 function roleLabel(r: string) {
-  return ROLE_LABELS[r] || r
+  if (r === 'system') return '系统'
+  return baseRoleLabel(r)
 }
 function statusColor(s: WorkflowInstance['status']) {
   return { running: 'arcoblue', approved: 'green', rejected: 'red', expired: 'orange', finished: 'gray' }[s] || 'gray'
