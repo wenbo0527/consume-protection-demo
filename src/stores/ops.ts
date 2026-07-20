@@ -3,6 +3,7 @@
 // 与质检 store 联动:质检评分决定绩效里的"均分"
 
 import { defineStore } from 'pinia'
+import { generateId } from '@/utils/format'
 
 // ============ 类型 ============
 
@@ -304,7 +305,7 @@ export const useOpsStore = defineStore('ops', {
 
     /** 请假申请 */
     applyLeave(input: Omit<LeaveRequest, 'id' | 'status' | 'applicantAt'>): LeaveRequest {
-      const id = `LV-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(Math.floor(Math.random() * 9000) + 1000)}`
+      const id = generateId('LV')
       const lv: LeaveRequest = {
         ...input,
         id,

@@ -19,8 +19,16 @@ export type InstanceRow = {
   [k: string]: any
 }
 
+/**
+ * WorkflowInstance.status 映射。
+ *
+ * 注意:这是项目里"工作流实例"状态的真相源。
+ * 之前 'running' 在 utils/workflow-helpers 里写成了 '审批中',
+ * 但 WorkflowTodosCard.vue 与 WorkflowMonitor.vue 各自复制贴成了 '进行中'
+ * ——本 util 收敛后,所有页面统一走这里。
+ */
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  running: { label: '审批中', color: 'blue' },
+  running: { label: '审批中', color: 'arcoblue' },
   approved: { label: '已审批', color: 'green' },
   finished: { label: '已完成', color: 'gray' },
   rejected: { label: '已驳回', color: 'red' },
@@ -42,6 +50,16 @@ const NODE_NAME_MAP: Record<string, string> = {
 /** 通用:状态 → 标签 + 颜色 */
 export function mapInstanceStatus(s: string): { label: string; color: string } {
   return STATUS_MAP[s] || { label: s, color: 'gray' }
+}
+
+/** 状态色(仅取 color 字段) */
+export function mapInstanceStatusColor(s: string): string {
+  return STATUS_MAP[s]?.color || 'gray'
+}
+
+/** 状态中文(仅取 label 字段) */
+export function mapInstanceStatusLabel(s: string): string {
+  return STATUS_MAP[s]?.label || s
 }
 
 /** 通用:节点 code → 中文名 */

@@ -3,6 +3,7 @@
 // 也可用于业务执行岗 / 审查之间的指令传递
 
 import { defineStore } from 'pinia'
+import { generateId } from '@/utils/format'
 
 // ============ 类型 ============
 
@@ -164,7 +165,7 @@ export const useInstructionStore = defineStore('instruction', {
 
     /** 下达指令(由管理层发起) */
     create(input: Omit<Instruction, 'id' | 'status' | 'createdAt' | 'updatedAt'>): Instruction {
-      const id = `IN-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(Math.floor(Math.random() * 9000) + 1000)}`
+      const id = generateId('IN')
       const now = nowStr()
       const ins: Instruction = {
         ...input,

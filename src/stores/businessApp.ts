@@ -3,6 +3,7 @@
 // 完成 4.5「坐席↔支撑岗」双向闭环
 
 import { defineStore } from 'pinia'
+import { generateId } from '@/utils/format'
 
 // ============ 类型 ============
 
@@ -173,7 +174,7 @@ export const useBusinessAppStore = defineStore('businessApp', {
 
     /** 坐席发起申请 */
     create(input: Omit<BusinessApplication, 'id' | 'status' | 'createdAt' | 'updatedAt'>): BusinessApplication {
-      const id = `BA-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(Math.floor(Math.random() * 9000) + 1000)}`
+      const id = generateId('BA')
       const now = nowStr()
       const app: BusinessApplication = { ...input, id, status: 'pending', createdAt: now, updatedAt: now }
       this.items.unshift(app)

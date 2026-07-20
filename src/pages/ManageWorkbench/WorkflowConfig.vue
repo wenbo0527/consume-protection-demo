@@ -502,6 +502,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { useWorkflowStore, WorkflowKind } from '@/stores/workflow'
+import { mapNodeName } from '@/utils/workflow-helpers'
 
 const activeState = ref('todo')
 
@@ -655,9 +656,8 @@ function onSlaChange(kind: WorkflowKind, code: string, v: number) {
 function onAutoChange(kind: WorkflowKind, code: string, v: boolean) {
   wf.updateNode(kind, code, { autoNext: v })
 }
-function kindShort(k: string) {
-  return { apply: '申请', approve: '审批', execute: '执行', notify: '通知', auto: '自动', archive: '归档' }[k] || k
-}
+// 节点类型 → 中文名 · 复用 utils/workflow-helpers 真相源
+const kindShort = mapNodeName
 </script>
 
 <style scoped>

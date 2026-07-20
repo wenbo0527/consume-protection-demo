@@ -2,6 +2,7 @@
 // 合同模板 / 合同生成 / 票据(收据/发票) / 贷后发送 / 归档
 
 import { defineStore } from 'pinia'
+import { generateId } from '@/utils/format'
 
 // ============ 类型 ============
 
@@ -296,7 +297,7 @@ export const useBillingStore = defineStore('billing', {
     }): BillingDoc | null {
       const tpl = this.templates.find((t) => t.id === input.templateId)
       if (!tpl) return null
-      const id = `BD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(Math.floor(Math.random() * 9000) + 1000)}`
+      const id = generateId('BD')
       const doc: BillingDoc = {
         id,
         type: tpl.type,

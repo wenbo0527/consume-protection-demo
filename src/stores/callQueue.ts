@@ -2,6 +2,7 @@
 // 提供来电队列 + 坐席负载 + 抢单/自动分单策略
 
 import { defineStore } from 'pinia'
+import { generateId } from '@/utils/format'
 
 export type CallPriority = 'urgent' | 'high' | 'normal' | 'low'
 export type CallStatus = 'waiting' | 'assigned' | 'connected' | 'finished' | 'dropped'
@@ -144,7 +145,7 @@ export const useCallQueueStore = defineStore('callQueue', {
      * 其他优先级 → 保持 waiting,等坐席抢单
      */
     incomingCall(input: Omit<CallQueueEntry, 'id' | 'status' | 'queuedAt'>): CallQueueEntry {
-      const id = `CALL-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(Math.floor(Math.random() * 9000) + 1000)}`
+      const id = generateId('CALL')
       const entry: CallQueueEntry = {
         ...input,
         id,

@@ -361,6 +361,7 @@ import { tickets } from '@/mock/data'
 import { useWorkflowStore, WorkflowInstance, WorkflowKind } from '@/stores/workflow'
 import { useRectifyStore } from '@/stores/rectify'
 import { roleShortLabel as baseRoleLabel } from '@/utils/role-name'
+import { mapInstanceStatusColor, mapInstanceStatusLabel, mapNodeName } from '@/utils/workflow-helpers'
 import StatusBadge from '@/components/StatusBadge.vue'
 
 const period = ref('today')
@@ -503,18 +504,17 @@ function nodeKindColor(k: string) {
     'gray'
   )
 }
-function nodeKindShort(k: string) {
-  return { apply: '申请', approve: '审批', execute: '执行', notify: '通知', auto: '自动', archive: '归档' }[k] || k
-}
+// 节点类型 → 中文名 · 复用 utils/workflow-helpers 真相源
+const nodeKindShort = mapNodeName
 function roleLabel(r: string) {
   if (r === 'system') return '系统'
   return baseRoleLabel(r)
 }
 function statusColor(s: WorkflowInstance['status']) {
-  return { running: 'arcoblue', approved: 'green', rejected: 'red', expired: 'orange', finished: 'gray' }[s] || 'gray'
+  return mapInstanceStatusColor(s)
 }
 function statusLabel(s: WorkflowInstance['status']) {
-  return { running: '进行中', approved: '已通过', rejected: '已驳回', expired: '已超时', finished: '已完成' }[s] || s
+  return mapInstanceStatusLabel(s)
 }
 </script>
 

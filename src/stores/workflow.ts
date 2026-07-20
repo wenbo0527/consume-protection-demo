@@ -5,6 +5,7 @@
 // 4. 副作用:节点完成时调用 onComplete(如停催通过→催收系统停止触达;协商通过→自动触发停催;审查归档→写知识库)
 
 import { defineStore } from 'pinia'
+import { generateId } from '@/utils/format'
 import { useAlertStore } from './alert'
 import { EVT } from '@/constants/events'
 
@@ -529,7 +530,7 @@ export const useWorkflowStore = defineStore('workflow', {
         log('warn', 'start', `template disabled: ${input.kind}`)
         return null
       }
-      const id = `WF-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(Math.floor(Math.random() * 9000) + 1000)}`
+      const id = generateId('WF')
       const firstNode = tpl.nodes[0]
       const now = nowStr()
       // 实例总 SLA = 所有节点的 slaHours 之和(粗略估算;真实场景按节点切换逐段计时)

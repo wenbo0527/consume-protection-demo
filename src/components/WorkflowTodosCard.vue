@@ -187,6 +187,7 @@ import { Message } from '@arco-design/web-vue'
 import { useWorkflowStore, WorkflowInstance, RoleKey } from '@/stores/workflow'
 import { useUserStore, getRoleInfo } from '@/stores/user'
 import { roleShortLabel as roleLabel, roleLabelByKey } from '@/utils/role-name'
+import { mapInstanceStatusColor, mapInstanceStatusLabel, mapNodeName } from '@/utils/workflow-helpers'
 
 const props = defineProps<{
   /** 当前角色,用于过滤待办 */
@@ -284,15 +285,14 @@ function nodeKindColor(k: string) {
   )
 }
 
-function kindShort(k: string) {
-  return { apply: '申请', approve: '审批', execute: '执行', notify: '通知', auto: '自动', archive: '归档' }[k] || k
-}
+// 节点类型 → 中文名 · 复用 utils/workflow-helpers 真相源
+const kindShort = mapNodeName
 
 function statusColor(s: WorkflowInstance['status']) {
-  return { running: 'arcoblue', approved: 'green', rejected: 'red', expired: 'orange', finished: 'gray' }[s] || 'gray'
+  return mapInstanceStatusColor(s)
 }
 function statusLabel(s: WorkflowInstance['status']) {
-  return { running: '进行中', approved: '已通过', rejected: '已驳回', expired: '已超时', finished: '已完成' }[s] || s
+  return mapInstanceStatusLabel(s)
 }
 
 // SLA 进度信息
