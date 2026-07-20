@@ -186,14 +186,14 @@ import { computed, ref } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { useWorkflowStore, WorkflowInstance, RoleKey } from '@/stores/workflow'
 import { useUserStore, getRoleInfo } from '@/stores/user'
-import { roleShortLabel as roleShortLabelImport, roleLabelByKey } from '@/utils/role-name'
+import * as roleNameMod from '@/utils/role-name'
 import { mapInstanceStatusColor, mapInstanceStatusLabel, mapNodeName } from '@/utils/workflow-helpers'
 
 // ⚠️ Vue3 <script setup> 关键:import ... as alias 只在 JS 内可用,
-// template 上下文里只暴露 **显式 const/function**。否则 template 引用
-// 会 fallback 到 window 全局,渲染出 import alias 的源码字符串。
-// 因此这里把 roleShortLabel 重新导出为 const 供 template 用:
-const roleLabel = roleShortLabelImport
+// template 上下文里只暴露 **显式 const/function**。
+// 改用 namespace import(对象)再提取,这样 setup scope 能正常收到,
+// template 里 `{{ roleLabel }}` 拿到的是函数引用本身,调用后才能渲染字符串。
+const { roleShortLabel: roleLabel, roleLabelByKey } = roleNameMod
 
 const props = defineProps<{
   /** 当前角色,用于过滤待办 */
