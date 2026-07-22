@@ -8,10 +8,7 @@
       <a-button type="primary" @click="$router.push('/review/create')"><icon-plus /> 新建立项</a-button>
     </div>
 
-    <!-- 业务工作流待办(P1 引入:审查人员归档后进入知识库审核/通知坐席的节点) -->
-    <div style="margin-bottom: 16px">
-      <workflow-todos-card role="review" :operator-name="'王芳'" />
-    </div>
+    <!-- 工作流待办已迁移至工单详情页 -->
 
     <!-- 状态筛选 -->
     <div class="cp-card" style="padding: 16px 20px; margin-bottom: 12px">
@@ -86,7 +83,6 @@ import { computed, ref } from 'vue'
 import { reviewProjects } from '@/mock/data'
 import StatusBadge from '@/components/StatusBadge.vue'
 import WorkflowSteps from '@/components/WorkflowSteps.vue'
-import WorkflowTodosCard from '@/components/WorkflowTodosCard.vue'
 
 const status = ref('')
 const list = reviewProjects

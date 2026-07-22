@@ -18,7 +18,7 @@
           <icon-phone v-if="!ready" /> <icon-pause v-else />
           {{ ready ? '已开启接线 - 停止' : '开启接线' }}
         </a-button>
-        <a-button size="small" @click="simulateIncoming"> <icon-plus /> 模拟来电 </a-button>
+        <a-button size="small" @click="simulateCallQueueIncoming"> <icon-plus /> 模拟来电 </a-button>
         <!-- OPT-5:坐席发起业务申请入口 -->
         <a-button size="small" type="primary" status="warning" @click="showAppForm = true">
           <icon-plus /> 发起业务申请
@@ -73,6 +73,164 @@
     </a-modal>
 
     <!-- 客户列表 -->
+
+    <!-- ============ v3 新增:今日来电记录区(主任务区,常驻) ============ -->
+    <div class="cp-call-records">
+      <div class="cp-call-records-head">
+        <h2 class="cp-call-records-title">
+          <icon-phone />
+          今日来电
+          <a-tag size="small">{{ todayCalls.length }} 通</a-tag>
+          <a-tag v-if="ringingCall" color="red" size="small">
+            <icon-sound /> 振铃中 · {{ ringingElapsedSec }}s
+          </a-tag>
+        </h2>
+        <a-space>
+          <a-button
+            size="mini"
+            :disabled="!ready"
+            @click="simulateIncoming"
+          >
+            <icon-plus /> 模拟来电
+          </a-button>
+          <a-button size="mini" @click="triggerQueueIncoming">
+            <icon-plus /> 从队列触发
+          </a-button>
+        </a-space>
+      </div>
+      <a-table
+        :data="todayCalls"
+        :pagination="false"
+        row-key="id"
+        size="small"
+        :row-class-name="callRowClass"
+      >
+        <a-table-column title="来电 ID" data-index="id" :width="160">
+          <template #cell="{ record }">
+            <span class="mono" style="font-size: 12px">{{ record.id }}</span>
+          </template>
+        </a-table-column>
+        <a-table-column title="时间" data-index="queuedAt" :width="130">
+          <template #cell="{ record }">
+            <span style="font-size: 12px">{{ record.queuedAt }}</span>
+          </template>
+        </a-table-column>
+        <a-table-column title="客户" :width="140">
+          <template #cell="{ record }">
+            <span style="font-weight: 500">{{ record.customerName }}</span>
+            <div style="font-size: 11px; color: var(--cp-text-tertiary)">{{ record.customerId }}</div>
+          </template>
+        </a-table-column>
+        <a-table-column title="渠道" data-index="channel" :width="70" />
+        <a-table-column title="紧急度" :width="80">
+          <template #cell="{ record }">
+            <a-tag :color="priorityColor(record.priority)" size="small">
+              {{ priorityLabel(record.priority) }}
+            </a-tag>
+          </template>
+        </a-table-column>
+        <a-table-column title="等待时长" :width="100">
+          <template #cell="{ record }">
+            {{ waitingMinutes(record) }} 分钟
+          </template>
+        </a-table-column>
+        <a-table-column title="状态" :width="120">
+          <template #cell="{ record }">
+            <a-tag v-if="record.taggedStatus === 'missed'" color="red" size="small">
+              🔴 未接
+            </a-tag>
+            <a-tag v-else-if="record.taggedStatus === 'rejected'" color="orange" size="small">
+              🟡 拒绝
+            </a-tag>
+            <a-tag v-else-if="record.taggedStatus === 'timeout'" color="orangered" size="small">
+              🟠 超时
+            </a-tag>
+            <a-tag v-else-if="record.status === 'waiting'" color="arcoblue" size="small">
+              待接听
+            </a-tag>
+            <a-tag v-else-if="record.status === 'connected'" color="green" size="small">
+              已接通
+            </a-tag>
+            <a-tag v-else size="small">{{ statusLabel(record.status) }}</a-tag>
+            <div v-if="record.taggedReason" style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 2px">
+              {{ record.taggedReason }}
+            </div>
+          </template>
+        </a-table-column>
+        <a-table-column title="操作" :width="240" fixed="right">
+          <template #cell="{ record }">
+            <a-space :size="4">
+              <a-button
+                v-if="!record.taggedStatus && record.status === 'waiting'"
+                size="mini"
+                type="text"
+                status="danger"
+                @click="openTagModal(record, 'missed')"
+              >
+                标未接
+              </a-button>
+              <a-button
+                v-if="!record.taggedStatus && record.status === 'waiting'"
+                size="mini"
+                type="text"
+                status="warning"
+                @click="openTagModal(record, 'rejected')"
+              >
+                标拒绝
+              </a-button>
+              <a-button
+                v-if="record.taggedStatus && record.taggedStatus !== 'timeout'"
+                size="mini"
+                type="text"
+                @click="openTagModal(record, record.taggedStatus)"
+              >
+                改原因
+              </a-button>
+            </a-space>
+          </template>
+        </a-table-column>
+      </a-table>
+      <a-empty v-if="!todayCalls.length" description="今日暂无来电记录" />
+    </div>
+
+    <!-- ============ v3 新增:打标 Modal ============ -->
+    <a-modal
+      v-model:visible="tagModalVisible"
+      :title="tagModalTitle"
+      :width="480"
+      :ok-text="'确认打标'"
+      @ok="confirmTag"
+    >
+      <a-alert
+        type="info"
+        show-icon
+        style="margin-bottom: 12px"
+      >
+        <template #content>
+          打标后系统将<b>自动生成回访工单</b>,落到坐席外呼待办。
+        </template>
+      </a-alert>
+      <a-form :model="tagForm" layout="vertical">
+        <a-form-item label="打标类型" required>
+          <a-radio-group v-model="tagForm.type" disabled>
+            <a-radio value="missed">🔴 未接听</a-radio>
+            <a-radio value="rejected">🟡 拒绝</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item label="原因" required>
+          <a-radio-group v-model="tagForm.reasonKey">
+            <a-radio value="busy">忙线</a-radio>
+            <a-radio value="away">暂离</a-radio>
+            <a-radio value="wrong_number">号码错误</a-radio>
+            <a-radio value="other">其他</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item v-if="tagForm.reasonKey === 'other'" label="具体原因" required>
+          <a-textarea v-model="tagForm.reasonText" :rows="2" placeholder="请说明具体原因" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
     <div class="cp-desk-body">
       <div class="cp-desk-main">
         <div class="cp-main-head">
@@ -237,17 +395,182 @@ import { useWorkbenchStore } from '@/stores/workbench'
 import { useTagRuleStore, RiskTag as RiskTagType } from '@/stores/tagRule'
 import { useBusinessAppStore, AppType, AppPriority } from '@/stores/businessApp'
 import { useUserStore, getRoleInfo } from '@/stores/user'
+import { useCallQueueStore, CallQueueEntry, CallPriority, CallStatus } from '@/stores/callQueue'
 import { customers, tickets } from '@/mock/data'
 import RiskTag from '@/components/RiskTag.vue'
 import TicketDetail from './TicketDetail.vue'
 import StartWorkflowModal from '@/components/StartWorkflowModal.vue'
-import WorkflowTodosCard from '@/components/WorkflowTodosCard.vue'
 import { Message } from '@arco-design/web-vue'
 
 const router = useRouter()
 const wb = useWorkbenchStore()
+const callQueue = useCallQueueStore()
 
 const ready = ref(true)
+
+/** ================== v3 新增:今日来电记录区 ================== */
+const todayCalls = computed<CallQueueEntry[]>(() =>
+  [...callQueue.entries].sort((a, b) => b.queuedAt.localeCompare(a.queuedAt))
+)
+
+/** 振铃中的来电(未接通且无打标) */
+const ringingCall = computed<CallQueueEntry | undefined>(() =>
+  callQueue.entries.find(
+    (e) => !e.taggedStatus && e.status === 'waiting' && e.assignedAgentId === '张敏'
+  )
+)
+
+/** 振铃已过秒数(本地计时,1s 一次刷新) */
+const ringingElapsedSec = ref(0)
+const RING_TIMEOUT_SEC = 5 // v3 要求:5 秒未接自动打"超时"
+let ringTicker: any = null
+
+/** 派生:是否有未处理的"未接/拒绝/超时"打标 */
+const _unhandledCallWatch = computed(() => ringingCall.value?.id ?? null)
+
+/** 工具 */
+function priorityColor(p: CallPriority): string {
+  return { urgent: 'red', high: 'orange', normal: 'arcoblue', low: 'gray' }[p]
+}
+function priorityLabel(p: CallPriority): string {
+  return { urgent: '紧急', high: '高', normal: '普通', low: '低' }[p]
+}
+function statusLabel(s: CallStatus): string {
+  return { waiting: '待接听', assigned: '已分配', connected: '已接通', finished: '已结束', dropped: '已掉线' }[s]
+}
+function waitingMinutes(record: CallQueueEntry): number {
+  if (!record.queuedAt) return 0
+  const t = new Date(record.queuedAt).getTime()
+  if (isNaN(t)) return 0
+  return Math.max(0, Math.floor((Date.now() - t) / 60000))
+}
+function callRowClass({ record }: { record: CallQueueEntry }): string {
+  if (record.taggedStatus === 'missed') return 'cp-row-missed'
+  if (record.taggedStatus === 'rejected') return 'cp-row-rejected'
+  if (record.taggedStatus === 'timeout') return 'cp-row-timeout'
+  if (record.status === 'waiting' && record.assignedAgentId === '张敏') return 'cp-row-ringing'
+  return ''
+}
+
+/** 触发模拟来电(走 callQueue) */
+function simulateCallQueueIncoming() {
+  const C = [
+    { id: 'C001', name: '刘建国', priority: 'normal' as CallPriority },
+    { id: 'C002', name: '孙丽华', priority: 'high' as CallPriority },
+    { id: 'C003', name: '周志远', priority: 'urgent' as CallPriority },
+    { id: 'C004', name: '吴芳', priority: 'normal' as CallPriority },
+    { id: 'C005', name: '陈伟', priority: 'low' as CallPriority }
+  ]
+  const c = C[Math.floor(Math.random() * C.length)]
+  callQueue.incomingCall({
+    customerId: c.id,
+    customerName: c.name,
+    channel: '电话',
+    priority: c.priority,
+    assignedAgentId: '张敏'
+  })
+}
+/** 从队列触发(接 PhoneChannel 已有逻辑) */
+function triggerQueueIncoming() {
+  const e = callQueue.entries.find((x) => x.status === 'waiting' && !x.assignedAgentId)
+  if (e) {
+    callQueue.assignToAgent(e.id, '张敏')
+    Message.info(`队列分单:${e.customerName} 已分配给张敏`)
+  } else {
+    Message.warning('队列暂无可分单,先点"模拟来电"或去 PhoneChannel 触发')
+  }
+}
+
+/** ================== v3 新增:5 秒未接 → 自动 markTimeout ================== */
+// 每秒检查一次,如果同一振铃已持续 ≥ 5 秒,自动打超时
+let ringCheckTicker: any = null
+onMounted(() => {
+  ringCheckTicker = setInterval(() => {
+    const rc = ringingCall.value
+    if (!rc) {
+      ringingElapsedSec.value = 0
+      return
+    }
+    ringingElapsedSec.value++
+    if (ringingElapsedSec.value >= RING_TIMEOUT_SEC) {
+      const r = callQueue.markTimeout(rc.id, RING_TIMEOUT_SEC)
+      if (r.ok) {
+        Message.warning(`系统自动打标:${rc.customerName} 5 秒未接听 → 已生成回访工单`)
+      }
+      ringingElapsedSec.value = 0
+    }
+  }, 1000)
+})
+onUnmounted(() => {
+  if (ringCheckTicker) {
+    clearInterval(ringCheckTicker)
+    ringCheckTicker = null
+  }
+})
+
+/** ================== v3 新增:打标 Modal ================== */
+interface TagForm {
+  entryId: string
+  customerName: string
+  type: 'missed' | 'rejected'
+  reasonKey: 'busy' | 'away' | 'wrong_number' | 'other'
+  reasonText: string
+}
+const tagModalVisible = ref(false)
+const tagForm = reactive<TagForm>({
+  entryId: '',
+  customerName: '',
+  type: 'missed',
+  reasonKey: 'busy',
+  reasonText: ''
+})
+const tagModalTitle = computed(() => {
+  const t = tagForm.type === 'missed' ? '未接听' : '拒绝'
+  return `打标 · ${t} · ${tagForm.customerName || ''}`
+})
+function openTagModal(record: CallQueueEntry, type: 'missed' | 'rejected') {
+  tagForm.entryId = record.id
+  tagForm.customerName = record.customerName
+  tagForm.type = type
+  // 解析已有原因
+  const r = record.taggedReason || ''
+  const reasonMap: Record<string, 'busy' | 'away' | 'wrong_number'> = {
+    忙线: 'busy',
+    暂离: 'away',
+    号码错误: 'wrong_number'
+  }
+  if (r && reasonMap[r]) {
+    tagForm.reasonKey = reasonMap[r]
+    tagForm.reasonText = ''
+  } else if (r) {
+    tagForm.reasonKey = 'other'
+    tagForm.reasonText = r
+  } else {
+    tagForm.reasonKey = 'busy'
+    tagForm.reasonText = ''
+  }
+  tagModalVisible.value = true
+}
+function confirmTag() {
+  const reason =
+    tagForm.reasonKey === 'other'
+      ? (tagForm.reasonText || '').trim()
+      : ({ busy: '忙线', away: '暂离', wrong_number: '号码错误' } as const)[tagForm.reasonKey]
+  if (!reason) {
+    Message.error('请填写具体原因')
+    return
+  }
+  const r =
+    tagForm.type === 'missed'
+      ? callQueue.markMissed(tagForm.entryId, reason)
+      : callQueue.markRejected(tagForm.entryId, reason)
+  if (r.ok) {
+    Message.success(`已打标 · 已生成回访工单(${tagForm.customerName})`)
+  } else {
+    Message.error('打标失败:未找到该来电')
+  }
+  tagModalVisible.value = false
+}
 
 const searchKey = ref('')
 const ticketModalVisible = ref(false)
@@ -490,6 +813,46 @@ function formatDuration(s: number) {
 </script>
 
 <style scoped>
+/* ============ v3 新增:今日来电区样式 ============ */
+.cp-call-records {
+  background: #fff;
+  border: 1px solid var(--cp-border-light);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.cp-call-records-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.cp-call-records-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cp-call-records :deep(.cp-row-missed) td {
+  background: #fff5f5 !important;
+}
+.cp-call-records :deep(.cp-row-rejected) td {
+  background: #fffbe6 !important;
+}
+.cp-call-records :deep(.cp-row-timeout) td {
+  background: #fff2e8 !important;
+}
+.cp-call-records :deep(.cp-row-ringing) td {
+  background: #e8f4ff !important;
+  animation: cp-ringing-pulse 1s ease-in-out infinite;
+}
+@keyframes cp-ringing-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 0 rgba(20, 148, 232, 0.2); }
+  50% { box-shadow: inset 0 0 0 4px rgba(20, 148, 232, 0.1); }
+}
+
 .cp-desk {
   display: flex;
   flex-direction: column;

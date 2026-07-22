@@ -16,6 +16,7 @@ export type WorkflowKind =
   | 'credit_objection' // 征信异议
   | 'review_archive' // 审查归档→知识库
   | 'alert_directive' // 管理层下达指令(预警→坐席)
+  | 'callback' // 未接/拒绝回访(v3 新增:呼入打标自动生成)
 
 export type NodeKind = 'apply' | 'approve' | 'execute' | 'notify' | 'auto' | 'archive'
 
@@ -316,6 +317,35 @@ const DEFAULT_TEMPLATES: WorkflowTemplate[] = [
         slaHours: 0,
         autoNext: false,
         sideEffect: 'mark_alert_verified'
+      }
+    ]
+  },
+  {
+    kind: 'callback',
+    name: '未接/拒绝回访',
+    desc: 'v3 新增:呼入来电未接听/拒绝坐席后,自动生成回访工单,落到坐席外呼待办',
+    enabled: true,
+    nodes: [
+      {
+        code: 'pending',
+        name: '待回访',
+        kind: 'apply',
+        handlerRole: 'agent',
+        slaHours: 24,
+        autoNext: false,
+        fields: [
+          { key: 'tagType', label: '打标类型', type: 'select', options: ['missed', 'rejected', 'timeout'] },
+          { key: 'tagReason', label: '打标原因', type: 'text' },
+          { key: 'fromCallId', label: '来源来电', type: 'text' }
+        ]
+      },
+      {
+        code: 'callback_done',
+        name: '已回访',
+        kind: 'archive',
+        handlerRole: 'agent',
+        slaHours: 0,
+        autoNext: false
       }
     ]
   }

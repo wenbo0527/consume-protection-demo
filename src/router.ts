@@ -4,7 +4,13 @@ import MainLayout from './layout/MainLayout.vue'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', redirect: '/login' },
-  { path: '/login', name: 'Login', component: () => import('./pages/Login.vue'), meta: { title: '登录' } },
+      { path: '/login', name: 'Login', component: () => import('./pages/Login.vue'), meta: { title: '登录' } },
+      {
+        path: '/journey',
+        name: 'Journey',
+        component: () => import('./pages/Journey/JourneyMap.vue'),
+        meta: { title: '旅程说明', role: 'all' }
+      },
   {
     path: '/',
     component: MainLayout,
@@ -263,24 +269,30 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   if (to.meta?.title) document.title = `${to.meta.title} - 消保投诉管理系统`
 
+  // 白名单页面:无需登录即可访问(讲解/演示入口)
+  // - /login:登录页本身
+  // - /journey:用户旅程说明(讲解辅助页,只读)
+  const PUBLIC_PATHS = new Set(['/login', '/journey'])
+  if (PUBLIC_PATHS.has(to.path)) {
+    return next()
+  }
+
   // 未登录用户访问工作台 → 跳转到登录页
-  if (to.path !== '/login') {
-    let role: string | null = null
-    try {
-      role = localStorage.getItem('cp_user_role')
-    } catch (e) {
-      console.warn('[cp-router] read localStorage failed', e)
-    }
-    // eslint-disable-next-line no-console
-    console.log('[cp-router] beforeEach', {
-      to: to.fullPath,
-      hasRole: !!role,
-      role
-    })
-    if (!role) {
-      console.warn('[cp-router] no role found, redirect to /login')
-      return next({ path: '/login' })
-    }
+  let role: string | null = null
+  try {
+    role = localStorage.getItem('cp_user_role')
+  } catch (e) {
+    console.warn('[cp-router] read localStorage failed', e)
+  }
+  // eslint-disable-next-line no-console
+  console.log('[cp-router] beforeEach', {
+    to: to.fullPath,
+    hasRole: !!role,
+    role
+  })
+  if (!role) {
+    console.warn('[cp-router] no role found, redirect to /login')
+    return next({ path: '/login' })
   }
 
   next()

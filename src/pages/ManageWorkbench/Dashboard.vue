@@ -32,10 +32,7 @@
       <kpi-card label="预警处置率" :value="92" extra="目标 ≥95%" trend="up" tag="待提升" tag-color="orange" />
     </div>
 
-    <!-- 业务工作流待办(P1 引入) -->
-    <div style="margin-bottom: 16px">
-      <workflow-todos-card role="manage" :operator-name="'陈强'" />
-    </div>
+    <!-- 工作流待办已迁移至工单详情页 -->
 
     <a-row :gutter="16" style="margin-top: 4px">
       <!-- 投诉趋势 -->
@@ -203,7 +200,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import KpiCard from '@/components/KpiCard.vue'
-import WorkflowTodosCard from '@/components/WorkflowTodosCard.vue'
 
 const period = ref('day')
 

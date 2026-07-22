@@ -28,10 +28,7 @@
       </div>
     </div>
 
-    <!-- 业务工作流待办(P1 引入:管理层在此也可处理指令类工作流) -->
-    <div style="margin-bottom: 16px">
-      <workflow-todos-card role="manage" :operator-name="'陈强'" />
-    </div>
+    <!-- 工作流待办已迁移至工单详情页 -->
 
     <div class="cp-card" style="padding: 0">
       <a-table :data="alerts" :pagination="false">
@@ -176,7 +173,6 @@ import { useWorkflowStore } from '@/stores/workflow'
 import { useAlertStore } from '@/stores/alert'
 import { useInstructionStore, InstructionPriority, InstructionRole } from '@/stores/instruction'
 import { useUserStore, getRoleInfo } from '@/stores/user'
-import WorkflowTodosCard from '@/components/WorkflowTodosCard.vue'
 import { Message } from '@arco-design/web-vue'
 
 const wf = useWorkflowStore()

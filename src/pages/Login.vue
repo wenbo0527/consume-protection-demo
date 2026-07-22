@@ -118,13 +118,24 @@ async function enter(key: RoleKey) {
   }
   // 等待下一个 tick,确保 store 状态变更完成
   await new Promise((resolve) => setTimeout(resolve, 0))
+
+  // 检查是否有"登录后跳转"的目标(由 JourneyMap 等页面预设)
+  let jumpTarget: string | null = null
+  try {
+    jumpTarget = sessionStorage.getItem('cp_jump_after_login')
+    if (jumpTarget) sessionStorage.removeItem('cp_jump_after_login')
+  } catch (e) {
+    /* ignore */
+  }
+
   try {
     // eslint-disable-next-line no-console
     console.log('[cp-login] before router.push', {
       currentRole: userStore.currentRole,
-      ls: localStorage.getItem('cp_user_role')
+      ls: localStorage.getItem('cp_user_role'),
+      jumpTarget
     })
-    await router.push(defaults[key])
+    await router.push(jumpTarget || defaults[key])
     // eslint-disable-next-line no-console
     console.log('[cp-login] after router.push, route =', router.currentRoute.value.fullPath)
   } catch (e) {

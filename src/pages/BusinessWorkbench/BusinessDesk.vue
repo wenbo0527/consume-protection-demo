@@ -18,10 +18,7 @@
       </a-space>
     </div>
 
-    <!-- 业务工作流待办(P1 引入) -->
-    <div style="padding: 12px 16px 0">
-      <workflow-todos-card role="business" :operator-name="'李伟'" />
-    </div>
+    <!-- 工作流待办已迁移至工单详情页 -->
 
     <div class="cp-desk-body">
       <!-- 任务流 -->
@@ -126,7 +123,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { Message } from '@arco-design/web-vue'
-import WorkflowTodosCard from '@/components/WorkflowTodosCard.vue'
 
 interface BizTask {
   id: string

@@ -57,6 +57,26 @@
       <div class="cp-description">{{ ticket.description }}</div>
     </div>
 
+    <!-- ============== 第二段半:工作流节点图(按工单类型绑定) ============== -->
+    <div v-if="workflowBinding" class="cp-tk-section cp-tk-workflow-section">
+      <div class="cp-section-label">
+        <icon-flow style="color: var(--cp-brand)" />
+        <span>工作流轨迹</span>
+        <a-tag size="small" color="arcoblue">
+          {{ workflowTemplateName }}
+        </a-tag>
+        <span style="font-size: 11px; color: var(--cp-text-tertiary); margin-left: auto">
+          共 {{ workflowTemplateNodes.length }} 个节点 · 当前在第
+          <b style="color: var(--cp-brand)">{{ workflowCurrentIdx + 1 }}</b> 步
+        </span>
+      </div>
+      <workflow-node-graph
+        :kind="workflowBinding.kind"
+        :current-node="workflowBinding.currentNode"
+        :executions="workflowBinding.executions"
+      />
+    </div>
+
     <!-- ============== 第三段:相关知识 + 处理意见(并排) ============== -->
     <div class="cp-tk-work">
       <!-- 左:相关知识推荐 -->
@@ -205,6 +225,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { tickets, customers, knowledge } from '@/mock/data'
 import StatusBadge from '@/components/StatusBadge.vue'
 import RiskTag from '@/components/RiskTag.vue'
+import WorkflowNodeGraph from '@/components/WorkflowNodeGraph.vue'
+import { useWorkflowStore, type WorkflowKind } from '@/stores/workflow'
 import { Message } from '@arco-design/web-vue'
 
 const props = defineProps<{ ticketId?: string; embedded?: boolean }>()
@@ -212,9 +234,56 @@ const emit = defineEmits<{ (e: 'close'): void }>()
 
 const route = useRoute()
 const router = useRouter()
+const wf = useWorkflowStore()
 
 const ticket = computed(() => tickets.find((t) => t.id === (props.ticketId || route.params.id)))
 const customer = computed(() => customers.find((c) => c.id === ticket.value?.customerId))
+
+/** ============ 工作流绑定(工单 type → workflow kind) ============
+ *  对应需求:工作流节点展示与具体工单类型绑定,而非在通用待办卡片中展示
+ *  优先级:优先用 wf.instances 里关联本工单的实例;否则按工单 type/Category 推导
+ */
+const workflowBinding = computed(() => {
+  if (!ticket.value) return null
+  // 优先:从 workflow 实例里查工单关联
+  const inst = wf.instances.find((i) => i.ticketId === ticket.value!.id)
+  if (inst) {
+    return { kind: inst.kind, currentNode: inst.currentNode, executions: inst.executions }
+  }
+  // 兜底:按工单 type/category 推导 kind
+  const kind = inferKindFromTicket(ticket.value)
+  if (!kind) return null
+  return { kind, currentNode: undefined, executions: [] }
+})
+
+function inferKindFromTicket(t: any): WorkflowKind | null {
+  const cat = (t.category || '').toString()
+  const reason = (t.reason || '').toString()
+  const type = (t.type || '').toString()
+  if (reason.includes('催收') || cat.includes('催收') || cat.includes('债务催收')) {
+    if (reason.includes('停催')) return 'stop_collection'
+    return 'stop_collection' // 默认债务催收走停催停扣
+  }
+  if (reason.includes('协商') || cat.includes('协商')) return 'negotiate'
+  if (reason.includes('征信') || cat.includes('征信')) return 'credit_objection'
+  if (type === 'external' || reason.includes('12345') || reason.includes('转办')) return 'transfer_mediate'
+  if (reason.includes('调解')) return 'transfer_mediate'
+  if (cat.includes('审查') || reason.includes('审查')) return 'review_archive'
+  if (reason.includes('指令') || reason.includes('预警')) return 'alert_directive'
+  if (reason.includes('回访') || reason.includes('未接') || reason.includes('拒绝')) return 'callback'
+  return null
+}
+
+const workflowTemplateName = computed(() =>
+  workflowBinding.value ? wf.templateByKind(workflowBinding.value.kind)?.name || '-' : '-'
+)
+const workflowTemplateNodes = computed(() =>
+  workflowBinding.value ? wf.templateByKind(workflowBinding.value.kind)?.nodes || [] : []
+)
+const workflowCurrentIdx = computed(() => {
+  if (!workflowBinding.value) return -1
+  return workflowTemplateNodes.value.findIndex((n) => n.code === workflowBinding.value!.currentNode)
+})
 
 const opinion = ref('')
 const cited = ref<any[]>([])

@@ -18,6 +18,74 @@
       </template>
     </a-alert>
 
+    <!-- ============ P3-B6:试算数据时效 · T-2 vs 当天 切换器 ============ -->
+    <a-card class="cp-card" style="margin-bottom: 16px; border-left: 4px solid var(--cp-warning)">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px">
+        <h3 class="cp-section-title" style="margin: 0">
+          💰 试算数据时效(支撑岗第三大痛点)
+          <a-tag color="orange" size="small">T-2 数据 vs 当天核心数据</a-tag>
+        </h3>
+        <a-radio-group v-model="dataMode" type="button">
+          <a-radio-button value="t-2">📉 T-2 数仓数据</a-radio-button>
+          <a-radio-button value="today">📈 当天核心数据</a-radio-button>
+        </a-radio-group>
+      </div>
+      <a-row :gutter="12">
+        <a-col :span="6">
+          <div class="cp-stat-card">
+            <div class="cp-stat-label">剩余本金</div>
+            <div class="cp-stat-value mono">¥{{ trialData.principal.toLocaleString() }}</div>
+            <div class="cp-stat-extra" :style="{ color: diffDiff.principal > 0 ? 'var(--cp-warning)' : 'var(--cp-success)' }">
+              {{ diffDiff.principal > 0 ? '+' : '' }}¥{{ diffDiff.principal }} vs {{ dataMode === 't-2' ? '当天' : 'T-2' }}
+            </div>
+          </div>
+        </a-col>
+        <a-col :span="6">
+          <div class="cp-stat-card">
+            <div class="cp-stat-label">累计利息</div>
+            <div class="cp-stat-value mono">¥{{ trialData.interest.toLocaleString() }}</div>
+            <div class="cp-stat-extra" :style="{ color: diffDiff.interest > 0 ? 'var(--cp-warning)' : 'var(--cp-success)' }">
+              {{ diffDiff.interest > 0 ? '+' : '' }}¥{{ diffDiff.interest }} vs {{ dataMode === 't-2' ? '当天' : 'T-2' }}
+            </div>
+          </div>
+        </a-col>
+        <a-col :span="6">
+          <div class="cp-stat-card">
+            <div class="cp-stat-label">累计罚息</div>
+            <div class="cp-stat-value mono" style="color: var(--cp-danger)">¥{{ trialData.penalty.toLocaleString() }}</div>
+            <div class="cp-stat-extra" :style="{ color: diffDiff.penalty > 0 ? 'var(--cp-danger)' : 'var(--cp-success)' }">
+              {{ diffDiff.penalty > 0 ? '+' : '' }}¥{{ diffDiff.penalty }} vs {{ dataMode === 't-2' ? '当天' : 'T-2' }}
+            </div>
+          </div>
+        </a-col>
+        <a-col :span="6">
+          <div class="cp-stat-card">
+            <div class="cp-stat-label">合计应还</div>
+            <div class="cp-stat-value mono" style="color: var(--cp-brand)">¥{{ trialData.total.toLocaleString() }}</div>
+            <div class="cp-stat-extra" :style="{ color: diffDiff.total > 0 ? 'var(--cp-warning)' : 'var(--cp-success)' }">
+              {{ diffDiff.total > 0 ? '+' : '' }}¥{{ diffDiff.total }} vs {{ dataMode === 't-2' ? '当天' : 'T-2' }}
+            </div>
+          </div>
+        </a-col>
+      </a-row>
+      <a-alert
+        :type="dataMode === 't-2' ? 'warning' : 'success'"
+        show-icon
+        style="margin-top: 12px"
+      >
+        <template #title>
+          {{ dataMode === 't-2' ? '⚠️ 当前使用 T-2 数仓数据 — 试算金额可能与最终结果不一致' : '✅ 使用当天核心数据 — 试算精确' }}
+        </template>
+        <template #content>
+          <span style="font-size: 12px">
+            {{ dataMode === 't-2'
+              ? '⚠️ 痛点:监管要求 15 个工作日内处理完毕,T-2 数据无法满足审批时效。需登录堡垒机手工核对核心数据(极繁琐)。'
+              : '✅ 痛点已解决:工单系统直连核心系统,审批时效精确到元,无需人工核对。' }}
+          </span>
+        </template>
+      </a-alert>
+    </a-card>
+
     <div class="cp-card" style="padding: 0">
       <a-table :data="list" :pagination="{ pageSize: 10 }">
         <template #columns>
@@ -52,10 +120,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useWorkflowStore } from '@/stores/workflow'
 import { enrichNegotiateRow, getPayload } from '@/utils/workflow-helpers'
 const wf = useWorkflowStore()
+
+/** ============ P3-B6:试算数据时效切换 ============
+ *  对应旅程:支撑岗 §3f "T+2 数据无法满足实时试算,审批需当天最新"
+ *  数据为 mock:T-2 数仓(滞后) vs 当天核心(实时)
+ */
+const dataMode = ref<'t-2' | 'today'>('t-2')
+const trialToday = { principal: 85320, interest: 4820, penalty: 1240, total: 91380 }
+const trialT2 = { principal: 85000, interest: 4600, penalty: 980, total: 90580 }
+const trialData = computed(() => (dataMode.value === 'today' ? trialToday : trialT2))
+const diffDiff = computed(() => {
+  const a = trialData.value
+  const b = dataMode.value === 'today' ? trialT2 : trialToday
+  return {
+    principal: a.principal - b.principal,
+    interest: a.interest - b.interest,
+    penalty: a.penalty - b.penalty,
+    total: a.total - b.total
+  }
+})
 
 const list = computed(() =>
   wf.instances

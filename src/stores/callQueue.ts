@@ -1,12 +1,19 @@
 // 通话队列 store(OPT-FIX P2-10 + P3-3 共享)
 // 提供来电队列 + 坐席负载 + 抢单/自动分单策略
+// v3 新增:未接/拒绝/超时打标 + 自动生成回访工单
 
 import { defineStore } from 'pinia'
 import { generateId } from '@/utils/format'
+import { useWorkflowStore } from './workflow'
 
 export type CallPriority = 'urgent' | 'high' | 'normal' | 'low'
 export type CallStatus = 'waiting' | 'assigned' | 'connected' | 'finished' | 'dropped'
 export type AgentLoadStatus = 'online' | 'busy' | 'offline'
+
+/** v3 新增:打标类型 */
+export type TagType = 'missed' | 'rejected' | 'timeout'
+/** v3 新增:打标原因(枚举 + 自定义) */
+export type TagReason = 'busy' | 'away' | 'wrong_number' | 'other'
 
 export interface CallQueueEntry {
   id: string // CALL-20260715-0001
@@ -20,6 +27,14 @@ export interface CallQueueEntry {
   assignedAt?: string
   connectedAt?: string
   finishedAt?: string
+  /** v3 新增:打标状态(未接/拒绝/超时) */
+  taggedStatus?: TagType
+  /** v3 新增:打标原因(枚举值或自定义文本) */
+  taggedReason?: string
+  /** v3 新增:打标时间 */
+  taggedAt?: string
+  /** v3 新增:坐席响应时长(秒),用于质检/绩效统计 */
+  responseTimeSec?: number
 }
 
 export interface CallAgent {
@@ -214,6 +229,89 @@ export const useCallQueueStore = defineStore('callQueue', {
       this.entries.splice(idx, 1)
       this.persist()
       return true
+    },
+
+    /** ============ v3 新增:未接听打标 ============
+     * 坐席手动标记:客户来电但未接听
+     * 自动联动:生成回访工单(callback 工作流),落到坐席外呼待办
+     */
+    markMissed(entryId: string, reason: string): { ok: boolean; callbackInstanceId?: string } {
+      const e = this.entries.find((x) => x.id === entryId)
+      if (!e) return { ok: false }
+      const taggedAt = nowStr()
+      const responseTimeSec = e.connectedAt
+        ? Math.floor((new Date(taggedAt).getTime() - new Date(e.connectedAt).getTime()) / 1000)
+        : undefined
+      e.taggedStatus = 'missed'
+      e.taggedReason = reason
+      e.taggedAt = taggedAt
+      e.responseTimeSec = responseTimeSec
+      e.status = 'finished' // 未接 → 移出待处理池(保留记录)
+      this.persist()
+      const inst = this._createCallbackInstance(e, 'missed', reason)
+      return { ok: true, callbackInstanceId: inst?.id }
+    },
+
+    /** ============ v3 新增:拒绝打标 ============
+     * 坐席主动拒接,需填原因(弹窗强制填)
+     */
+    markRejected(entryId: string, reason: string): { ok: boolean; callbackInstanceId?: string } {
+      const e = this.entries.find((x) => x.id === entryId)
+      if (!e) return { ok: false }
+      const taggedAt = nowStr()
+      e.taggedStatus = 'rejected'
+      e.taggedReason = reason
+      e.taggedAt = taggedAt
+      e.status = 'finished'
+      this.persist()
+      const inst = this._createCallbackInstance(e, 'rejected', reason)
+      return { ok: true, callbackInstanceId: inst?.id }
+    },
+
+    /** ============ v3 新增:超时自动打标 ============
+     * 系统自动触发:来电后 5 秒未接听
+     * 响应时长固定传 5(秒)
+     */
+    markTimeout(entryId: string, responseTimeSec = 5): { ok: boolean; callbackInstanceId?: string } {
+      const e = this.entries.find((x) => x.id === entryId)
+      if (!e) return { ok: false }
+      const taggedAt = nowStr()
+      e.taggedStatus = 'timeout'
+      e.taggedReason = `坐席 ${responseTimeSec} 秒内未接听(系统自动)`
+      e.taggedAt = taggedAt
+      e.responseTimeSec = responseTimeSec
+      e.status = 'finished'
+      this.persist()
+      const inst = this._createCallbackInstance(e, 'timeout', e.taggedReason)
+      return { ok: true, callbackInstanceId: inst?.id }
+    },
+
+    /** 私有:为来电打标后,自动创建一条 callback 工作流实例(回访工单) */
+    _createCallbackInstance(
+      e: CallQueueEntry,
+      tagType: TagType,
+      reason: string
+    ): { id: string } | null {
+      try {
+        const wf = useWorkflowStore()
+        const inst = wf.start({
+          kind: 'callback',
+          initiator: '系统(来电打标联动)',
+          initiatorRole: 'agent',
+          customerId: e.customerId,
+          customerName: e.customerName,
+          payload: {
+            tagType,
+            tagReason: reason,
+            fromCallId: e.id
+          }
+        })
+        return inst ? { id: inst.id } : null
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('[cp-call-queue] create callback workflow failed', err)
+        return null
+      }
     },
 
     /** 模拟新来电(测试用) */

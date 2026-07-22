@@ -30,6 +30,80 @@
       </div>
     </div>
 
+    <!-- ============ P3-A6:三级标签体系(投诉→根因→整改) ============ -->
+    <a-card class="cp-card" style="margin-bottom: 16px; border-left: 4px solid var(--cp-brand)">
+      <h3 class="cp-section-title" style="margin: 0 0 12px">
+        🏷️ 三级标签体系(投诉标签 → 根因标签 → 整改标签)
+        <a-tag color="arcoblue" size="small">Phase 2 · 5 大类 15 小类</a-tag>
+      </h3>
+      <a-row :gutter="16">
+        <a-col :span="8">
+          <div class="cp-tag-l1" style="border-color: #1494e8">
+            <div class="cp-tag-l1-title">L1 投诉标签(场景)</div>
+            <div class="cp-tag-l1-meta">基于工单投诉性质 / 业务类别 / 投诉原因</div>
+            <div class="cp-tag-list">
+              <a-tag
+                v-for="t in tagL1"
+                :key="t.code"
+                color="arcoblue"
+                size="small"
+                style="margin: 2px; cursor: pointer"
+                @click="activeL1 = t.code; activeL2 = null"
+              >
+                {{ t.name }}<span style="margin-left: 4px; opacity: 0.7">({{ t.count }})</span>
+              </a-tag>
+            </div>
+          </div>
+        </a-col>
+        <a-col :span="8">
+          <div class="cp-tag-l2" style="border-color: #722ed1">
+            <div class="cp-tag-l2-title">L2 根因标签(下钻)</div>
+            <div class="cp-tag-l2-meta">点击左侧投诉标签 → 下钻根因</div>
+            <div v-if="activeL1" class="cp-tag-list">
+              <a-tag
+                v-for="t in tagL2"
+                :key="t.code"
+                color="purple"
+                size="small"
+                style="margin: 2px; cursor: pointer"
+                @click="activeL2 = t.code"
+              >
+                {{ t.name }}<span style="margin-left: 4px; opacity: 0.7">({{ t.count }})</span>
+              </a-tag>
+            </div>
+            <a-empty v-else description="请先选择投诉标签" :size="'small'" />
+          </div>
+        </a-col>
+        <a-col :span="8">
+          <div class="cp-tag-l3" style="border-color: #f5222d">
+            <div class="cp-tag-l3-title">L3 整改标签(措施)</div>
+            <div class="cp-tag-l3-meta">点击根因标签 → 下钻整改措施</div>
+            <div v-if="activeL2" class="cp-tag-list">
+              <a-tag
+                v-for="t in tagL3"
+                :key="t.code"
+                color="red"
+                size="small"
+                style="margin: 2px"
+              >
+                {{ t.name }}<span style="margin-left: 4px; opacity: 0.7">({{ t.count }})</span>
+              </a-tag>
+            </div>
+            <a-empty v-else-if="activeL1" description="请选择根因标签" :size="'small'" />
+            <a-empty v-else description="请先选择投诉标签" :size="'small'" />
+          </div>
+        </a-col>
+      </a-row>
+      <a-alert type="info" show-icon style="margin-top: 12px">
+        <template #content>
+          <span style="font-size: 12px">
+            📌 <b>同业参考</b>:TRS 浦发项目 6 大客服分析因子覆盖 3000+ 标签,识别准确率 90%。
+            Phase 3 完整版将扩展至 9 大类 45 小类。
+          </span>
+        </template>
+      </a-alert>
+    </a-card>
+
     <!-- Tabs -->
     <a-tabs default-active-key="reports">
       <a-tab-pane key="reports" title="溯源报告 ({{ store.reports.length }})">
@@ -298,6 +372,44 @@
         </a-timeline>
 
         <a-divider v-if="currentTask.verification" style="margin: 12px 0">验证结果</a-divider>
+
+        <!-- ============ P3-C2 整改效果验证 · 投诉量对比图 ============ -->
+        <div v-if="currentTask.verification" class="cp-rectify-effect">
+          <h4 style="margin: 0 0 8px; font-size: 13px">
+            📊 整改效果验证 · 投诉量对比
+            <a-tag size="small" :color="effectDelta < 0 ? 'green' : 'red'" style="margin-left: 8px">
+              {{ effectDelta > 0 ? '+' : '' }}{{ effectDelta }}%
+            </a-tag>
+          </h4>
+          <div class="cp-rectify-effect-meta">
+            整改前 <span class="mono">{{ effectData.before }}</span> 条/月 → 整改后
+            <span class="mono">{{ effectData.after }}</span> 条/月
+          </div>
+          <!-- 简易条形对比(用 div 实现,无外部图表依赖) -->
+          <div class="cp-rectify-bars">
+            <div class="cp-rectify-bar-row">
+              <div class="cp-rectify-bar-label">整改前</div>
+              <div class="cp-rectify-bar-track">
+                <div
+                  class="cp-rectify-bar-fill"
+                  :style="{ width: (effectData.before / maxBarValue) * 100 + '%', background: '#f5222d' }"
+                ></div>
+              </div>
+              <div class="cp-rectify-bar-num mono">{{ effectData.before }}</div>
+            </div>
+            <div class="cp-rectify-bar-row">
+              <div class="cp-rectify-bar-label">整改后</div>
+              <div class="cp-rectify-bar-track">
+                <div
+                  class="cp-rectify-bar-fill"
+                  :style="{ width: (effectData.after / maxBarValue) * 100 + '%', background: '#52c41a' }"
+                ></div>
+              </div>
+              <div class="cp-rectify-bar-num mono">{{ effectData.after }}</div>
+            </div>
+          </div>
+        </div>
+
         <a-alert
           v-if="currentTask.verification"
           :type="currentTask.verification.result === 'pass' ? 'success' : 'error'"
@@ -355,13 +467,172 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRectifyStore, TraceReport, RectifyTask } from '@/stores/rectify'
 import { useReviewStore } from '@/stores/review'
 import { Message } from '@arco-design/web-vue'
 
 const store = useRectifyStore()
 const reviewStore = useReviewStore()
+
+/** ============ P3-A6:三级标签体系(投诉→根因→整改) ============
+ *  对应旅程:管理层 §1.6 "标签体系未建" + §3.1 "溯源归因是独立动作,不是工单流转附属品"
+ *  数据为 mock,Phase 2 起步 5 大类 15 小类,Phase 3 完整版 9 大类 45 小类
+ */
+interface TagNode {
+  code: string
+  name: string
+  count: number
+  children?: TagNode[]
+}
+const tagTree: TagNode[] = [
+  {
+    code: 'overdue',
+    name: '逾期催收',
+    count: 128,
+    children: [
+      {
+        code: 'overdue_freq',
+        name: '催收频次过高',
+        count: 67,
+        children: [
+          { code: 'overdue_freq_law', name: '违反日触达上限', count: 23 },
+          { code: 'overdue_freq_hr', name: '非工作时间外呼', count: 18 },
+          { code: 'overdue_freq_relatives', name: '联系第三方', count: 26 }
+        ]
+      },
+      {
+        code: 'overdue_words',
+        name: '催收话术违规',
+        count: 38,
+        children: [
+          { code: 'overdue_words_threat', name: '威胁恐吓言语', count: 21 },
+          { code: 'overdue_words_disclose', name: '泄露客户信息', count: 17 }
+        ]
+      },
+      {
+        code: 'overdue_proc',
+        name: '催收流程不合规',
+        count: 23,
+        children: [
+          { code: 'overdue_proc_nopost', name: '停催后仍外呼', count: 14 },
+          { code: 'overdue_proc_misroute', name: '错客催收', count: 9 }
+        ]
+      }
+    ]
+  },
+  {
+    code: 'pricing',
+    name: '定价收费',
+    count: 86,
+    children: [
+      {
+        code: 'pricing_fee',
+        name: '息费收取',
+        count: 52,
+        children: [
+          { code: 'pricing_fee_over', name: '超出综合 IRR 上限', count: 31 },
+          { code: 'pricing_fee_calc', name: '罚息/违约金计算错误', count: 21 }
+        ]
+      },
+      {
+        code: 'pricing_disclose',
+        name: '信息披露',
+        count: 34,
+        children: [
+          { code: 'pricing_disclose_irr', name: 'IRR 未明示', count: 19 },
+          { code: 'pricing_disclose_serv', name: '服务费未拆分', count: 15 }
+        ]
+      }
+    ]
+  },
+  {
+    code: 'data',
+    name: '个人信息',
+    count: 45,
+    children: [
+      {
+        code: 'data_query',
+        name: '信息查询',
+        count: 21,
+        children: [
+          { code: 'data_query_credit', name: '征信异议处理超时', count: 13 },
+          { code: 'data_query_self', name: '本人信息查询拒绝', count: 8 }
+        ]
+      },
+      {
+        code: 'data_change',
+        name: '信息修改',
+        count: 24,
+        children: [
+          { code: 'data_change_phone', name: '预留号码变更拒绝', count: 16 },
+          { code: 'data_change_addr', name: '地址变更未更新', count: 8 }
+        ]
+      }
+    ]
+  },
+  {
+    code: 'service',
+    name: '服务态度',
+    count: 32,
+    children: [
+      {
+        code: 'service_attitude',
+        name: '坐席态度',
+        count: 19,
+        children: [
+          { code: 'service_attitude_rude', name: '言语不礼貌', count: 11 },
+          { code: 'service_attitude_no', name: '未回应客户诉求', count: 8 }
+        ]
+      },
+      {
+        code: 'service_response',
+        name: '响应时效',
+        count: 13,
+        children: [
+          { code: 'service_response_call', name: '5 秒未接听', count: 7 },
+          { code: 'service_response_msg', name: '工单响应超时', count: 6 }
+        ]
+      }
+    ]
+  },
+  {
+    code: 'platform',
+    name: '平台合作',
+    count: 19,
+    children: [
+      {
+        code: 'platform_transfer',
+        name: '外部转接',
+        count: 19,
+        children: [
+          { code: 'platform_transfer_jd', name: '京东投诉升级', count: 8 },
+          { code: 'platform_transfer_mt', name: '美团投诉升级', count: 6 },
+          { code: 'platform_transfer_12345', name: '12345 转办件', count: 5 }
+        ]
+      }
+    ]
+  }
+]
+
+const activeL1 = ref<string | null>(null)
+const activeL2 = ref<string | null>(null)
+
+const tagL1 = computed(() => tagTree.map((t) => ({ code: t.code, name: t.name, count: t.count })))
+const tagL2 = computed(() => {
+  if (!activeL1.value) return []
+  const node = tagTree.find((t) => t.code === activeL1.value)
+  return (node?.children || []).map((t) => ({ code: t.code, name: t.name, count: t.count }))
+})
+const tagL3 = computed(() => {
+  if (!activeL2.value) return []
+  for (const l1 of tagTree) {
+    if (l1.code !== activeL1.value) continue
+    const l2 = l1.children?.find((t) => t.code === activeL2.value)
+    return (l2?.children || []).map((t) => ({ code: t.code, name: t.name, count: t.count }))
+  }
+  return []
+})
 
 function statusColor(s: string) {
   return (
@@ -562,6 +833,26 @@ function openDetail(t: RectifyTask) {
   currentTask.value = t
   detailVisible.value = true
 }
+
+/** ============ P3-C2:整改效果验证(投诉量对比图) ============
+ *  对应旅程:管理层 §3.2 "整改后投诉量降了吗?不知道"
+ *  数据来源:从当前 task 关联的 report.data.complaintCount 派生(整改前 vs 整改后)
+ *  整改后数量按报告里的"期望下降率 + 实际下降率"综合计算
+ */
+const effectData = computed(() => {
+  if (!currentTask.value?.verification) return { before: 0, after: 0 }
+  const report = store.reports.find((r) => r.id === currentTask.value?.reportId)
+  const before = report?.data?.complaintCount ?? 0
+  const dropRate = currentTask.value.verification.metricDrop ?? 0
+  const after = Math.max(0, Math.round(before * (1 - dropRate / 100)))
+  return { before, after }
+})
+const effectDelta = computed(() => {
+  const { before, after } = effectData.value
+  if (!before) return 0
+  return Math.round(((after - before) / before) * 100)
+})
+const maxBarValue = computed(() => Math.max(effectData.value.before, effectData.value.after, 1))
 </script>
 
 <style scoped>
@@ -570,5 +861,80 @@ function openDetail(t: RectifyTask) {
   font-weight: 600;
   margin: 0 0 12px;
   color: var(--cp-text);
+}
+
+/* ============ P3-A6 三级标签体系 ============ */
+.cp-tag-l1,
+.cp-tag-l2,
+.cp-tag-l3 {
+  border-left: 3px solid;
+  background: #fafbfc;
+  border-radius: 4px;
+  padding: 10px 12px;
+  min-height: 160px;
+}
+.cp-tag-l1-title,
+.cp-tag-l2-title,
+.cp-tag-l3-title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.cp-tag-l1-meta,
+.cp-tag-l2-meta,
+.cp-tag-l3-meta {
+  font-size: 11px;
+  color: var(--cp-text-tertiary);
+  margin-bottom: 8px;
+}
+.cp-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* ============ P3-C2 整改效果条形对比图 ============ */
+.cp-rectify-effect {
+  background: #fafbfc;
+  border: 1px solid var(--cp-border-light);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.cp-rectify-effect-meta {
+  font-size: 12px;
+  color: var(--cp-text-secondary);
+  margin-bottom: 12px;
+}
+.cp-rectify-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cp-rectify-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cp-rectify-bar-label {
+  width: 50px;
+  font-size: 12px;
+  color: var(--cp-text-secondary);
+}
+.cp-rectify-bar-track {
+  flex: 1;
+  height: 14px;
+  background: #f0f1f2;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.cp-rectify-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+.cp-rectify-bar-num {
+  width: 50px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
 }
 </style>

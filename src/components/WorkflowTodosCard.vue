@@ -272,11 +272,16 @@ function kindColor(kind: WorkflowInstance['kind']) {
       negotiate: 'green',
       transfer_mediate: 'arcoblue',
       credit_objection: 'red',
+      callback: 'gray',
       review_archive: 'purple',
       alert_directive: 'magenta'
     }[kind] || 'gray'
   )
 }
+
+/** ============ 工作流模板节点图(待办为空时讲解兜底 — 已废弃,模板节点图移至 TicketDetail) ============ */
+// 旧版:availableTemplates / roleColor / nodeRoleLabel 已删除
+// 新版:工作流节点展示已迁至工单详情页 TicketDetail.vue(按工单类型绑定)
 
 function nodeKindColor(k: string) {
   return (
@@ -411,6 +416,8 @@ function doReject() {
 </script>
 
 <style scoped>
+/* ============ 工作流模板节点图已迁至工单详情页 TicketDetail.vue ============ */
+
 .cp-wf-todos-head {
   display: flex;
   justify-content: space-between;

@@ -1,4 +1,5 @@
 <template>
+  <div class="cp-journey-drawer-host">
   <a-layout class="cp-layout">
     <!-- 浅色侧栏(Arco 企业最佳实践) -->
     <a-layout-sider
@@ -57,6 +58,18 @@
               <alert-center-popover />
             </a-tooltip>
             <notification-center />
+            <!-- ============ 顶部入口:用户旅程说明(讲解辅助) ============ -->
+            <a-tooltip content="打开用户旅程说明(讲解辅助页,只读)">
+              <a-button
+                type="outline"
+                size="medium"
+                class="cp-journey-header-btn"
+                @click="openJourney"
+              >
+                <icon-location />
+                <span>旅程说明</span>
+              </a-button>
+            </a-tooltip>
             <a-divider direction="vertical" style="height: 20px; margin: 0 4px" />
             <a-dropdown trigger="hover">
               <div class="cp-user-chip">
@@ -112,6 +125,7 @@
       </div>
     </a-modal>
   </a-layout>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -337,6 +351,11 @@ function handleLogout() {
   userStore.logout()
   router.push('/login')
 }
+
+/** 顶部"旅程说明"按钮:跳转到 /journey 路由 */
+function openJourney() {
+  router.push({ path: '/journey', query: { from: route.fullPath } })
+}
 </script>
 
 <style scoped>
@@ -445,6 +464,21 @@ function handleLogout() {
 .cp-header-right {
   display: flex;
   align-items: center;
+}
+
+/* ============ 顶部"旅程说明"按钮(讲解入口) ============ */
+.cp-journey-header-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--cp-brand);
+  border-color: var(--cp-brand);
+  font-weight: 500;
+}
+.cp-journey-header-btn:hover {
+  background: var(--cp-brand-soft);
+  color: var(--cp-brand);
+  border-color: var(--cp-brand);
 }
 
 /* 用户头像 */

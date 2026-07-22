@@ -90,6 +90,74 @@
       </a-space>
     </div>
 
+    <!-- ============ P3-B3:待手工介入 OA 队列(管理层/支撑岗第三大痛点) ============ -->
+    <a-card class="cp-card" style="margin-bottom: 16px; border-left: 4px solid var(--cp-danger)">
+      <h3 class="cp-section-title" style="margin: 0 0 12px">
+        ⚠️ 待手工介入 OA 队列
+        <a-tag color="red" size="small">痛点:专人手工登录 OA 创建审批单 + 手动粘贴介质</a-tag>
+        <a-tag size="small" style="margin-left: 8px">{{ oaQueue.length }} 条待处理</a-tag>
+      </h3>
+      <a-table :data="oaQueue" :pagination="{ pageSize: 5 }" row-key="id" size="small">
+        <template #columns>
+          <a-table-column title="工单号" data-index="id" :width="170">
+            <template #cell="{ record }">
+              <span class="mono" style="color: var(--cp-danger); font-weight: 500">{{ record.id }}</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="客户" data-index="customerName" :width="100" />
+          <a-table-column title="审批类型" data-index="oaType" :width="120">
+            <template #cell="{ record }">
+              <a-tag :color="record.oaType === '息费减免' ? 'red' : 'orange'" size="small">
+                {{ record.oaType }}
+              </a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="金额" data-index="amount" :width="120">
+            <template #cell="{ record }">
+              <span class="mono" style="font-weight: 600">¥{{ record.amount.toLocaleString() }}</span>
+              <div style="font-size: 11px; color: var(--cp-text-tertiary)">
+                {{ record.amount >= 100000 ? '→ 总裁办' : '→ 部门总经理' }}
+              </div>
+            </template>
+          </a-table-column>
+          <a-table-column title="待粘贴介质" :width="180">
+            <template #cell="{ record }">
+              <span style="font-size: 11px; color: var(--cp-text-tertiary)">
+                {{ record.mediaInfo }}
+              </span>
+            </template>
+          </a-table-column>
+          <a-table-column title="卡点时长" :width="100">
+            <template #cell="{ record }">
+              <span style="color: var(--cp-danger); font-weight: 600">{{ record.hours }}h</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="操作" :width="180">
+            <template #cell="{ record }">
+              <a-space :size="4">
+                <a-button size="mini" type="primary" status="danger" @click="gotoOA(record)">
+                  🔗 跳转 OA 系统
+                </a-button>
+                <a-button size="mini" @click="markOABypassed(record)">
+                  标记已手工处理
+                </a-button>
+              </a-space>
+            </template>
+          </a-table-column>
+        </template>
+      </a-table>
+      <a-alert type="error" show-icon style="margin-top: 12px">
+        <template #title>⚠️ 痛点:跨系统操作繁琐,人工出错率高</template>
+        <template #content>
+          <span style="font-size: 12px">
+            现状流程:工单系统发起审批 → <b>专人手工登录 OA</b> → <b>手动粘贴介质信息</b> → OA 审批 → 结果回写。
+            理想路径(Phase 1):工单系统直连 OA → 介质信息自动回显 → 审批结果自动同步回工单。
+            对应管理层 §2.2 + 支撑岗 §3e "审批流转" 痛点。
+          </span>
+        </template>
+      </a-alert>
+    </a-card>
+
     <!-- 工单流转追踪列表 -->
     <div class="cp-card" style="padding: 0">
       <a-table :data="filteredTickets" :pagination="{ pageSize: 10 }">
@@ -363,9 +431,39 @@ import { useRectifyStore } from '@/stores/rectify'
 import { roleShortLabel as baseRoleLabel } from '@/utils/role-name'
 import { mapInstanceStatusColor, mapInstanceStatusLabel, mapNodeName } from '@/utils/workflow-helpers'
 import StatusBadge from '@/components/StatusBadge.vue'
+import { Message } from '@arco-design/web-vue'
 
 const period = ref('today')
 const keyword = ref('')
+
+/** ============ P3-B3:待手工介入 OA 队列 ============
+ *  对应旅程:管理层 §2.2 + 支撑岗 §3e "专人手工登录 OA 创建审批单 + 手动粘贴介质"
+ *  数据为 mock,演示痛点;Phase 1 起将与 OA 系统打通
+ */
+interface OaQueueItem {
+  id: string
+  customerName: string
+  oaType: '息费减免' | '停催审批' | '重组分期'
+  amount: number
+  mediaInfo: string
+  hours: number
+}
+const oaQueue = ref<OaQueueItem[]>([
+  { id: 'GD-20260718-0021', customerName: '周志远', oaType: '息费减免', amount: 128000, mediaInfo: '借据 JD-2026-0056 + 客户身份证(已脱敏)', hours: 36 },
+  { id: 'GD-20260719-0034', customerName: '孙丽华', oaType: '息费减免', amount: 42000, mediaInfo: '借据 JD-2026-0112', hours: 12 },
+  { id: 'GD-20260720-0008', customerName: '刘建国', oaType: '停催审批', amount: 0, mediaInfo: '工单关联 + 协商方案', hours: 8 },
+  { id: 'GD-20260720-0019', customerName: '吴芳', oaType: '重组分期', amount: 85000, mediaInfo: '借据 JD-2026-0203 + 还款承诺书', hours: 4 }
+])
+function gotoOA(item: OaQueueItem) {
+  Message.warning(`演示模式:已打开 OA 系统(外部链接)处理 ${item.id}`)
+}
+function markOABypassed(item: OaQueueItem) {
+  const idx = oaQueue.value.findIndex((q) => q.id === item.id)
+  if (idx >= 0) {
+    oaQueue.value.splice(idx, 1)
+    Message.success(`已标记 ${item.id} 为手工处理完毕`)
+  }
+}
 const statusFilter = ref('')
 const urgencyFilter = ref('')
 const regOnly = ref(false)
@@ -493,6 +591,7 @@ function kindColor(kind: WorkflowKind) {
       negotiate: 'green',
       transfer_mediate: 'arcoblue',
       credit_objection: 'red',
+      callback: 'gray',
       review_archive: 'purple',
       alert_directive: 'magenta'
     }[kind] || 'gray'
