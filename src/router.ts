@@ -202,9 +202,19 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'manage/workflow-config',
-        name: 'ManageWorkflowConfig',
-        component: () => import('./pages/ManageWorkbench/WorkflowConfig.vue'),
-        meta: { title: '工单流程配置' }
+        redirect: '/manage/ticket-state'
+      },
+      {
+        path: 'manage/ticket-state',
+        name: 'ManageTicketState',
+        component: () => import('./pages/ManageWorkbench/TicketStateConfig.vue'),
+        meta: { title: '工单状态机配置' }
+      },
+      {
+        path: 'manage/bizflow',
+        name: 'ManageBizFlow',
+        component: () => import('./pages/ManageWorkbench/BizFlowConfig.vue'),
+        meta: { title: '业务工作流配置' }
       },
       {
         path: 'manage/workflow-monitor',
@@ -217,6 +227,12 @@ const routes: RouteRecordRaw[] = [
         name: 'ManageQuality',
         component: () => import('./pages/ManageWorkbench/QualityManage.vue'),
         meta: { title: '质检管理' }
+      },
+      {
+        path: 'manage/feedback',
+        name: 'ManageFeedback',
+        component: () => import('./pages/ManageWorkbench/FeedbackManage.vue'),
+        meta: { title: '满意度评价管理' }
       },
       {
         path: 'manage/ops',

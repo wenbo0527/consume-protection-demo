@@ -274,7 +274,7 @@ const menus = computed<MenuGroup[]>(() => {
           items: [
             { name: '消保看板', path: '/manage/dashboard' },
             { name: '预警中心', path: '/manage/alert', badge: 5 },
-            { name: '不满意评价', path: '/manage/alert' }
+            { name: '满意度评价', path: '/manage/feedback' }
           ]
         },
         {
@@ -300,12 +300,13 @@ const menus = computed<MenuGroup[]>(() => {
           title: '流程管理',
           icon: 'icon-swap',
           items: [
-            { name: '工单流程配置', path: '/manage/workflow-config' },
+            { name: '工单状态机配置', path: '/manage/ticket-state' },
+            { name: '业务工作流配置', path: '/manage/bizflow' },
             { name: '工单流转监控', path: '/manage/workflow-monitor' }
           ]
         },
         {
-          key: 'g5',
+          key: 'g6',
           title: '运营管理',
           icon: 'icon-tool',
           items: [

@@ -11,28 +11,39 @@
           <a-radio-button value="week">本周</a-radio-button>
           <a-radio-button value="month">本月</a-radio-button>
         </a-radio-group>
-        <a-button><icon-export /> 导出报表</a-button>
+        <a-button @click="onExportReport"><icon-export /> 导出报表</a-button>
       </a-space>
     </div>
 
     <!-- KPI 卡片 -->
     <div class="cp-stat-row">
       <kpi-card
-        label="当日投诉量"
-        :value="162"
-        extra="阈值 120 · 超 35%"
-        trend="up"
-        alert
-        tag="超阈值"
-        tag-color="red"
+        v-for="(k, idx) in kpiData"
+        :key="idx"
+        :label="k.label"
+        :value="typeof k.value === 'number' ? k.value : 0"
+        :extra="k.extra"
+        :trend="k.trend"
+        :alert="k.alert"
+        :tag="k.tag"
+        :tag-color="k.tagColor"
       />
-      <kpi-card label="处理时效" :value="4.2" extra="目标 ≤15 工作日" trend="flat" tag="达标" tag-color="green" />
-      <kpi-card label="监管件超时率" :value="3.8" extra="目标 ≤5%" trend="down" tag="达标" tag-color="green" />
-      <kpi-card label="一次性解决率" :value="76" extra="目标 ≥70%" trend="up" tag="达标" tag-color="green" />
-      <kpi-card label="预警处置率" :value="92" extra="目标 ≥95%" trend="up" tag="待提升" tag-color="orange" />
     </div>
 
-    <!-- 工作流待办已迁移至工单详情页 -->
+    <!-- 工作流待办入口:跳转至工单监控(管理层查看全局状态) -->
+    <a-row :gutter="16" style="margin-top: 4px">
+      <a-col :span="24">
+        <a-alert type="info" show-icon>
+          <template #title>工作流待办</template>
+          <template #content>
+            已在每个角色工作台展示(支持工单详情内联处理)。
+            <a-link style="margin-left: 8px" @click="$router.push('/manage/workflow-monitor')">
+              跳转到工单流转监控 →
+            </a-link>
+          </template>
+        </a-alert>
+      </a-col>
+    </a-row>
 
     <a-row :gutter="16" style="margin-top: 4px">
       <!-- 投诉趋势 -->
@@ -41,7 +52,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
             <h3 class="cp-section-title" style="margin: 0">投诉量趋势</h3>
             <a-space :size="4">
-              <a-link>查看详细报表 →</a-link>
+              <a-link @click="onViewDetailedReport">查看详细报表 →</a-link>
             </a-space>
           </div>
           <div class="cp-chart">
@@ -189,7 +200,7 @@
             </div>
           </div>
           <div style="text-align: center; margin-top: 12px">
-            <a-button size="small">查看全部</a-button>
+            <a-button size="small" @click="$router.push('/manage/feedback')">查看全部</a-button>
           </div>
         </div>
       </a-col>
@@ -199,23 +210,113 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { Message } from '@arco-design/web-vue'
 import KpiCard from '@/components/KpiCard.vue'
+
+const router = useRouter()
+
+/** 导出报表:把当前 dashboard 数据序列化为 CSV 并下载 */
+function onExportReport() {
+  const rows = [
+    ['指标', '数值', '目标', '状态'],
+    ['当日投诉量', '162', '120', '超阈值'],
+    ['处理时效(工作日)', '4.2', '15', '达标'],
+    ['监管件超时率(%)', '3.8', '5', '达标'],
+    ['一次性解决率(%)', '76', '70', '达标'],
+    ['预警处置率(%)', '92', '95', '待提升']
+  ]
+  const csv = '\uFEFF' + rows.map((r) => r.join(',')).join('\n') // \uFEFF = UTF-8 BOM
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `dashboard-${new Date().toISOString().slice(0, 10)}.csv`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+  Message.success('报表已下载')
+}
+
+/** 查看详细报表:跳到运营管理(报表占位入口) */
+function onViewDetailedReport() {
+  router.push('/manage/ops')
+}
 
 const period = ref('day')
 
-const xLabels = ['07-09', '07-10', '07-11', '07-12', '07-13', '07-14', '07-15']
-const yLabels = ['200', '150', '100', '50', '0']
-const data = [80, 95, 88, 110, 92, 128, 162]
+/**
+ * 投诉量趋势(按 period 切换:今日/本周/本月)
+ * - 今日:7 个整点的细分
+ * - 本周:过去 7 天
+ * - 本月:过去 30 天(每 5 天一个数据点)
+ */
+interface TrendDataset {
+  xLabels: string[]
+  yLabels: string[]
+  data: number[]
+}
+
+const trendSeries: Record<string, TrendDataset> = {
+  day: {
+    xLabels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'],
+    yLabels: ['200', '150', '100', '50', '0'],
+    data: [12, 18, 28, 56, 92, 128, 162]
+  },
+  week: {
+    xLabels: ['07-09', '07-10', '07-11', '07-12', '07-13', '07-14', '07-15'],
+    yLabels: ['200', '150', '100', '50', '0'],
+    data: [80, 95, 88, 110, 92, 128, 162]
+  },
+  month: {
+    xLabels: ['07-01', '07-05', '07-10', '07-15', '07-20', '07-25', '07-30'],
+    yLabels: ['300', '225', '150', '75', '0'],
+    data: [120, 145, 180, 220, 195, 240, 268]
+  }
+}
+
+const xLabels = computed(() => trendSeries[period.value].xLabels)
+const yLabels = computed(() => trendSeries[period.value].yLabels)
+const data = computed(() => trendSeries[period.value].data)
 const dataPoints = computed(() =>
-  data.map((v, i) => ({
-    x: 40 + i * (640 / (xLabels.length - 1)),
-    y: 190 - (v / 200) * 150
+  data.value.map((v, i) => ({
+    x: 40 + i * (640 / (xLabels.value.length - 1)),
+    y: 190 - (v / parseInt(yLabels.value[0])) * 150
   }))
 )
 const linePoints = computed(() => dataPoints.value.map((p) => `${p.x},${p.y}`).join(' '))
 const areaPoints = computed(() => {
   const pts = dataPoints.value
   return `40,190 ${pts.map((p) => `${p.x},${p.y}`).join(' ')} 680,190`
+})
+
+/** KPI 卡片按 period 切换 */
+const kpiData = computed(() => {
+  const map: Record<string, Array<{ label: string; value: number | string; extra: string; trend: 'up' | 'down' | 'flat'; tag?: string; tagColor?: string; alert?: boolean }>> = {
+    day: [
+      { label: '当日投诉量', value: 162, extra: '阈值 120 · 超 35%', trend: 'up', alert: true, tag: '超阈值', tagColor: 'red' },
+      { label: '处理时效', value: 4.2, extra: '目标 ≤15 工作日', trend: 'flat', tag: '达标', tagColor: 'green' },
+      { label: '监管件超时率', value: 3.8, extra: '目标 ≤5%', trend: 'down', tag: '达标', tagColor: 'green' },
+      { label: '一次性解决率', value: 76, extra: '目标 ≥70%', trend: 'up', tag: '达标', tagColor: 'green' },
+      { label: '预警处置率', value: 92, extra: '目标 ≥95%', trend: 'up', tag: '待提升', tagColor: 'orange' }
+    ],
+    week: [
+      { label: '本周投诉量', value: 855, extra: '日均 122 · 较上周 +8%', trend: 'up', alert: true, tag: '上升', tagColor: 'orange' },
+      { label: '本周处理时效', value: 4.5, extra: '目标 ≤15 工作日', trend: 'flat', tag: '达标', tagColor: 'green' },
+      { label: '监管件超时率', value: 4.2, extra: '目标 ≤5%', trend: 'down', tag: '达标', tagColor: 'green' },
+      { label: '一次性解决率', value: 74, extra: '目标 ≥70%', trend: 'up', tag: '达标', tagColor: 'green' },
+      { label: '预警处置率', value: 88, extra: '目标 ≥95%', trend: 'up', tag: '待提升', tagColor: 'orange' }
+    ],
+    month: [
+      { label: '本月投诉量', value: 3680, extra: '日均 122 · 环比 +5%', trend: 'up', alert: true, tag: '上升', tagColor: 'orange' },
+      { label: '本月处理时效', value: 4.8, extra: '目标 ≤15 工作日', trend: 'up', tag: '关注', tagColor: 'orange' },
+      { label: '监管件超时率', value: 4.5, extra: '目标 ≤5%', trend: 'down', tag: '达标', tagColor: 'green' },
+      { label: '一次性解决率', value: 73, extra: '目标 ≥70%', trend: 'flat', tag: '达标', tagColor: 'green' },
+      { label: '预警处置率', value: 91, extra: '目标 ≥95%', trend: 'up', tag: '待提升', tagColor: 'orange' }
+    ]
+  }
+  return map[period.value] || map.day
 })
 
 const channels = [

@@ -28,7 +28,16 @@
       </div>
     </div>
 
-    <!-- 工作流待办已迁移至工单详情页 -->
+    <!-- 工作流待办入口 -->
+    <a-alert type="info" show-icon style="margin-bottom: 16px">
+      <template #title>工作流待办说明</template>
+      <template #content>
+        管理层下达的指令会进入坐席端工作流待办。
+        <a-link style="margin-left: 8px" @click="$router.push('/manage/workflow-monitor')">
+          跳转到工单流转监控 →
+        </a-link>
+      </template>
+    </a-alert>
 
     <div class="cp-card" style="padding: 0">
       <a-table :data="alerts" :pagination="false">
@@ -249,6 +258,10 @@ function confirm() {
     Message.warning('请填写处置意见')
     return
   }
+  if (!current.value) {
+    showDrawer.value = false
+    return
+  }
   // 走 alert_directive 工作流
   // 节点1:管理层确认预警(含指令内容/指派坐席) → 自动推进
   // 节点2:坐席执行指令
@@ -257,13 +270,13 @@ function confirm() {
     kind: 'alert_directive',
     initiator: '陈强',
     initiatorRole: 'manage',
-    alertId: current.value?.id,
+    alertId: current.value.id,
     ticketId: relatedTicket.value || undefined,
     payload: {
       instruction: instruction.value || '请尽快处置关联工单',
       assignTo: '张敏',
       opinion: opinion.value,
-      alertTitle: current.value?.title
+      alertTitle: current.value.title
     }
   })
   if (inst) {
@@ -271,8 +284,12 @@ function confirm() {
   } else {
     Message.success('处置完成,指令已下达')
   }
-  // 原 mock 状态变更
-  if (current.value) current.value.status = 'alert_handle'
+  // 走 alertStore action(持久化 + 状态机正确状态)
+  // dispose: alert_open(未处置) → alert_handle(处置中) → alert_done(已处置) → alert_verified(已验证,需工单关单)
+  alertStore.updateStatus(current.value.id, action.value === 'ignore' ? 'alert_done' : 'alert_handle', {
+    // 关联工单写回 store
+    relatedTicket: relatedTicket.value || current.value.relatedTicket
+  })
   showDrawer.value = false
 }
 </script>

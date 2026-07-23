@@ -18,7 +18,16 @@
       </a-space>
     </div>
 
-    <!-- 工作流待办已迁移至工单详情页 -->
+    <!-- 工作流待办提示 -->
+    <a-alert type="info" show-icon style="margin: 8px 12px">
+      <template #title>工作流待办</template>
+      <template #content>
+        待办已绑定到具体业务申请(如停催/协商),在工单详情内联处理。
+        <a-link style="margin-left: 8px" @click="$router.push('/manage/workflow-monitor')">
+          跳转到工单流转监控 →
+        </a-link>
+      </template>
+    </a-alert>
 
     <div class="cp-desk-body">
       <!-- 任务流 -->

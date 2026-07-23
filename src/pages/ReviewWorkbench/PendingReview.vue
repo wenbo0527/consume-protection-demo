@@ -8,7 +8,16 @@
       <a-button type="primary" @click="$router.push('/review/create')"><icon-plus /> 新建立项</a-button>
     </div>
 
-    <!-- 工作流待办已迁移至工单详情页 -->
+    <!-- 工作流待办:跳转 -->
+    <a-alert type="info" show-icon style="margin-bottom: 12px">
+      <template #title>工作流待办</template>
+      <template #content>
+        审查相关工作流实例可在"溯源整改"和"工单流转监控"中查看。
+        <a-link style="margin-left: 8px" @click="$router.push('/manage/workflow-monitor')">
+          跳转到工单流转监控 →
+        </a-link>
+      </template>
+    </a-alert>
 
     <!-- 状态筛选 -->
     <div class="cp-card" style="padding: 16px 20px; margin-bottom: 12px">

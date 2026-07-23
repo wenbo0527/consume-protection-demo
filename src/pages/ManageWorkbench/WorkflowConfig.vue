@@ -391,118 +391,35 @@
           </a-table>
         </div>
       </a-tab-pane>
-
-      <!-- ========== 业务工作流(坐席/支撑岗/管理层联动) ========== -->
-      <a-tab-pane key="bizflow" title="业务工作流 (6 个)">
-        <a-row :gutter="16">
-          <a-col :span="9">
-            <div class="cp-card" style="padding: 12px">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px">
-                <h3 class="cp-section-title" style="margin: 0">工作流模板</h3>
-                <a-switch v-model="bizFlowEnabled[activeTpl]" @change="onToggleBiz(activeTpl)" />
-              </div>
-              <div
-                v-for="tpl in bizFlowTemplates"
-                :key="tpl.kind"
-                :class="['cp-bizflow-item', { 'is-active': activeTpl === tpl.kind }]"
-                @click="activeTpl = tpl.kind"
-              >
-                <div style="display: flex; justify-content: space-between; align-items: center">
-                  <span style="font-weight: 600">{{ tpl.name }}</span>
-                  <a-tag size="small" :color="tpl.enabled ? 'green' : 'gray'">{{
-                    tpl.enabled ? '启用' : '停用'
-                  }}</a-tag>
-                </div>
-                <div style="font-size: 11px; color: var(--cp-text-tertiary); margin-top: 4px; line-height: 1.5">
-                  {{ tpl.desc }}
-                </div>
-              </div>
-            </div>
-          </a-col>
-
-          <a-col :span="15">
-            <div class="cp-card" style="padding: 16px">
-              <div v-if="activeTemplate">
-                <h3 class="cp-section-title">{{ activeTemplate.name }} · 节点配置</h3>
-                <div style="font-size: 12px; color: var(--cp-text-tertiary); margin-bottom: 12px">
-                  {{ activeTemplate.desc }}
-                </div>
-                <a-table :data="activeTemplate.nodes" :pagination="false" row-key="code">
-                  <template #columns>
-                    <a-table-column title="#" :width="40">
-                      <template #cell="{ rowIndex }">{{ rowIndex + 1 }}</template>
-                    </a-table-column>
-                    <a-table-column title="节点" data-index="name" />
-                    <a-table-column title="类型" :width="80">
-                      <template #cell="{ record }">
-                        <a-tag size="small">{{ kindShort(record.kind) }}</a-tag>
-                      </template>
-                    </a-table-column>
-                    <a-table-column title="处置角色" :width="180">
-                      <template #cell="{ record }">
-                        <a-select
-                          :model-value="record.handlerRole"
-                          size="small"
-                          @change="(v: any) => onRoleChange(activeTpl, record.code, v)"
-                        >
-                          <a-option value="agent">坐席</a-option>
-                          <a-option value="business">支撑岗</a-option>
-                          <a-option value="review">审查</a-option>
-                          <a-option value="manage">管理层</a-option>
-                          <a-option value="system">系统</a-option>
-                        </a-select>
-                      </template>
-                    </a-table-column>
-                    <a-table-column title="SLA(小时)" :width="110">
-                      <template #cell="{ record }">
-                        <a-input-number
-                          :model-value="record.slaHours"
-                          size="small"
-                          :min="0"
-                          :max="240"
-                          @change="(v: number | undefined) => onSlaChange(activeTpl, record.code, v ?? 0)"
-                          style="width: 90px"
-                        />
-                      </template>
-                    </a-table-column>
-                    <a-table-column title="自动推进" :width="80">
-                      <template #cell="{ record }">
-                        <a-switch
-                          :model-value="record.autoNext"
-                          size="small"
-                          @change="(v: any) => onAutoChange(activeTpl, record.code, v as boolean)"
-                        />
-                      </template>
-                    </a-table-column>
-                    <a-table-column title="副作用">
-                      <template #cell="{ record }">
-                        <a-tag v-if="record.sideEffect" size="small" color="purple">{{ record.sideEffect }}</a-tag>
-                        <span v-else style="color: var(--cp-text-tertiary); font-size: 11px">-</span>
-                      </template>
-                    </a-table-column>
-                  </template>
-                </a-table>
-
-                <a-alert type="info" show-icon style="margin-top: 12px">
-                  <template #title>配置即时生效</template>
-                  <template #content>
-                    修改后保存到 localStorage,所有角色的工作流待办立即按新规则过滤。
-                    <div style="margin-top: 6px">启用开关(右上)关闭后,坐席发起申请时该工作流不可选。</div>
-                  </template>
-                </a-alert>
-              </div>
-            </div>
-          </a-col>
-        </a-row>
-      </a-tab-pane>
     </a-tabs>
+
+    <!-- 业务工作流已拆分至独立页面 /manage/bizflow -->
+    <div class="cp-card" style="padding: 16px 20px; margin-top: 16px">
+      <a-row :gutter="16" align="center">
+        <a-col :span="18">
+          <div style="font-weight: 600; margin-bottom: 4px">业务工作流(停催 / 协商 / 征信异议 / 转调解 ...)</div>
+          <div style="font-size: 12px; color: var(--cp-text-tertiary)">
+            节点角色、SLA、副作用等配置已迁出,点击下方按钮进入独立配置页。
+          </div>
+        </a-col>
+        <a-col :span="6" style="text-align: right">
+          <a-button type="primary" @click="goBizFlow">
+            <icon-swap /> 前往业务工作流配置
+          </a-button>
+        </a-col>
+      </a-row>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import { useWorkflowStore, WorkflowKind } from '@/stores/workflow'
-import { mapNodeName } from '@/utils/workflow-helpers'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+function goBizFlow() {
+  router.push('/manage/bizflow')
+}
 
 const activeState = ref('todo')
 
@@ -629,56 +546,10 @@ const versions = [
   { version: 'V1.5', time: '2026-02-10 14:00', publisher: '陈强(管理)', changes: 'Phase 0 试运行版本' }
 ]
 
-// ============ 业务工作流(联动坐席/支撑岗/管理层) ============
-const wf = useWorkflowStore()
-const bizFlowTemplates = computed(() => wf.templates)
-const activeTpl = ref<WorkflowKind>('stop_collection')
-const activeTemplate = computed(() => wf.templates.find((t) => t.kind === activeTpl.value))
-
-// 启用开关的双向绑定(拷贝一份便于 v-model)
-const bizFlowEnabled = reactive<Record<string, boolean>>({})
-function refreshBizFlowEnabled() {
-  wf.templates.forEach((t) => {
-    bizFlowEnabled[t.kind] = t.enabled
-  })
-}
-refreshBizFlowEnabled()
-
-function onToggleBiz(kind: WorkflowKind) {
-  wf.updateTemplate(kind, { enabled: !!bizFlowEnabled[kind] })
-}
-function onRoleChange(kind: WorkflowKind, code: string, v: any) {
-  wf.updateNode(kind, code, { handlerRole: v })
-}
-function onSlaChange(kind: WorkflowKind, code: string, v: number) {
-  if (typeof v === 'number') wf.updateNode(kind, code, { slaHours: v })
-}
-function onAutoChange(kind: WorkflowKind, code: string, v: boolean) {
-  wf.updateNode(kind, code, { autoNext: v })
-}
-// 节点类型 → 中文名 · 复用 utils/workflow-helpers 真相源
-const kindShort = mapNodeName
+// 业务工作流已迁出至独立页面 /manage/bizflow
 </script>
 
 <style scoped>
-/* 业务工作流模板选择 */
-.cp-bizflow-item {
-  padding: 10px 12px;
-  border: 1px solid var(--cp-border-light);
-  border-radius: 6px;
-  margin-bottom: 6px;
-  cursor: pointer;
-  transition: all 0.15s;
-  background: #fff;
-}
-.cp-bizflow-item:hover {
-  border-color: var(--cp-brand);
-  background: var(--cp-brand-soft);
-}
-.cp-bizflow-item.is-active {
-  border-color: var(--cp-brand);
-  background: var(--cp-brand-soft);
-}
 .cp-section-title {
   font-size: 14px;
   font-weight: 600;

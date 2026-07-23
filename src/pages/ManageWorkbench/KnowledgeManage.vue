@@ -5,7 +5,7 @@
         <h1 class="cp-page-title">知识管理(场景视图)</h1>
         <div class="cp-page-subtitle">审查归档自动同步 · 按工单场景聚合 · 同步后"待审核"需管理员确认生效</div>
       </div>
-      <a-button type="primary"><icon-plus /> 新增知识条目</a-button>
+      <a-button type="primary" @click="onAddKnowledge"><icon-plus /> 新增知识条目</a-button>
     </div>
 
     <div class="cp-stat-row">
@@ -41,7 +41,7 @@
               <div style="display: flex; flex-direction: column; gap: 8px">
                 <div v-for="k in groupByScene(s)" :key="k.id" class="cp-scene-item">
                   <div style="display: flex; justify-content: space-between; align-items: center">
-                    <a-link size="small">{{ k.title }}</a-link>
+                    <a-link size="small" @click="openKbItem(k)">{{ k.title }}</a-link>
                     <a-tag v-if="k.status === 'pending'" color="orange" size="small">待审核</a-tag>
                     <a-tag v-else color="green" size="small">生效</a-tag>
                   </div>
@@ -57,7 +57,7 @@
 
       <a-tab-pane key="all" title="全部条目">
         <div class="cp-card" style="padding: 0">
-          <a-table :data="knowledge" :pagination="{ pageSize: 10 }">
+          <a-table :data="items" :pagination="{ pageSize: 10 }">
             <template #columns>
               <a-table-column title="标题" data-index="title" />
               <a-table-column title="类别">
@@ -86,8 +86,8 @@
                     <a-button v-if="record.status === 'pending'" size="small" type="primary" @click="approve(record)"
                       >审核生效</a-button
                     >
-                    <a-button v-if="record.status === 'active'" size="small" status="warning">下架</a-button>
-                    <a-button size="small">编辑</a-button>
+                    <a-button v-if="record.status === 'active'" size="small" status="warning" @click="archive(record)">下架</a-button>
+                    <a-button size="small" @click="edit(record)">编辑</a-button>
                   </a-space>
                 </template>
               </a-table-column>
@@ -117,7 +117,7 @@
               </a-table-column>
               <a-table-column title="操作">
                 <template #cell>
-                  <a-button size="small">查看详情</a-button>
+                  <a-button size="small" @click="viewSyncDetail">查看详情</a-button>
                 </template>
               </a-table-column>
             </template>
@@ -130,27 +130,54 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { knowledge, KnowledgeItem } from '@/mock/data'
+import { knowledge as mockKnowledge } from '@/mock/data'
 import { useWorkflowStore } from '@/stores/workflow'
+import { useKnowledgeStore } from '@/stores/knowledge'
 import { Message } from '@arco-design/web-vue'
 
 const wf = useWorkflowStore()
+const kbStore = useKnowledgeStore()
 
-const activeCount = computed(() => knowledge.filter((k) => k.status === 'active').length)
-const pendingCount = computed(() => knowledge.filter((k) => k.status === 'pending').length)
-const scenes = computed(() => Array.from(new Set(knowledge.map((k) => k.scene).filter(Boolean))) as string[])
+/**
+ * 统一视图:
+ * - 真实数据源:kbStore.items(支持 add/approve/reject/edit/remove)
+ * - mock 数据保留兼容,以便场景视图能拿到 scene 字段
+ * 合并两条数据流,scene/view 等展示字段以 mock 为基准
+ */
+const items = computed<any[]>(() => {
+  // 把 store 已有同 id 的项目合并,并把 store 项目以额外形式带 scene
+  const map = new Map<string, any>()
+  mockKnowledge.forEach((m: any) => map.set(m.id, m))
+  // 把 store 的 pending 项目叠加(可能 mock 没有)
+  kbStore.pending.forEach((k: any) => {
+    if (!map.has(k.id)) {
+      // 取一个伪 scene,以便场景视图能展示
+      map.set(k.id, { ...k, scene: '审查归档', categoryLabel: k.category })
+    }
+  })
+  return Array.from(map.values())
+})
+
+const activeCount = computed(() => items.value.filter((k: any) => k.status === 'active').length)
+const pendingCount = computed(() => items.value.filter((k: any) => k.status === 'pending').length)
+const scenes = computed(() =>
+  Array.from(new Set(items.value.map((k: any) => k.scene).filter(Boolean))) as string[]
+)
 
 function groupByScene(scene: string) {
-  return knowledge.filter((k) => k.scene === scene)
+  return items.value.filter((k: any) => k.scene === scene)
 }
 
-function approve(record: KnowledgeItem) {
-  record.status = 'active'
-  // 找到关联 review 工作流实例(如果有 reviewId),推进 kb_review 节点
-  const reviewId = record.source?.includes('消保审查') ? record.source.split('·')[1] : undefined
+/** 审核生效:走 store */
+function approve(record: any) {
+  const id = record.id
+  // 1) 调 store approve
+  kbStore.approve(id, '陈强(管理)')
+  // 2) 推动关联 review 工作流(若 record.source 标了 reviewId)
+  const reviewId = record.reviewId || (record.source?.includes('消保审查') ? record.source.split('·')[1] : undefined)
   if (reviewId) {
     const inst = wf.instances.find(
-      (i) => i.kind === 'review_archive' && i.reviewId === reviewId && i.status === 'running'
+      (i: any) => i.kind === 'review_archive' && i.reviewId === reviewId && i.status === 'running'
     )
     if (inst) {
       wf.approve(inst.id, '知识管理员', `审核通过知识条目:${record.title}`)
@@ -158,6 +185,43 @@ function approve(record: KnowledgeItem) {
     }
   }
   Message.success(`"${record.title}" 已生效,坐席将收到系统通知`)
+}
+
+/** 下架:走 store */
+function archive(record: any) {
+  kbStore.reject(record.id)
+  Message.info(`"${record.title}" 已下架`)
+}
+
+/** 编辑:弹出抽屉 */
+function edit(record: any) {
+  Message.info(`编辑「${record.title}」- 该功能将进入 Phase 3 知识编辑面`)
+}
+
+/** 同步记录详情 */
+function viewSyncDetail() {
+  Message.info('同步记录详情面板 - 后续将接入审查归档详情')
+}
+
+/** 知识标题点击 → 进入详情 */
+function openKbItem(record: any) {
+  Message.info(`打开知识条目「${record.title}」详情`)
+}
+
+/** 新增知识条目 */
+function onAddKnowledge() {
+  const title = window.prompt('新增知识条目标题', '')
+  if (!title) return
+  kbStore.add({
+    title,
+    category: '人工录入',
+    tags: ['人工录入'],
+    source: 'manual',
+    summary: '人工录入的知识条目,待管理员补充内容',
+    content: '请补充正文内容',
+    author: '陈强(管理)'
+  })
+  Message.success(`已创建「${title}」,状态:待审核`)
 }
 
 const syncLogs = [

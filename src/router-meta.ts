@@ -187,8 +187,25 @@ export const ROUTE_META: RouteMetaDef[] = [
     menuParent: '溯源整改',
     menuOrder: 1
   },
-  { path: 'manage/list', name: 'ManageList', title: '名单管理', showInMenu: true, menuParent: '管理', menuOrder: 6 },
-  { path: 'manage/workflow-config', name: 'ManageWorkflowConfig', title: '工单流程配置', showInMenu: false },
+  { path: 'manage/lists', name: 'ManageList', title: '名单管理', showInMenu: true, menuParent: '管理', menuOrder: 6 },
+  { path: 'manage/feedback', name: 'ManageFeedback', title: '满意度评价', showInMenu: true, menuParent: '管理', menuOrder: 5.5 },
+  { path: 'manage/workflow-config', name: 'ManageWorkflowConfig', title: '工单流程配置(已迁移)', showInMenu: false },
+  {
+    path: 'manage/ticket-state',
+    name: 'ManageTicketState',
+    title: '工单状态机配置',
+    showInMenu: true,
+    menuParent: '流程管理',
+    menuOrder: 1
+  },
+  {
+    path: 'manage/bizflow',
+    name: 'ManageBizFlow',
+    title: '业务工作流配置',
+    showInMenu: true,
+    menuParent: '流程管理',
+    menuOrder: 2
+  },
 
   // 审查
   {
@@ -235,7 +252,7 @@ export const ROUTE_META: RouteMetaDef[] = [
 
   // 消费者
   { path: 'consumer/complaints', name: 'ConsumerComplaints', title: '我的投诉', showInMenu: false },
-  { path: 'consumer/satisfaction', name: 'ConsumerSatisfaction', title: '满意度', showInMenu: false }
+  { path: 'consumer/feedback', name: 'ConsumerFeedback', title: '满意度', showInMenu: false }
 ]
 
 /** 按 showInMenu 过滤 + 按 menuParent 分组 */
