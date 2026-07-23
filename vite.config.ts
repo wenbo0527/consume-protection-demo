@@ -41,5 +41,34 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, 'src') }
   },
+  // ============ X6 v3.1.7 setZIndex 修复 ============
+  // X6 v3.1.7 的 Cell class methods(setZIndex/getZIndex/removeZIndex)被 esbuild
+  // minify 重命名了方法定义(短名如 Z),但保留 X6 内部的 `cell.setZIndex` 字符串
+  // 属性访问,导致运行时找不到对应函数,报 "is not a function"。
+  // 修复:关闭 esbuild minify,改用 terser 严格保留 class methods。
+  // 权衡:bundle 略大(从 ~1.3MB 涨到 ~2MB),但完全保留 X6 内部方法名。
+  build: {
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        // 保留 class methods 名(不要把 setZIndex 重命名为 Z)
+        keep_classnames: true,
+        keep_fnames: true
+      },
+      mangle: {
+        keep_classnames: true,
+        keep_fnames: true
+      }
+    },
+    rollupOptions: {
+      treeshake: {
+        propertyReadSideEffects: true,
+        tryCatchDeoptimization: false
+      }
+    }
+  },
+  optimizeDeps: {
+    include: ['@antv/x6']
+  },
   base: basePath
 })
