@@ -18,7 +18,7 @@ export type WorkflowKind =
   | 'alert_directive' // 管理层下达指令(预警→坐席)
   | 'callback' // 未接/拒绝回访(v3 新增:呼入打标自动生成)
 
-export type NodeKind = 'apply' | 'approve' | 'execute' | 'notify' | 'auto' | 'archive'
+export type NodeKind = 'apply' | 'approve' | 'execute' | 'notify' | 'auto' | 'archive' | 'start' | 'end'
 
 import { RoleKey } from './user'
 
@@ -49,9 +49,62 @@ export interface WorkflowTemplate {
   nodes: WorkflowNode[]
   /** 是否启用(管理层可在 WorkflowConfig 关闭) */
   enabled: boolean
+  /** 适用场景(可空,空表示全部) */
+  applicableScenes?: string[]
 }
 
 export type InstanceStatus = 'running' | 'approved' | 'rejected' | 'expired' | 'finished'
+
+// ============ 工单状态机(独立于业务工作流模板) ============
+// 与 WorkflowTemplate 平行:状态机描述"一张工单从建单到关单的阶段",由管理层在 ticket-state 配置页维护。
+export type TicketStateCode =
+  | 'pending' // 待分派
+  | 'todo' // 待接收
+  | 'processing' // 处理中
+  | 'transfer' // 待流转
+  | 'closing' // 待关单
+  | 'closed' // 已关单(终态)
+
+export type HandlerType = 'rule' | 'assignee' | 'system'
+export type TimeoutAction = '自动催办' | '升级上级' | '预警通知' | '无动作'
+
+export interface TicketState {
+  code: TicketStateCode
+  name: string
+  handlerType: HandlerType
+  /** 超时规则(可读字符串,如 "8h" / "监管件7d / 普通件15d") */
+  timeout: string
+  /** 超时后的系统动作 */
+  timeoutAction: TimeoutAction
+  isStart: boolean
+  isEnd: boolean
+}
+
+export interface TicketTransitionRule {
+  /** 规则名 */
+  name: string
+  from: TicketStateCode
+  to: TicketStateCode
+  trigger: string
+  /** 适用工单范围 */
+  scope: string[]
+  enabled: boolean
+}
+
+export interface RegulatorPolicy {
+  /** 处理总时限(自然语言,如 "7 个工作日") */
+  totalSla: string
+  /** 到期前预警时间 */
+  warnBefore: string
+  /** 超时后动作 */
+  overdueAction: '仅预警通知' | '预警通知+升级' | '升级至消保管理层'
+  /** 处理优先级 */
+  priority: '特急' | '紧急' | '普通'
+  /** 归档要求 */
+  archiveRequires: { summary: boolean; evidence: boolean; review: boolean }
+  /** 处理完成后自动报送监管平台 */
+  autoReport: boolean
+}
 
 export interface NodeExecution {
   nodeCode: string
@@ -93,6 +146,89 @@ export interface WorkflowInstance {
 }
 
 const STORAGE_KEY = 'cp_workflow_data'
+
+// ============ 工单状态机默认数据 ============
+
+const DEFAULT_TICKET_STATES: TicketState[] = [
+  {
+    code: 'pending',
+    name: '待分派',
+    handlerType: 'rule',
+    timeout: '24h',
+    timeoutAction: '自动催办',
+    isStart: true,
+    isEnd: false
+  },
+  {
+    code: 'todo',
+    name: '待接收',
+    handlerType: 'assignee',
+    timeout: '8h',
+    timeoutAction: '自动催办',
+    isStart: false,
+    isEnd: false
+  },
+  {
+    code: 'processing',
+    name: '处理中',
+    handlerType: 'assignee',
+    timeout: '监管件7d / 普通件15d',
+    timeoutAction: '升级上级',
+    isStart: false,
+    isEnd: false
+  },
+  {
+    code: 'transfer',
+    name: '待流转',
+    handlerType: 'assignee',
+    timeout: '4h',
+    timeoutAction: '预警通知',
+    isStart: false,
+    isEnd: false
+  },
+  {
+    code: 'closing',
+    name: '待关单',
+    handlerType: 'assignee',
+    timeout: '72h',
+    timeoutAction: '自动催办',
+    isStart: false,
+    isEnd: false
+  },
+  {
+    code: 'closed',
+    name: '已关单',
+    handlerType: 'system',
+    timeout: '-',
+    timeoutAction: '无动作',
+    isStart: false,
+    isEnd: true
+  }
+]
+
+const DEFAULT_TRANSITION_RULES: TicketTransitionRule[] = [
+  { name: '坐席接收规则', from: 'todo', to: 'processing', trigger: '坐席点击接收', scope: ['全部'], enabled: true },
+  { name: '转办规则', from: 'processing', to: 'transfer', trigger: '坐席选择转办', scope: ['投诉', '外部转办'], enabled: true },
+  { name: '升级规则', from: 'processing', to: 'transfer', trigger: '坐席选择升级', scope: ['投诉', '监管件'], enabled: true },
+  { name: '关单规则', from: 'closing', to: 'closed', trigger: '坐席确认关单', scope: ['全部'], enabled: true },
+  { name: '监管件归档', from: 'processing', to: 'closed', trigger: '监管件直接归档', scope: ['监管件'], enabled: true },
+  { name: '自动催办', from: 'todo', to: 'todo', trigger: '8h 超时', scope: ['全部'], enabled: true },
+  { name: '超时升级', from: 'processing', to: 'transfer', trigger: '监管件 7d / 普通件 15d 超时', scope: ['全部'], enabled: true },
+  { name: '审批驳回', from: 'transfer', to: 'processing', trigger: 'OA 审批驳回', scope: ['业务执行类'], enabled: true },
+  { name: '客户不满意升级', from: 'closed', to: 'processing', trigger: '≤2 星评价', scope: ['投诉'], enabled: true },
+  { name: '方案违约恢复', from: 'processing', to: 'processing', trigger: '协商方案违约,自动恢复催收', scope: ['业务执行类'], enabled: true },
+  { name: '到期自动恢复', from: 'processing', to: 'closed', trigger: '停催到期前 1 天提醒', scope: ['业务执行类'], enabled: true },
+  { name: '知识归档触发', from: 'closed', to: 'closed', trigger: '审查归档自动同步知识库', scope: ['审查立项'], enabled: true }
+]
+
+const DEFAULT_REGULATOR_POLICY: RegulatorPolicy = {
+  totalSla: '7 个工作日',
+  warnBefore: '1 天',
+  overdueAction: '预警通知+升级',
+  priority: '特急',
+  archiveRequires: { summary: true, evidence: true, review: false },
+  autoReport: true
+}
 
 // ============ 副作用实现 ============
 // 由节点 onComplete 触发,这里用 store action 实现
@@ -447,6 +583,9 @@ function buildMockInstances(): WorkflowInstance[] {
 interface PersistedState {
   templates: WorkflowTemplate[]
   instances: WorkflowInstance[]
+  ticketStates: TicketState[]
+  transitionRules: TicketTransitionRule[]
+  regulatorPolicy: RegulatorPolicy
 }
 
 function loadPersisted(): PersistedState {
@@ -454,14 +593,28 @@ function loadPersisted(): PersistedState {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const obj = JSON.parse(raw) as PersistedState
-      if (Array.isArray(obj.templates) && Array.isArray(obj.instances)) return obj
+      if (Array.isArray(obj.templates) && Array.isArray(obj.instances)) {
+        // 老数据兜底:状态机字段缺失时填默认值
+        return {
+          templates: obj.templates,
+          instances: obj.instances,
+          ticketStates: obj.ticketStates?.length ? obj.ticketStates : JSON.parse(JSON.stringify(DEFAULT_TICKET_STATES)),
+          transitionRules: obj.transitionRules?.length
+            ? obj.transitionRules
+            : JSON.parse(JSON.stringify(DEFAULT_TRANSITION_RULES)),
+          regulatorPolicy: obj.regulatorPolicy ?? JSON.parse(JSON.stringify(DEFAULT_REGULATOR_POLICY))
+        }
+      }
     }
   } catch (e) {
     log('warn', 'load', 'parse localStorage failed', e)
   }
   return {
     templates: JSON.parse(JSON.stringify(DEFAULT_TEMPLATES)),
-    instances: buildMockInstances()
+    instances: buildMockInstances(),
+    ticketStates: JSON.parse(JSON.stringify(DEFAULT_TICKET_STATES)),
+    transitionRules: JSON.parse(JSON.stringify(DEFAULT_TRANSITION_RULES)),
+    regulatorPolicy: JSON.parse(JSON.stringify(DEFAULT_REGULATOR_POLICY))
   }
 }
 
@@ -478,7 +631,10 @@ export const useWorkflowStore = defineStore('workflow', {
     const init = loadPersisted()
     return {
       templates: init.templates as WorkflowTemplate[],
-      instances: init.instances as WorkflowInstance[]
+      instances: init.instances as WorkflowInstance[],
+      ticketStates: init.ticketStates as TicketState[],
+      transitionRules: init.transitionRules as TicketTransitionRule[],
+      regulatorPolicy: init.regulatorPolicy as RegulatorPolicy
     }
   },
 
@@ -536,7 +692,13 @@ export const useWorkflowStore = defineStore('workflow', {
 
   actions: {
     persist() {
-      savePersisted({ templates: this.templates, instances: this.instances })
+      savePersisted({
+        templates: this.templates,
+        instances: this.instances,
+        ticketStates: this.ticketStates,
+        transitionRules: this.transitionRules,
+        regulatorPolicy: this.regulatorPolicy
+      })
     },
 
     /** 发起工作流 */
@@ -773,6 +935,84 @@ export const useWorkflowStore = defineStore('workflow', {
       this.persist()
     },
 
+    /**
+     * 新建工作流模板(管理层)
+     * 会在 templates 末尾追加,持久化
+     */
+    addTemplate(input: {
+      kind: string
+      name: string
+      desc?: string
+      nodes?: WorkflowNode[]
+      enabled?: boolean
+      applicableScenes?: string[]
+    }) {
+      if (this.templates.some((t) => t.kind === input.kind)) {
+        log('warn', 'template.add', `kind=${input.kind} 已存在,忽略`)
+        return null
+      }
+      const tpl: WorkflowTemplate = {
+        kind: input.kind as WorkflowKind,
+        name: input.name,
+        desc: input.desc || '',
+        enabled: input.enabled ?? true,
+        nodes: input.nodes && input.nodes.length > 0 ? input.nodes : [this._defaultStartNode(input.kind)],
+        applicableScenes: input.applicableScenes || []
+      }
+      this.templates.push(tpl)
+      log('log', 'template.add', input.kind, input.name)
+      this.persist()
+      return tpl
+    },
+    /** 默认起始节点(用于新建模板) */
+    _defaultStartNode(kind: string): WorkflowNode {
+      return {
+        code: `${kind}_start`,
+        name: '受理',
+        kind: 'start',
+        handlerRole: 'agent',
+        slaHours: 4,
+        autoNext: false
+      }
+    },
+    /** 删除模板 */
+    removeTemplate(kind: WorkflowKind) {
+      this.templates = this.templates.filter((t) => t.kind !== kind)
+      log('log', 'template.remove', kind)
+      this.persist()
+    },
+    /**
+     * 导入模板(从 JSON 字符串)
+     * - 解析失败抛错
+     * - kind 重复覆盖
+     */
+    importTemplatesFromJson(json: string) {
+      const obj = JSON.parse(json)
+      if (!Array.isArray(obj)) throw new Error('需要数组')
+      let added = 0
+      let updated = 0
+      obj.forEach((raw: any) => {
+        const existing = this.templates.find((t) => t.kind === raw.kind)
+        if (existing) {
+          Object.assign(existing, raw)
+          updated++
+        } else {
+          this.addTemplate(raw)
+          added++
+        }
+      })
+      this.persist()
+      return { added, updated }
+    },
+    /**
+     * 发布:占位。当前实现等价于保存草稿(已 persist),
+     * 真实环境应记录"已发布快照"用于回滚
+     */
+    publishAll(publisher = '陈强(管理)') {
+      log('log', 'template.publish', `${this.templates.length} templates`, publisher)
+      this.persist()
+    },
+
     /** 计算某实例当前节点的 SLA 进度(0~1,>1 即超时) */
     slaProgress(inst: WorkflowInstance): number {
       const tpl = this.templates.find((t) => t.kind === inst.kind)
@@ -802,6 +1042,38 @@ export const useWorkflowStore = defineStore('workflow', {
           )
         }
       })
+      this.persist()
+    },
+
+    // ============ 工单状态机(独立配置面) ============
+    updateTicketState(code: TicketStateCode, patch: Partial<TicketState>) {
+      const s = this.ticketStates.find((x) => x.code === code)
+      if (!s) return
+      Object.assign(s, patch)
+      log('log', 'ticketState.update', `${code} patched`, patch)
+      this.persist()
+    },
+    addTicketState(s: TicketState) {
+      if (this.ticketStates.some((x) => x.code === s.code)) return
+      this.ticketStates.push(s)
+      log('log', 'ticketState.add', `code=${s.code}`)
+      this.persist()
+    },
+    updateTransitionRule(idx: number, patch: Partial<TicketTransitionRule>) {
+      const r = this.transitionRules[idx]
+      if (!r) return
+      Object.assign(r, patch)
+      log('log', 'transition.update', `#${idx} patched`, patch)
+      this.persist()
+    },
+    addTransitionRule(r: TicketTransitionRule) {
+      this.transitionRules.push(r)
+      log('log', 'transition.add', `name=${r.name}`)
+      this.persist()
+    },
+    updateRegulatorPolicy(patch: Partial<RegulatorPolicy>) {
+      Object.assign(this.regulatorPolicy, patch)
+      log('log', 'regulatorPolicy.update', 'patched', patch)
       this.persist()
     }
   }

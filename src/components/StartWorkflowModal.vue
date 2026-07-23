@@ -134,12 +134,14 @@ const canSubmit = computed(() => !!currentTpl.value && currentTpl.value.enabled)
 
 function nodeColor(k: WorkflowNode['kind']) {
   return {
+    start: '#909399',
     apply: 'var(--cp-brand)',
     approve: 'var(--cp-warning)',
     execute: 'var(--cp-success)',
     notify: '#909399',
     auto: '#909399',
-    archive: '#909399'
+    archive: '#909399',
+    end: '#909399'
   }[k]
 }
 
