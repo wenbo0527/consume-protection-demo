@@ -65,7 +65,7 @@
         <p class="cp-login-p">请选择您的角色进入对应工作台</p>
 
         <div class="cp-role-grid">
-          <div v-for="role in ROLE_LIST" :key="role.key" class="cp-role-card" @click="enter(role.key)">
+          <div v-for="role in VISIBLE_ROLES" :key="role.key" class="cp-role-card" @click="enter(role.key)">
             <div class="cp-role-icon-wrap">
               <component :is="role.icon" :size="20" />
             </div>
@@ -94,6 +94,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useUserStore, ROLE_LIST, RoleKey } from '@/stores/user'
+
+// 不向登录用户暴露"消保审查人员"角色卡片;后端若需要,仍可通过深链访问
+const VISIBLE_ROLES = ROLE_LIST.filter((r) => r.key !== 'review')
 
 const router = useRouter()
 const userStore = useUserStore()

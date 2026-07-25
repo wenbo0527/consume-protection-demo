@@ -69,14 +69,6 @@ export const ROLE_LIST: RoleInfo[] = [
     desc: '规范执行业务操作、审批流程清晰'
   },
   {
-    key: 'review',
-    name: '消保审查人员',
-    username: '王芳',
-    workbench: '审查工作台',
-    icon: 'icon-check-circle',
-    desc: '产品上线前消保风险审查'
-  },
-  {
     key: 'manage',
     name: '消保管理层',
     username: '陈强',
