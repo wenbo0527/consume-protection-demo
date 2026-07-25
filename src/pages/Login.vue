@@ -6,7 +6,7 @@
         <div class="cp-login-logo">
           <div class="cp-login-logo-icon">保</div>
           <div>
-            <div class="cp-login-brand-title">消保投诉管理系统</div>
+            <div class="cp-login-brand-title">投诉管理系统</div>
             <div class="cp-login-brand-sub">Consumer Protection Complaint Management</div>
           </div>
         </div>
@@ -14,8 +14,8 @@
         <div class="cp-login-features">
           <h2 class="cp-login-feature-title">合规 · 高效 · 闭环</h2>
           <p class="cp-login-feature-desc">
-            覆盖消保审查立项、投诉全流程处置、溯源整改闭环的<br />
-            统一作业平台,把消保工作从"散装"变成"闭环"。
+            覆盖投诉全流程受理、流转监控、溯源整改与回退闭环的<br />
+            统一作业平台,把客户诉求从"分散渠道"变成"一站闭环"。
           </p>
 
           <div class="cp-login-feature-grid">

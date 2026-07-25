@@ -12,7 +12,7 @@
       <div class="cp-logo" :class="{ 'is-collapsed': collapsed }">
         <div class="cp-logo-icon">保</div>
         <div v-show="!collapsed" class="cp-logo-text">
-          <div class="cp-logo-title">消保管理系统</div>
+          <div class="cp-logo-title">投诉管理系统</div>
           <div class="cp-logo-sub">V2.0 · Demo</div>
         </div>
       </div>
@@ -272,7 +272,7 @@ const menus = computed<MenuGroup[]>(() => {
           title: '驾驶舱',
           icon: 'icon-dashboard',
           items: [
-            { name: '消保看板', path: '/manage/dashboard' },
+            { name: '投诉看板', path: '/manage/dashboard' },
             { name: '预警中心', path: '/manage/alert', badge: 5 },
             { name: '满意度评价', path: '/manage/feedback' }
           ]
