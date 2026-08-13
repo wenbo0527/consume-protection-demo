@@ -1,3 +1,6 @@
+<!-- 🏆 精选项目（2026-08-13 标记） -->
+> 🏆 **本仓已被选为 [wenbo0527](https://github.com/wenbo0527) 个人主页 6 大核心项目之一**
+
 # 消保客服工作台 · ConsumeProtection Demo
 
 > 一个**跨角色业务全链路**演示项目,展示 **Vue 3 + Pinia + Arco Design** 构建消保(消费者权益保护)客服系统的最佳实践。
